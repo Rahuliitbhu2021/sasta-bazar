@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('./config/database');
 const compression = require('compression');
+const pool = require('./config/database');
 
 dotenv.config();
 
@@ -36,31 +37,19 @@ app.get('/', (req, res) => {
   res.json({ message: 'Backend is running on port 5000' });
 });
 // Helper functions
-function dbGet(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
-    });
-  });
+async function dbGet(sql, params = []) {
+  const result = await pool.query(sql, params);
+  return result.rows[0];
 }
 
-function dbRun(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
-      if (err) reject(err);
-      else resolve({ id: this.lastID });
-    });
-  });
+async function dbRun(sql, params = []) {
+  const result = await pool.query(sql, params);
+  return { id: result.rows[0]?.id };
 }
 
-function dbAll(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
+async function dbAll(sql, params = []) {
+  const result = await pool.query(sql, params);
+  return result.rows;
 }
 // Add this function after other helper functions
 function calculatePriceWithDiscount(price, discountPercent) {
