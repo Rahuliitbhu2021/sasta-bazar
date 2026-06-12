@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: shop_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: shop_management
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - shop_network
+
+  backend:
+    build: ./backend
+    container_name: shop_backend
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      DB_NAME: shop_management
+    depends_on:
+      - postgres
+    networks:
+      - shop_network
+
+  frontend:
+    build: ./frontend
+    container_name: shop_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - shop_network
+
+volumes:
+  postgres_data:
+
+networks:
+  shop_network:
+    driver: bridge

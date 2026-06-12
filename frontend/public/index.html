@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SASTA BAZAR | Premium Shop Management with Barcode Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ============================================ */
+        /* CSS SECTION - STYLES FOR PREMIUM UI */
+        /* ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse at 20% 30%, #0a0a2a, #000000);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Stars Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 3s) ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb-1 { width: 300px; height: 300px; background: rgba(230, 126, 34, 0.15); top: 10%; left: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: rgba(243, 156, 18, 0.1); bottom: 10%; right: -100px; animation-delay: -5s; }
+        .orb-3 { width: 250px; height: 250px; background: rgba(230, 126, 34, 0.08); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Premium Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(230, 126, 34, 0.3);
+        }
+
+        .login-box {
+            max-width: 480px;
+            margin: 80px auto;
+            padding: 48px;
+        }
+
+        /* Logo Section */
+        .logo-wrapper {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            font-size: 64px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        .logo-wrapper h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #e67e22);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-top: 12px;
+        }
+
+        .logo-wrapper p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-top: 8px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px;
+            border-radius: 60px;
+            margin-bottom: 32px;
+        }
+
+        .toggle-option {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .toggle-option.active {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4);
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            font-size: 14px;
+            color: white;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #e67e22;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #e67e22;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Premium Header */
+        .premium-header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .header-title h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .header-title p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(230,126,34,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(230, 126, 34, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card h3 {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+        }
+
+        /* Sections */
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 28px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(230, 126, 34, 0.5);
+            display: inline-block;
+        }
+
+        /* Scanner Section */
+        .scanner-section {
+            background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(230,126,34,0.2);
+        }
+
+        /* Tables */
+        .premium-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .premium-table th, .premium-table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .premium-table th {
+            background: rgba(255, 255, 255, 0.03);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+        }
+
+        .premium-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-discount { background: linear-gradient(135deg, #e67e22, #f39c12); color: white; }
+        .badge-cashback { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
+        .badge-stock-low { background: #e74c3c; color: white; }
+        .badge-stock-good { background: #27ae60; color: white; }
+
+        /* Cart Total Box */
+        .cart-total-box {
+            background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(230,126,34,0.2);
+        }
+
+        /* Modal */
+        .modal-premium {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 32px;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalPop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        /* Alert */
+        .alert-premium {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            padding: 16px 24px;
+            border-radius: 24px;
+            display: none;
+            z-index: 2000;
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            backdrop-filter: blur(20px);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-success { background: rgba(39, 174, 96, 0.9); color: white; border-left: 4px solid #2ecc71; }
+        .alert-error { background: rgba(231, 76, 60, 0.9); color: white; border-left: 4px solid #e74c3c; }
+        .alert-info { background: rgba(52, 152, 219, 0.9); color: white; border-left: 4px solid #3498db; }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-connected { background: rgba(39, 174, 96, 0.2); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
+        .status-disconnected { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #e67e22, #f39c12); border-radius: 10px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 12px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .premium-table { font-size: 11px; }
+            .premium-table th, .premium-table td { padding: 8px; }
+            .login-box { margin: 40px 20px; padding: 32px; }
+        }
+
+        /* Print */
+        @media print {
+            body * { visibility: hidden; }
+            .print-bill, .print-bill * { visibility: visible; }
+            .print-bill { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: white; }
+            .no-print { display: none; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="container">
+        <!-- ============================================ -->
+        <!-- LOGIN SECTION -->
+        <!-- ============================================ -->
+        <div id="loginSection" class="glass-card login-box">
+            <div class="logo-wrapper">
+                <div class="logo-icon"><i class="fas fa-store"></i></div>
+                <h1>SASTA BAZAR</h1>
+                <p>सस्ता बाजार - आपका अपना दुकान</p>
+            </div>
+            <div id="dbStatus" style="text-align: center; margin-bottom: 20px;"></div>
+            
+            <div class="toggle-switch">
+                <button class="toggle-option active" onclick="showAdminLogin()"><i class="fas fa-crown"></i> Admin</button>
+                <button class="toggle-option" onclick="showCustomerLogin()"><i class="fas fa-user"></i> Customer</button>
+            </div>
+            
+            <div id="adminLoginForm">
+                <div class="input-group">
+                    <label><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="adminEmail" placeholder="admin@shop.com">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" style="width:100%" onclick="adminLogin()"><i class="fas fa-arrow-right"></i> Login as Admin</button>
+            </div>
+            
+            <div id="customerLoginForm" style="display:none;">
+                <div class="input-group">
+                    <label><i class="fas fa-phone"></i> Mobile Number</label>
+                    <input type="tel" id="custMobileLogin" placeholder="9876543210">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="custPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" style="width:100%" onclick="customerLogin()"><i class="fas fa-arrow-right"></i> Login</button>
+                <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
+                <button class="btn btn-outline" style="width:100%" onclick="showRegistration()"><i class="fas fa-user-plus"></i> Create New Account</button>
+            </div>
+            
+            <div id="registrationForm" style="display:none;">
+                <h3 style="color:white; text-align:center; margin-bottom:20px;">✨ Create Account</h3>
+                <div class="input-group"><input type="text" id="regName" placeholder="Full Name"></div>
+                <div class="input-group"><input type="tel" id="regMobile" placeholder="Mobile Number"></div>
+                <div class="input-group"><input type="password" id="regPassword" placeholder="Password"></div>
+                <div class="input-group"><input type="text" id="regReferral" placeholder="Referral Code (Optional)"></div>
+                <button class="btn btn-success" style="width:100%" onclick="register()"><i class="fas fa-check"></i> Register</button>
+                <button class="btn btn-outline" style="width:100%; margin-top:10px" onclick="showCustomerLogin()"><i class="fas fa-arrow-left"></i> Back</button>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ADMIN DASHBOARD -->
+        <!-- ============================================ -->
+        <div id="adminDashboard" class="dashboard">
+            <div class="premium-header">
+                <div class="header-title">
+                    <h2><i class="fas fa-chart-line"></i> Admin Dashboard</h2>
+                    <p>Manage products, customers, and track sales</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary btn-sm" onclick="showAddProductModal()"><i class="fas fa-plus"></i> Product</button>
+                    <button class="btn btn-success btn-sm" onclick="showAddCustomerModal()"><i class="fas fa-user-plus"></i> Customer</button>
+                    <button class="btn btn-warning btn-sm" onclick="showWalletControlModal()"><i class="fas fa-wallet"></i> Wallet</button>
+                    <button class="btn btn-danger btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-rupee-sign"></i></div><h3>Total Sales</h3><div class="stat-value" id="totalSales">₹0</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><h3>Customers</h3><div class="stat-value" id="totalCustomers">0</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-gift"></i></div><h3>Commission Paid</h3><div class="stat-value" id="totalCommission">₹0</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><h3>Low Stock</h3><div class="stat-value" id="lowStock">0</div></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-boxes"></i> Products Inventory</div>
+                <div style="overflow-x: auto;">
+                    <table class="premium-table">
+                        <thead><tr><th>Code</th><th>Name</th><th>Price</th><th>Discount</th><th>Cashback</th><th>Stock</th><th>Actions</th></tr></thead>
+                        <tbody id="productsList"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-users"></i> Customer Directory</div>
+                <div style="overflow-x: auto;">
+                    <table class="premium-table">
+                        <thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th><th>Action</th></tr></thead>
+                        <tbody id="customersList"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-receipt"></i> Billing System</div>
+                
+                <!-- ============================================ -->
+                <!-- BARCODE SCANNER SECTION - SCAN PRODUCTS -->
+                <!-- ============================================ -->
+                <div class="scanner-section">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div style="flex: 2;">
+                            <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+                                <i class="fas fa-qrcode"></i> 📷 Barcode Scanner
+                            </label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="barcodeInput" placeholder="Scan product barcode here..." 
+                                       style="flex: 1; padding: 14px 18px; background: rgba(255,255,255,0.1); border: 2px solid rgba(230,126,34,0.3); border-radius: 24px; color: white; font-size: 16px; font-family: monospace; letter-spacing: 2px;">
+                                <button class="btn btn-primary" onclick="document.getElementById('barcodeInput').focus()" style="padding: 14px 24px;">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                            <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 10px;">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>How to use:</strong> Click on scanner field → Scan barcode with thermal scanner → Product automatically added to cart!
+                                <span style="color: #e67e22;">✨ No button needed!</span>
+                            </p>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <div style="display: inline-block; background: rgba(230,126,34,0.2); border-radius: 16px; padding: 12px 20px;">
+                                <i class="fas fa-barcode" style="font-size: 32px; color: #e67e22;"></i>
+                                <p style="color: white; font-size: 11px; margin-top: 5px;">Ready to scan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <select id="billCustomer" class="input-group"><option>Select Customer</option></select>
+                    <select id="billProduct" class="input-group"><option>Select Product</option></select>
+                    <input type="number" id="billQuantity" placeholder="Quantity" value="1" class="input-group">
+                    <button class="btn btn-primary" onclick="addToCart()"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+                </div>
+                
+                <h3 style="color:white; margin: 20px 0 15px 0;"><i class="fas fa-shopping-cart"></i> Current Bill</h3>
+                <div style="overflow-x: auto;">
+                    <table class="premium-table">
+                        <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Discount</th><th>Cashback</th><th>Total</th><th></th></tr></thead>
+                        <tbody id="cartList"></tbody>
+                    </table>
+                </div>
+                <div class="cart-total-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div><strong>Subtotal:</strong> <span id="cartSubtotal">₹0</span></div>
+                        <div style="color:#f39c12"><strong>Discount:</strong> -<span id="cartDiscount">₹0</span></div>
+                        <div style="color:#2ecc71"><strong>🎁 Cashback:</strong> +<span id="cartCashback">₹0</span></div>
+                        <div style="font-size: 24px; font-weight: 800;"><strong>Total:</strong> <span id="cartTotal">₹0</span></div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-success" onclick="createBill()"><i class="fas fa-check-circle"></i> Generate Bill</button>
+                    <button class="btn btn-primary" onclick="printBillFromCart()"><i class="fas fa-print"></i> Print Bill</button>
+                    <button class="btn btn-danger" onclick="clearCart()"><i class="fas fa-trash"></i> Clear Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- CUSTOMER DASHBOARD -->
+        <!-- ============================================ -->
+        <div id="customerDashboard" class="dashboard">
+            <div class="premium-header">
+                <div class="header-title"><h2><i class="fas fa-user-circle"></i> Customer Portal</h2><p>Track your wallet and referrals</p></div>
+                <div><button class="btn btn-primary btn-sm" onclick="showAddMoneyModal()"><i class="fas fa-plus-circle"></i> Add Money</button><button class="btn btn-danger btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-wallet"></i></div><h3>Wallet Balance</h3><div class="stat-value" id="custWallet">₹0</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-shopping-bag"></i></div><h3>Total Purchases</h3><div class="stat-value" id="custPurchases">₹0</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-friends"></i></div><h3>Referrals</h3><div class="stat-value" id="custReferrals">0</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-coins"></i></div><h3>Commission Earned</h3><div class="stat-value" id="custCommission">₹0</div></div>
+            </div>
+            <div class="section">
+                <div class="section-title"><i class="fas fa-link"></i> Your Referral Code</div>
+                <div style="background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05)); padding: 30px; text-align: center; border-radius: 24px; border: 1px solid rgba(230,126,34,0.2);">
+                    <p style="font-size: 36px; font-weight: 800; letter-spacing: 4px; color: white;" id="myReferralCode"></p>
+                    <button class="btn btn-primary" onclick="copyReferralCode()"><i class="fas fa-copy"></i> Copy Code</button>
+                    <p style="margin-top: 15px; font-size: 12px; color: rgba(255,255,255,0.5);">Share this code - earn 0.5% commission on every purchase!</p>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title"><i class="fas fa-history"></i> Wallet History</div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransactions"></tbody></table></div>
+            </div>
+            <div class="section">
+                <div class="section-title"><i class="fas fa-receipt"></i> Purchase History</div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Bill No</th><th>Date</th><th>Amount</th></tr></thead><tbody id="purchasesList"></tbody></table></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS -->
+    <!-- ============================================ -->
+    <div id="productModal" class="modal-premium"><div class="modal-content"><h2><i class="fas fa-box"></i> Add Product</h2>
+        <div class="input-group"><input type="text" id="productCode" placeholder="Product Code (Barcode)"></div>
+        <div class="input-group"><input type="text" id="productName" placeholder="Product Name"></div>
+        <div class="input-group"><input type="number" id="productPrice" placeholder="Price (₹)"></div>
+        <div class="input-group"><input type="number" id="productDiscount" placeholder="Discount % (Cashback)" value="0"></div>
+        <div class="input-group"><input type="number" id="productStock" placeholder="Stock"></div>
+        <button class="btn btn-success" onclick="saveProduct()"><i class="fas fa-save"></i> Save</button>
+        <button class="btn btn-outline" onclick="closeModal('productModal')"><i class="fas fa-times"></i> Cancel</button>
+    </div></div>
+
+    <div id="customerModal" class="modal-premium"><div class="modal-content"><h2><i class="fas fa-user-plus"></i> Add Customer</h2>
+        <div class="input-group"><input type="text" id="newCustName" placeholder="Full Name"></div>
+        <div class="input-group"><input type="tel" id="newCustMobile" placeholder="Mobile"></div>
+        <div class="input-group"><input type="password" id="newCustPassword" placeholder="Password"></div>
+        <div class="input-group"><input type="text" id="newCustRef" placeholder="Referral Code"></div>
+        <button class="btn btn-success" onclick="saveCustomer()"><i class="fas fa-save"></i> Save</button>
+        <button class="btn btn-outline" onclick="closeModal('customerModal')"><i class="fas fa-times"></i> Cancel</button>
+    </div></div>
+
+    <div id="moneyModal" class="modal-premium"><div class="modal-content"><h2><i class="fas fa-plus-circle"></i> Add Money</h2>
+        <div class="input-group"><input type="number" id="moneyAmount" placeholder="Amount (₹)"></div>
+        <div class="input-group"><select id="paymentMethod"><option value="cash">💵 Cash</option><option value="card">💳 Card</option><option value="upi">📱 UPI</option></select></div>
+        <button class="btn btn-success" onclick="addMoney()"><i class="fas fa-check"></i> Add</button>
+        <button class="btn btn-outline" onclick="closeModal('moneyModal')"><i class="fas fa-times"></i> Cancel</button>
+    </div></div>
+
+    <div id="walletControlModal" class="modal-premium"><div class="modal-content"><h2><i class="fas fa-wallet"></i> Wallet Control</h2>
+        <div class="input-group"><select id="walletCustomerSelect"><option>Select Customer</option></select></div>
+        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:20px; margin:15px 0"><strong>Current Balance:</strong> <span id="currentBalance">₹0</span></div>
+        <div class="input-group"><input type="number" id="walletAmount" placeholder="Amount"></div>
+        <div class="input-group"><input type="text" id="walletReason" placeholder="Reason"></div>
+        <div style="display:flex; gap:10px"><button class="btn btn-success" onclick="adminAddMoney()"><i class="fas fa-plus"></i> Add</button><button class="btn btn-danger" onclick="adminDeductMoney()"><i class="fas fa-minus"></i> Deduct</button></div>
+        <button class="btn btn-outline" style="margin-top:15px" onclick="closeModal('walletControlModal')"><i class="fas fa-times"></i> Close</button>
+    </div></div>
+
+    <div id="alert" class="alert-premium"></div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT SECTION -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // CONFIGURATION & GLOBAL VARIABLES
+        // ============================================
+        const API_URL = 'http://localhost:5000/api';
+        let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
+
+        // Generate stars background
+        function generateStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.setProperty('--duration', Math.random() * 4 + 2 + 's');
+                star.style.animationDelay = Math.random() * 5 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        generateStars();
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        async function checkBackend() {
+            try { const res = await fetch('http://localhost:5000/'); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-connected"><i class="fas fa-check-circle"></i> Connected to Server</span>';
+            } catch(e) { document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-disconnected"><i class="fas fa-exclamation-circle"></i> Server not running! Start with: npm start</span>'; }
+        }
+
+        async function apiCall(method, endpoint, data = null) {
+            const options = { method, headers: { 'Content-Type': 'application/json' } };
+            if (authToken) options.headers['Authorization'] = `Bearer ${authToken}`;
+            if (data) options.body = JSON.stringify(data);
+            const response = await fetch(`${API_URL}${endpoint}`, options);
+            if (!response.ok) { const error = await response.json(); throw new Error(error.error || 'API failed'); }
+            return response.json();
+        }
+
+        function showAlert(msg, type) { const a = document.getElementById('alert'); a.textContent = msg; a.className = `alert-premium alert-${type}`; a.style.display = 'block'; setTimeout(() => a.style.display = 'none', 3000); }
+        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // ============================================
+        // AUTHENTICATION FUNCTIONS
+        // ============================================
+        function showAdminLogin() {
+            document.getElementById('adminLoginForm').style.display = 'block';
+            document.getElementById('customerLoginForm').style.display = 'none';
+            document.getElementById('registrationForm').style.display = 'none';
+            document.querySelectorAll('.toggle-option').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        function showCustomerLogin() {
+            document.getElementById('adminLoginForm').style.display = 'none';
+            document.getElementById('customerLoginForm').style.display = 'block';
+            document.getElementById('registrationForm').style.display = 'none';
+            document.querySelectorAll('.toggle-option').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        function showRegistration() {
+            document.getElementById('customerLoginForm').style.display = 'none';
+            document.getElementById('registrationForm').style.display = 'block';
+        }
+
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value;
+            if (!email || !password) return showAlert('Enter credentials', 'error');
+            try {
+                const res = await fetch(`${API_URL}/auth/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+                if (res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type: 'admin' }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!', 'success'); }
+                else showAlert('Invalid credentials', 'error');
+            } catch(e) { showAlert('Server error', 'error'); }
+        }
+
+        async function customerLogin() {
+            const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value;
+            if (!mobile || !password) return showAlert('Enter credentials', 'error');
+            try {
+                const res = await fetch(`${API_URL}/auth/customer/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mobile, password }) });
+                if (res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type: 'customer', data: data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert(`Welcome ${data.customer.name}!`, 'success'); }
+                else showAlert('Login failed', 'error');
+            } catch(e) { showAlert('Server error', 'error'); }
+        }
+
+        async function register() {
+            const name = document.getElementById('regName').value, mobile = document.getElementById('regMobile').value, password = document.getElementById('regPassword').value, ref = document.getElementById('regReferral').value;
+            if (!name || !mobile || !password) return showAlert('Fill all fields', 'error');
+            try {
+                const res = await fetch(`${API_URL}/auth/customer/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, mobile, password, referralCode: ref }) });
+                if (res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type: 'customer', data: data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert('Registration successful!', 'success'); }
+                else { const err = await res.json(); showAlert(err.error, 'error'); }
+            } catch(e) { showAlert('Registration failed', 'error'); }
+        }
+
+        // ============================================
+        // ADMIN DATA LOADING
+        // ============================================
+        async function loadAdminData() {
+            try {
+                const products = await apiCall('GET', '/products');
+                const customers = await apiCall('GET', '/customers');
+                const reports = await apiCall('GET', '/reports/dashboard');
+                document.getElementById('totalSales').innerHTML = `₹${reports.total_sales}`;
+                document.getElementById('totalCustomers').innerHTML = reports.total_customers;
+                document.getElementById('totalCommission').innerHTML = `₹${reports.total_commission}`;
+                document.getElementById('lowStock').innerHTML = reports.low_stock_alerts;
+                
+                const pl = document.getElementById('productsList'); pl.innerHTML = '';
+                products.forEach(p => { const cashback = (p.selling_price * (p.discount || 0)) / 100; pl.innerHTML += `<tr>
+                    <td>${p.product_code}</td>
+                    <td>${p.name}</td>
+                    <td>₹${p.selling_price}</td>
+                    <td><span class="badge badge-discount">${p.discount||0}%</span></td>
+                    <td><span class="badge badge-cashback">+₹${cashback.toFixed(2)}</span></td>
+                    <td><span class="badge ${p.current_stock<5 ? 'badge-stock-low' : 'badge-stock-good'}">${p.current_stock}</span></td>
+                    <td><button class="btn btn-sm btn-warning" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-sm btn-primary" onclick="setDiscount(${p.id})"><i class="fas fa-percent"></i></button></td>
+                </tr>`; });
+                
+                const cl = document.getElementById('customersList'); cl.innerHTML = '';
+                customers.forEach(c => { cl.innerHTML += `<tr>
+                    <td>${c.name}</td>
+                    <td>${c.mobile}</td>
+                    <td><strong>${c.referral_code}</strong></td>
+                    <td>₹${c.wallet_balance}</td>
+                    <td>₹${c.total_purchases}</td>
+                    <td><button class="btn btn-sm btn-primary" onclick="manageWallet(${c.id})"><i class="fas fa-wallet"></i></button></td>
+                </tr>`; });
+                
+                const cs = document.getElementById('billCustomer'); cs.innerHTML = '<option>Select Customer</option>';
+                customers.forEach(c => cs.innerHTML += `<option value="${c.id}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`);
+                
+                const ps = document.getElementById('billProduct'); ps.innerHTML = '<option>Select Product</option>';
+                products.forEach(p => { const cashback = (p.selling_price * (p.discount || 0)) / 100; ps.innerHTML += `<option value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount||0}" data-cashback="${cashback}" data-stock="${p.current_stock}">${p.name} - ₹${p.selling_price} (${p.discount||0}% off → +₹${cashback.toFixed(2)} cashback)</option>`; });
+            } catch(e) { showAlert('Error loading data', 'error'); }
+        }
+
+        // ============================================
+        // PRODUCT CRUD
+        // ============================================
+        async function saveProduct() {
+            const code = document.getElementById('productCode').value, name = document.getElementById('productName').value, price = parseFloat(document.getElementById('productPrice').value), discount = parseFloat(document.getElementById('productDiscount').value)||0, stock = parseInt(document.getElementById('productStock').value);
+            if(!code||!name||!price) return showAlert('Fill all fields','error');
+            if(discount<0||discount>100) return showAlert('Discount 0-100%','error');
+            try {
+                if(editingId) await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,min_stock_level:5,discount_percent:discount});
+                else await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,min_stock_level:5,discount_percent:discount});
+                showAlert('Product saved!','success'); closeModal('productModal'); await loadAdminData();
+            } catch(e) { showAlert('Error saving','error'); }
+        }
+
+        async function deleteProduct(id) { if(confirm('Delete?')){ try{ await apiCall('DELETE',`/products/${id}`); showAlert('Deleted','success'); await loadAdminData(); } catch(e){ showAlert('Error','error'); } } }
+        function editProduct(id){ editingId=id; document.getElementById('modalTitle').innerHTML='Edit Product'; showModal('productModal'); }
+        async function setDiscount(id){ let d=prompt('Enter discount % (0-100)','0'); if(d!==null){ try{ await apiCall('PATCH',`/products/${id}/discount`,{discount_percent:parseFloat(d)}); showAlert(`Discount ${d}% set`,'success'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } } }
+        async function saveCustomer(){ let n=document.getElementById('newCustName').value,m=document.getElementById('newCustMobile').value,r=document.getElementById('newCustRef').value; if(!n||!m) return showAlert('Fill name & mobile','error'); try{ await apiCall('POST','/customers',{name:n,mobile:m,referred_by:r||null}); showAlert('Customer added','success'); closeModal('customerModal'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } }
+
+        // ============================================
+        // CART FUNCTIONS
+        // ============================================
+        function addToCart(){
+            let cust=document.getElementById('billCustomer').value, prod=document.getElementById('billProduct'), pid=prod.value, qty=parseInt(document.getElementById('billQuantity').value);
+            if(!cust) return showAlert('Select customer','error'); if(!pid) return showAlert('Select product','error'); if(!qty||qty<1) return showAlert('Enter quantity','error');
+            let sel=prod.options[prod.selectedIndex], name=sel.text.split(' - ')[0], price=parseFloat(sel.dataset.price), disc=parseFloat(sel.dataset.discount), cashback=parseFloat(sel.dataset.cashback), stock=parseInt(sel.dataset.stock);
+            if(stock<qty) return showAlert(`Only ${stock} left`,'error');
+            let ex=cart.find(i=>i.product_id===parseInt(pid));
+            if(ex) ex.quantity+=qty;
+            else cart.push({product_id:parseInt(pid),name,originalPrice:price,discountPercent:disc,cashback,quantity:qty});
+            renderCart(); document.getElementById('billQuantity').value='1'; showAlert(`${name} added`,'success');
+        }
+
+        function renderCart(){
+            let tbody=document.getElementById('cartList'), subtotal=0, totalCashback=0; tbody.innerHTML='';
+            cart.forEach((item,idx)=>{ let itemTotal=item.originalPrice*item.quantity, itemCashback=item.cashback*item.quantity; subtotal+=itemTotal; totalCashback+=itemCashback;
+                tbody.innerHTML+=`<tr>
+                    <td>${item.name}</td>
+                    <td style="text-align:center">${item.quantity}</td>
+                    <td style="text-align:right">₹${item.originalPrice.toFixed(2)}</td>
+                    <td style="text-align:center"><span class="badge badge-discount">${item.discountPercent}%</span></td>
+                    <td style="text-align:right"><span class="badge badge-cashback">+₹${itemCashback.toFixed(2)}</span></td>
+                    <td style="text-align:right">₹${itemTotal.toFixed(2)}</span></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${idx})"><i class="fas fa-trash"></i></button></td>
+                </table>`; });
+            document.getElementById('cartSubtotal').innerHTML=`₹${subtotal.toFixed(2)}`;
+            document.getElementById('cartDiscount').innerHTML=`₹${(subtotal - (subtotal - totalCashback)).toFixed(2)}`;
+            document.getElementById('cartCashback').innerHTML=totalCashback.toFixed(2);
+            document.getElementById('cartTotal').innerHTML=`₹${subtotal.toFixed(2)}`;
+        }
+        function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
+        function clearCart(){ if(confirm('Clear cart?')){ cart=[]; renderCart(); showAlert('Cart cleared','info'); } }
+
+        async function createBill(){
+            if(cart.length===0) return showAlert('Cart empty','error');
+            let cust=document.getElementById('billCustomer').value;
+            if(!cust) return showAlert('Select customer','error');
+            let items=cart.map(i=>({product_id:i.product_id,quantity:i.quantity}));
+            try{
+                let res=await apiCall('POST','/bills',{customer_id:parseInt(cust),items,payment_method:'cash'});
+                showAlert(`Bill created! Cashback added`,'success');
+                let currentCart=[...cart]; cart=[]; renderCart(); await loadAdminData();
+                printBillAfterCreate(cust,currentCart);
+            }catch(e){ showAlert('Error: '+e.message,'error'); }
+        }
+
+        function printBillAfterCreate(custId,cartItems){
+            let cs=document.getElementById('billCustomer'), opt=cs.options[cs.selectedIndex], custName=opt?opt.text.split(' (')[0]:'Customer';
+            let subtotal=0,totalCashback=0,itemsHtml='';
+            cartItems.forEach(i=>{ let total=i.originalPrice*i.quantity, cb=i.cashback*i.quantity; subtotal+=total; totalCashback+=cb;
+                itemsHtml+=`<tr>
+                    <td>${i.name}</td><td style="text-align:center">${i.quantity}</td>
+                    <td style="text-align:right">₹${i.originalPrice.toFixed(2)}</td>
+                    <td style="text-align:center">${i.discountPercent}%</td>
+                    <td style="text-align:right">+₹${cb.toFixed(2)}</td>
+                </tr>`; });
+            let billNo=`SB${Date.now()}`, date=new Date().toLocaleString();
+            let html=`<div class="print-bill" style="font-family:'Courier New',monospace;max-width:350px;margin:0 auto;padding:15px;background:white;"><div style="text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;margin-bottom:10px;"><h2 style="margin:0;color:#e67e22;">🏪 SASTA BAZAR</h2><p style="margin:5px 0;font-size:11px;">सस्ता बाजार - आपका अपना दुकान</p><p style="margin:2px 0;font-size:10px;">123 Main Street, City | Ph: +91 98765 43210</p></div><div style="margin-bottom:10px;font-size:11px;"><p><strong>Bill No:</strong> ${billNo}</p><p><strong>Date:</strong> ${date}</p><p><strong>Customer:</strong> ${custName}</p><p><strong>Customer ID:</strong> ${custId}</p></div><table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;"><thead><tr style="border-bottom:1px solid #000;"><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th></tr></thead><tbody>${itemsHtml}</tbody></table><div style="border-top:1px solid #000;padding-top:8px;"><p style="display:flex;justify-content:space-between;font-weight:bold;"><strong>TOTAL:</strong> <span>₹${subtotal.toFixed(2)}</span></p><p style="display:flex;justify-content:space-between;color:#27ae60;"><strong>🎁 Cashback Added:</strong> <span>+₹${totalCashback.toFixed(2)}</span></p></div><div style="text-align:center;margin-top:15px;border-top:2px dashed #000;padding-top:10px;font-size:10px;"><p>✨ Thank you for shopping at SASTA BAZAR! ✨</p><p>🎉 You got ₹${totalCashback.toFixed(2)} cashback!</p></div></div>`;
+            let win=window.open('','_blank'); win.document.write(`<html><head><title>SASTA BAZAR Bill</title><style>body{margin:0;padding:20px;}</style></head><body onload="window.print();window.close();">${html}</body></html>`); win.document.close();
+        }
+        function printBillFromCart(){ if(cart.length===0) return showAlert('Cart empty','error'); let cust=document.getElementById('billCustomer').value; if(!cust) return showAlert('Select customer','error'); printBillAfterCreate(cust,cart); }
+
+        // ============================================
+        // BARCODE SCANNER FUNCTIONALITY (THERMAL SCANNER SUPPORT)
+        // ============================================
+        function setupBarcodeScanner() {
+            const barcodeInput = document.getElementById('barcodeInput');
+            if (!barcodeInput) return;
+            
+            barcodeInput.value = '';
+            
+            // Handle enter key (barcode scanners press enter after scan)
+            barcodeInput.addEventListener('keypress', async function(e) {
+                if (e.key === 'Enter') {
+                    const barcode = this.value.trim();
+                    if (barcode) {
+                        await processBarcodeScan(barcode);
+                        this.value = '';
+                        this.focus();
+                    }
+                }
+            });
+            
+            // Handle paste for manual entry
+            barcodeInput.addEventListener('paste', async function(e) {
+                setTimeout(async () => {
+                    const barcode = this.value.trim();
+                    if (barcode) {
+                        await processBarcodeScan(barcode);
+                        this.value = '';
+                        this.focus();
+                    }
+                }, 100);
+            });
+        }
+
+        async function processBarcodeScan(barcode) {
+            console.log('📷 Barcode scanned:', barcode);
+            
+            const customerId = document.getElementById('billCustomer').value;
+            if (!customerId) {
+                showAlert('Please select a customer first before scanning!', 'error');
+                document.getElementById('barcodeInput').focus();
+                return;
+            }
+            
+            try {
+                const products = await apiCall('GET', '/products');
+                const product = products.find(p => p.product_code === barcode);
+                
+                if (!product) {
+                    showAlert(`❌ Product with code "${barcode}" not found!`, 'error');
+                    document.getElementById('barcodeInput').focus();
+                    return;
+                }
+                
+                if (product.current_stock < 1) {
+                    showAlert(`❌ ${product.name} is out of stock!`, 'error');
+                    document.getElementById('barcodeInput').focus();
+                    return;
+                }
+                
+                const cashback = (product.selling_price * (product.discount || 0)) / 100;
+                const existingItem = cart.find(item => item.product_id === product.id);
+                
+                if (existingItem) {
+                    if (product.current_stock > existingItem.quantity) {
+                        existingItem.quantity++;
+                        showAlert(`✅ Added another ${product.name} to cart! Total: ${existingItem.quantity}`, 'success');
+                        playBeep();
+                    } else {
+                        showAlert(`⚠️ Only ${product.current_stock} left in stock!`, 'error');
+                    }
+                } else {
+                    cart.push({
+                        product_id: product.id,
+                        name: product.name,
+                        originalPrice: product.selling_price,
+                        discountPercent: product.discount || 0,
+                        cashback: cashback,
+                        quantity: 1
+                    });
+                    showAlert(`✅ "${product.name}" added to cart via barcode!`, 'success');
+                    playBeep();
+                }
+                
+                renderCart();
+                
+                // Flash effect
+                const cartSection = document.querySelector('.cart-total-box');
+                if (cartSection) {
+                    cartSection.style.transition = 'all 0.2s ease';
+                    cartSection.style.boxShadow = '0 0 20px rgba(230,126,34,0.5)';
+                    setTimeout(() => { cartSection.style.boxShadow = ''; }, 500);
+                }
+            } catch (error) {
+                showAlert('Error processing barcode: ' + error.message, 'error');
+            }
+            document.getElementById('barcodeInput').focus();
+        }
+
+        function playBeep() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.frequency.value = 880;
+                gainNode.gain.value = 0.1;
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                setTimeout(() => audioContext.close(), 500);
+            } catch(e) { console.log('Beep not supported'); }
+        }
+
+        // Auto-focus barcode input
+        setInterval(() => {
+            if (document.getElementById('adminDashboard').style.display === 'block') {
+                const barcodeInput = document.getElementById('barcodeInput');
+                if (barcodeInput && document.activeElement !== barcodeInput) {
+                    barcodeInput.focus();
+                }
+            }
+        }, 1000);
+
+        // ============================================
+        // CUSTOMER PORTAL FUNCTIONS
+        // ============================================
+        async function loadCustomerData(){
+            try{
+                let profile=await apiCall('GET','/customers/profile');
+                let transactions=await apiCall('GET',`/wallet/transactions/${profile.id}`);
+                let allCustomers=await apiCall('GET','/customers');
+                document.getElementById('custWallet').innerHTML=`₹${profile.wallet_balance}`;
+                document.getElementById('custPurchases').innerHTML=`₹${profile.total_purchases}`;
+                document.getElementById('myReferralCode').innerHTML=profile.referral_code;
+                let referrals=allCustomers.filter(c=>c.referred_by===profile.referral_code);
+                document.getElementById('custReferrals').innerHTML=referrals.length;
+                let wt=document.getElementById('walletTransactions'); wt.innerHTML='';
+                transactions.forEach(t=>{ wt.innerHTML+=`<td>
+                    <td>${new Date(t.created_at).toLocaleDateString()}</td>
+                    <td style="color:${t.transaction_type==='CREDIT'?'#2ecc71':'#e74c3c'}">${t.transaction_type}</td>
+                    <td>₹${t.amount}</td>
+                    <td>${t.description||'-'}</td>
+                </tr>`; });
+            }catch(e){ showAlert('Error loading profile','error'); }
+        }
+        async function addMoney(){ let amt=parseFloat(document.getElementById('moneyAmount').value), pm=document.getElementById('paymentMethod').value; if(!amt||amt<=0) return showAlert('Enter amount','error'); try{ let profile=await apiCall('GET','/customers/profile'); await apiCall('POST','/wallet/add-money',{customer_id:profile.id,amount:amt,payment_method:pm}); showAlert(`₹${amt} added!`,'success'); closeModal('moneyModal'); await loadCustomerData(); }catch(e){ showAlert('Error','error'); } }
+        function copyReferralCode(){ navigator.clipboard.writeText(document.getElementById('myReferralCode').innerText); showAlert('Copied!','success'); }
+
+        // ============================================
+        // ADMIN WALLET CONTROL
+        // ============================================
+        function showWalletControlModal(){ showModal('walletControlModal'); loadWalletCustomers(); }
+        async function loadWalletCustomers(){ try{ let cust=await apiCall('GET','/customers'); let sel=document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange=function(){ let opt=this.options[this.selectedIndex]; document.getElementById('currentBalance').innerHTML=`₹${opt.dataset.balance||0}`; }; }catch(e){ showAlert('Error','error'); } }
+        function manageWallet(id){ showWalletControlModal(); setTimeout(()=>{ let sel=document.getElementById('walletCustomerSelect'); for(let i=0;i<sel.options.length;i++) if(sel.options[i].value==id){ sel.selectedIndex=i; sel.onchange(); break; } },100); }
+        async function adminAddMoney(){ let cust=document.getElementById('walletCustomerSelect').value, amt=parseFloat(document.getElementById('walletAmount').value), reason=document.getElementById('walletReason').value; if(!cust||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cust),amount:amt,reason}); showAlert(`₹${amt} added`,'success'); await loadAdminData(); loadWalletCustomers(); document.getElementById('walletAmount').value=''; }catch(e){ showAlert('Error','error'); } }
+        async function adminDeductMoney(){ let cust=document.getElementById('walletCustomerSelect').value, amt=parseFloat(document.getElementById('walletAmount').value), reason=document.getElementById('walletReason').value; if(!cust||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cust),amount:amt,reason}); showAlert(`₹${amt} deducted`,'success'); await loadAdminData(); loadWalletCustomers(); document.getElementById('walletAmount').value=''; }catch(e){ showAlert('Error','error'); } }
+
+        // ============================================
+        // UI HELPER FUNCTIONS
+        // ============================================
+        function showAddProductModal(){ editingId=null; document.getElementById('modalTitle').innerHTML='Add Product'; document.getElementById('productCode').value=''; document.getElementById('productName').value=''; document.getElementById('productPrice').value=''; document.getElementById('productDiscount').value='0'; document.getElementById('productStock').value=''; showModal('productModal'); }
+        function showAddCustomerModal(){ showModal('customerModal'); }
+        function showAddMoneyModal(){ showModal('moneyModal'); }
+        function logout(){ authToken=null; currentUser=null; cart=[]; document.getElementById('loginSection').style.display='block'; document.getElementById('adminDashboard').style.display='none'; document.getElementById('customerDashboard').style.display='none'; showAlert('Logged out','info'); }
+
+        // Initialize
+        checkBackend(); setInterval(checkBackend,10000);
+    </script>
+</body>
+</html>
