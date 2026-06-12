@@ -10,7 +10,12 @@ const pool = require('./config/database');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(compression());
 const cache = new Map();
