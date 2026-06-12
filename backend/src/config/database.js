@@ -13,9 +13,9 @@ const pool = new Pool({
 
 pool.connect((err, client, release) => {
   if (err) {
-    console.error('❌ Database connection error:', err.message);
+    console.error('❌ Database error:', err.message);
   } else {
-    console.log('✅ PostgreSQL connected successfully');
+    console.log('✅ PostgreSQL connected');
     release();
   }
 });
