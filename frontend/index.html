@@ -20,7 +20,6 @@
             overflow-x: hidden;
         }
 
-        /* Premium Animated Background */
         .bg-gradient {
             position: fixed;
             top: 0;
@@ -40,7 +39,7 @@
             z-index: -1;
         }
 
-        .orb-1 { width: 400px; height: 400px; background: #e67e22; top: 10%; left: -100px; animation-delay: 0s; }
+        .orb-1 { width: 400px; height: 400px; background: #e67e22; top: 10%; left: -100px; }
         .orb-2 { width: 500px; height: 500px; background: #f39c12; bottom: 10%; right: -100px; animation-delay: -5s; }
         .orb-3 { width: 300px; height: 300px; background: #d35400; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
 
@@ -50,23 +49,15 @@
             66% { transform: translate(-30px, 30px) rotate(240deg); }
         }
 
-        /* Glassmorphic Container */
-        .glass-container {
-            background: rgba(10, 10, 10, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 32px;
-            margin: 20px;
-            transition: all 0.5s ease;
-        }
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 10;
         }
 
-        /* Premium Login Card */
+        /* Login Card */
         .login-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -75,14 +66,13 @@
             max-width: 500px;
             margin: 80px auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease;
         }
 
         .login-card:hover {
             transform: translateY(-8px);
             border-color: rgba(230, 126, 34, 0.3);
-            box-shadow: 0 35px 55px rgba(0, 0, 0, 0.4);
         }
 
         .logo-section {
@@ -113,7 +103,6 @@
             background-clip: text;
             color: transparent;
             margin-top: 15px;
-            letter-spacing: -1px;
         }
 
         .logo-section p {
@@ -152,7 +141,7 @@
             box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
         }
 
-        /* Premium Inputs */
+        /* Input Groups */
         .input-group-modern {
             margin-bottom: 25px;
         }
@@ -163,7 +152,6 @@
             font-weight: 500;
             color: rgba(255, 255, 255, 0.6);
             margin-bottom: 8px;
-            letter-spacing: 0.5px;
         }
 
         .input-group-modern input, .input-group-modern select {
@@ -189,7 +177,7 @@
             color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Premium Button */
+        /* Buttons */
         .btn-premium {
             padding: 16px 28px;
             border: none;
@@ -197,25 +185,8 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            transition: all 0.3s ease;
             font-family: 'Space Grotesk', sans-serif;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-premium::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn-premium:hover::before {
-            left: 100%;
         }
 
         .btn-primary-gold {
@@ -239,7 +210,22 @@
             color: white;
         }
 
-        /* Dashboard Header */
+        .btn-warning-modern {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .dashboard-header {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -263,7 +249,7 @@
             color: transparent;
         }
 
-        /* Stat Cards */
+        /* Stats Cards */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -277,25 +263,7 @@
             border-radius: 28px;
             padding: 25px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card-premium::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 20%, rgba(230,126,34,0.15), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .stat-card-premium:hover::after {
-            opacity: 1;
+            transition: all 0.4s ease;
         }
 
         .stat-card-premium:hover {
@@ -334,11 +302,6 @@
             padding: 30px;
             margin-bottom: 30px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.3s ease;
-        }
-
-        .section-premium:hover {
-            transform: translateY(-3px);
         }
 
         .section-title {
@@ -351,7 +314,6 @@
             display: inline-block;
         }
 
-        /* Scanner Section */
         .scanner-section {
             background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
             border-radius: 24px;
@@ -395,20 +357,29 @@
         .badge-discount { background: linear-gradient(135deg, #e67e22, #f39c12); color: white; }
         .badge-cashback { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
 
-        /* Buttons */
+        /* Buttons Small */
         .btn-icon {
-            padding: 8px 16px;
+            padding: 6px 14px;
             border: none;
-            border-radius: 40px;
+            border-radius: 30px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             margin: 0 3px;
             transition: all 0.2s ease;
         }
         .btn-edit { background: #3498db; color: white; }
         .btn-delete { background: #e74c3c; color: white; }
-        .btn-discount { background: #e67e22; color: white; }
+        .btn-wallet { background: #f39c12; color: white; }
+
+        /* Cart Total Box */
+        .cart-total-box {
+            background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
+            border-radius: 24px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(230,126,34,0.2);
+        }
 
         /* Modal */
         .modal-premium {
@@ -423,12 +394,6 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .modal-content-premium {
@@ -439,7 +404,7 @@
             width: 90%;
             max-width: 500px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: modalPop 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            animation: modalPop 0.4s ease;
         }
 
         @keyframes modalPop {
@@ -462,7 +427,7 @@
             border-radius: 50px;
             display: none;
             z-index: 2000;
-            animation: slideInRight 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            animation: slideInRight 0.4s ease;
             font-weight: 500;
             backdrop-filter: blur(20px);
         }
@@ -472,25 +437,9 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        .alert-success {
-            background: rgba(39, 174, 96, 0.9);
-            color: white;
-            border-left: 3px solid #2ecc71;
-        }
-        .alert-error {
-            background: rgba(231, 76, 60, 0.9);
-            color: white;
-            border-left: 3px solid #e74c3c;
-        }
-
-        /* Cart Total Box */
-        .cart-total-box {
-            background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
-            border-radius: 24px;
-            padding: 25px;
-            margin-top: 20px;
-            border: 1px solid rgba(230,126,34,0.2);
-        }
+        .alert-success { background: rgba(39, 174, 96, 0.9); color: white; border-left: 3px solid #2ecc71; }
+        .alert-error { background: rgba(231, 76, 60, 0.9); color: white; border-left: 3px solid #e74c3c; }
+        .alert-info { background: rgba(52, 152, 219, 0.9); color: white; border-left: 3px solid #3498db; }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -514,7 +463,7 @@
     <div class="animated-orb orb-3"></div>
 
     <div class="container">
-        <!-- Login Section -->
+        <!-- ========== LOGIN SECTION (Visible Initially) ========== -->
         <div id="loginSection" class="login-card">
             <div class="logo-section">
                 <div class="logo-icon"><i class="fas fa-crown"></i></div>
@@ -565,13 +514,17 @@
             </div>
         </div>
 
-        <!-- Admin Dashboard -->
-       <div>
-    <button class="btn-premium btn-primary-gold" onclick="showAddProductModal()"><i class="fas fa-plus"></i> Product</button>
-    <button class="btn-premium btn-success-modern" onclick="showAddCustomerModal()"><i class="fas fa-user-plus"></i> Customer</button>
-    <button class="btn-premium btn-warning" style="background:#f39c12;" onclick="showWalletControlModal()"><i class="fas fa-wallet"></i> Wallet Control</button>
-    <button class="btn-premium btn-danger-modern" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
-</div>
+        <!-- ========== ADMIN DASHBOARD (Hidden Initially) ========== -->
+        <div id="adminDashboard" class="dashboard" style="display:none;">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-chart-line"></i> Admin Dashboard</h1>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn-premium btn-primary-gold" style="padding:12px 20px;" onclick="showAddProductModal()"><i class="fas fa-plus"></i> Product</button>
+                    <button class="btn-premium btn-success-modern" style="padding:12px 20px;" onclick="showAddCustomerModal()"><i class="fas fa-user-plus"></i> Customer</button>
+                    <button class="btn-premium btn-warning-modern" style="padding:12px 20px;" onclick="showWalletControlModal()"><i class="fas fa-wallet"></i> Wallet Control</button>
+                    <button class="btn-premium btn-danger-modern" style="padding:12px 20px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
+                </div>
+            </div>
 
             <div class="stat-grid">
                 <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-chart-simple"></i></div><h3>Total Revenue</h3><div class="stat-value" id="totalSales">₹0</div></div>
@@ -587,7 +540,7 @@
 
             <div class="section-premium">
                 <div class="section-title"><i class="fas fa-users"></i> Customer Directory</div>
-                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th></tr></thead><tbody id="customersList"></tbody></table></div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th><th>Action</th></tr></thead><tbody id="customersList"></tbody></table></div>
             </div>
 
             <div class="section-premium">
@@ -621,25 +574,35 @@
             </div>
         </div>
 
-        <!-- Customer Dashboard -->
+        <!-- ========== CUSTOMER DASHBOARD (Hidden Initially) ========== -->
         <div id="customerDashboard" class="dashboard" style="display:none;">
             <div class="dashboard-header">
                 <h1><i class="fas fa-user-circle"></i> My Portal</h1>
-                <div><button class="btn-premium btn-danger-modern" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button></div>
+                <div><button class="btn-premium btn-danger-modern" style="padding:12px 20px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button></div>
+            </div>
+            
             <div class="stat-grid">
                 <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-wallet"></i></div><h3>Wallet Balance</h3><div class="stat-value" id="custWallet">₹0</div></div>
                 <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-shopping-bag"></i></div><h3>Total Spent</h3><div class="stat-value" id="custPurchases">₹0</div></div>
                 <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-user-friends"></i></div><h3>Referrals</h3><div class="stat-value" id="custReferrals">0</div></div>
             </div>
+            
             <div class="section-premium">
                 <div class="section-title"><i class="fas fa-link"></i> My Referral Code</div>
-                <div style="background:linear-gradient(135deg,rgba(230,126,34,0.1),rgba(243,156,18,0.05)); padding:25px; text-align:center; border-radius:24px;"><p style="font-size:32px; font-weight:700; letter-spacing:2px; color:white;" id="myReferralCode"></p><button class="btn-premium btn-primary-gold" onclick="copyReferralCode()"><i class="fas fa-copy"></i> Copy Code</button></div>
+                <div style="background:linear-gradient(135deg,rgba(230,126,34,0.1),rgba(243,156,18,0.05)); padding:25px; text-align:center; border-radius:24px;">
+                    <p style="font-size:32px; font-weight:700; letter-spacing:2px; color:white;" id="myReferralCode"></p>
+                    <button class="btn-premium btn-primary-gold" onclick="copyReferralCode()"><i class="fas fa-copy"></i> Copy Code</button>
+                </div>
             </div>
-            <div class="section-premium"><div class="section-title"><i class="fas fa-history"></i> Transaction History</div><div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransactions"></tbody></table></div></div>
+            
+            <div class="section-premium">
+                <div class="section-title"><i class="fas fa-history"></i> Transaction History</div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransactions"></tbody></table></div>
+            </div>
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- ========== MODALS ========== -->
     <div id="productModal" class="modal-premium"><div class="modal-content-premium"><h2><i class="fas fa-box"></i> Add Product</h2>
         <div class="input-group-modern"><input type="text" id="productCode" placeholder="Product Code"></div>
         <div class="input-group-modern"><input type="text" id="productName" placeholder="Product Name"></div>
@@ -659,15 +622,24 @@
         <button class="btn-premium" style="background:rgba(255,255,255,0.1);" onclick="closeModal('customerModal')">Cancel</button>
     </div></div>
 
-   
+    <div id="walletControlModal" class="modal-premium"><div class="modal-content-premium"><h2><i class="fas fa-wallet"></i> Wallet Control</h2>
+        <div class="input-group-modern"><select id="walletCustomerSelect"><option>Select Customer</option></select></div>
+        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:20px; margin:15px 0;"><strong>Current Balance:</strong> <span id="currentBalance">₹0</span></div>
+        <div class="input-group-modern"><input type="number" id="walletAmount" placeholder="Amount"></div>
+        <div class="input-group-modern"><input type="text" id="walletReason" placeholder="Reason"></div>
+        <div style="display:flex; gap:10px;"><button class="btn-premium btn-success-modern" onclick="adminAddMoney()"><i class="fas fa-plus"></i> Add Money</button><button class="btn-premium btn-danger-modern" onclick="adminDeductMoney()"><i class="fas fa-minus"></i> Deduct Money</button></div>
+        <button class="btn-premium" style="margin-top:15px; background:rgba(255,255,255,0.1);" onclick="closeModal('walletControlModal')">Close</button>
+    </div></div>
 
     <div id="alert" class="alert-premium"></div>
 
     <script>
+        // ========== CONFIGURATION ==========
         const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
         const API_URL = `${BACKEND_URL}/api`;
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
 
+        // ========== HELPER FUNCTIONS ==========
         async function checkBackend() {
             try { const res = await fetch(`${BACKEND_URL}/`); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">✅ Connected</span>';
             } catch(e) { document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">❌ Offline</span>'; }
@@ -686,16 +658,32 @@
         function showModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function showAdminLogin() { document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'none'; }
-        function showCustomerLogin() { document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('customerLoginForm').style.display = 'block'; document.getElementById('registrationForm').style.display = 'none'; }
-        function showRegistration() { document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'block'; }
+        // ========== AUTH FUNCTIONS ==========
+        function showAdminLogin() {
+            document.getElementById('adminLoginForm').style.display = 'block';
+            document.getElementById('customerLoginForm').style.display = 'none';
+            document.getElementById('registrationForm').style.display = 'none';
+            document.querySelectorAll('.toggle-option').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        function showCustomerLogin() {
+            document.getElementById('adminLoginForm').style.display = 'none';
+            document.getElementById('customerLoginForm').style.display = 'block';
+            document.getElementById('registrationForm').style.display = 'none';
+            document.querySelectorAll('.toggle-option').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        function showRegistration() {
+            document.getElementById('customerLoginForm').style.display = 'none';
+            document.getElementById('registrationForm').style.display = 'block';
+        }
 
         async function adminLogin() {
             const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value;
             if(!email||!password) return showAlert('Enter credentials','error');
             try {
                 const res = await fetch(`${API_URL}/auth/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
-                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'admin' }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome to Premium Dashboard!','success'); }
+                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'admin' }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!','success'); }
                 else { const err = await res.json(); showAlert(err.error,'error'); }
             } catch(e) { showAlert('Cannot connect to server','error'); }
         }
@@ -705,7 +693,7 @@
             if(!mobile||!password) return showAlert('Enter credentials','error');
             try {
                 const res = await fetch(`${API_URL}/auth/customer/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mobile,password}) });
-                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert(`Welcome back ${data.customer.name}!`,'success'); }
+                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert(`Welcome ${data.customer.name}!`,'success'); }
                 else { const err = await res.json(); showAlert(err.error,'error'); }
             } catch(e) { showAlert('Server error','error'); }
         }
@@ -720,6 +708,7 @@
             } catch(e) { showAlert('Registration failed','error'); }
         }
 
+        // ========== ADMIN FUNCTIONS ==========
         async function loadAdminData() {
             try {
                 const products = await apiCall('GET','/products'), customers = await apiCall('GET','/customers'), reports = await apiCall('GET','/reports/dashboard');
@@ -731,17 +720,26 @@
                 
                 const pl = document.getElementById('productsList'); pl.innerHTML = '';
                 products.forEach(p => { pl.innerHTML += `<tr>
-                    <td style="font-weight:600;">${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td>
+                    <td style="font-weight:600;">${p.product_code}</td>
+                    <td>${p.name}</td>
+                    <td>₹${p.selling_price}</td>
                     <td><span class="badge-premium badge-discount">${p.discount_percent||0}%</span></td>
                     <td style="color:${p.current_stock<5?'#e74c3c':'#27ae60'}">${p.current_stock}</td>
                     <td><button class="btn-icon btn-edit" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button> <button class="btn-icon btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button></td>
                 </tr>`; });
                 
                 const cl = document.getElementById('customersList'); cl.innerHTML = '';
-                customers.forEach(c => { cl.innerHTML += `<tr><td>${c.name}</td><td>${c.mobile}</td><td><code>${c.referral_code}</code></td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button class="btn-icon btn-edit" onclick="manageCustomerWallet(${c.id})"><i class="fas fa-wallet"></i></button></td></tr>`; });
+                customers.forEach(c => { cl.innerHTML += `<tr>
+                    <td>${c.name}</td>
+                    <td>${c.mobile}</td>
+                    <td><code>${c.referral_code}</code></td>
+                    <td>₹${c.wallet_balance}</td>
+                    <td>₹${c.total_purchases}</td>
+                    <td><button class="btn-icon btn-wallet" onclick="showWalletControlForCustomer(${c.id})"><i class="fas fa-wallet"></i> Manage</button></td>
+                </tr>`; });
                 
                 const cs = document.getElementById('billCustomer'); cs.innerHTML = '<option>Select Customer</option>';
-                customers.forEach(c => { cs.innerHTML += `<option value="${c.id}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; });
+                customers.forEach(c => { cs.innerHTML += `<option value="${c.id}">${c.name} (${c.mobile}) - Wallet: ₹${c.wallet_balance}</option>`; });
                 
                 const ps = document.getElementById('billProduct'); ps.innerHTML = '<option>Select Product</option>';
                 products.forEach(p => { const cashback = (p.selling_price * (p.discount_percent||0))/100; ps.innerHTML += `<option value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cashback}" data-stock="${p.current_stock}">${p.name} - ₹${p.selling_price} (${p.discount_percent||0}% off → +₹${cashback} cashback)</option>`; });
@@ -772,6 +770,7 @@
             } catch(e) { showAlert('Error: '+e.message,'error'); }
         }
 
+        // ========== CART FUNCTIONS ==========
         function addToCartManual() {
             const cust = document.getElementById('billCustomer').value, prod = document.getElementById('billProduct'), pid = prod.value, qty = parseInt(document.getElementById('billQuantity').value);
             if(!cust) return showAlert('Select customer','error'); if(!pid) return showAlert('Select product','error'); if(!qty||qty<1) return showAlert('Enter quantity','error');
@@ -786,294 +785,65 @@
         function renderCart() {
             const tbody = document.getElementById('cartList'); let total = 0, totalCashback = 0; tbody.innerHTML = '';
             cart.forEach((item,idx)=>{ const itemTotal = item.originalPrice * item.quantity; const itemCashback = item.cashback * item.quantity; total += itemTotal; totalCashback += itemCashback;
-                tbody.innerHTML += `<tr><td>${item.name}</td><td style="text-align:center">${item.quantity}</td><td>₹${item.originalPrice}</td><td><span class="badge-premium badge-discount">${item.discountPercent}%</span></td><td><span class="badge-premium badge-cashback">+₹${itemCashback}</span></td><td>₹${itemTotal}</td><td><button class="btn-icon btn-delete" onclick="removeFromCart(${idx})"><i class="fas fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr>
+                    <td>${item.name}</td><td style="text-align:center">${item.quantity}</td><td style="text-align:right">₹${item.originalPrice}</td>
+                    <td style="text-align:center"><span class="badge-premium badge-discount">${item.discountPercent}%</span></td>
+                    <td style="text-align:right; color:#27ae60;">+₹${itemCashback.toFixed(2)}</span></td>
+                    <td style="text-align:right">₹${itemTotal.toFixed(2)}</span></td>
+                    <td><button class="btn-icon btn-delete" onclick="removeFromCart(${idx})"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
             });
             document.getElementById('cartTotal').innerHTML = total;
-            document.getElementById('cartCashback').innerHTML = totalCashback;
+            document.getElementById('cartCashback').innerHTML = totalCashback.toFixed(2);
         }
 
         function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
 
-      async function createBill() {
-    if (cart.length === 0) {
-        showAlert('Cart is empty! Add some items first.', 'error');
-        return;
-    }
-    
-    const customerId = document.getElementById('billCustomer').value;
-    if (!customerId) {
-        showAlert('Please select a customer', 'error');
-        return;
-    }
-    
-    let totalAmount = 0;
-    let totalCashback = 0;
-    const billItems = cart.map(item => {
-        const itemTotal = item.originalPrice * item.quantity;
-        const itemCashback = (item.cashback || 0) * item.quantity;
-        totalAmount += itemTotal;
-        totalCashback += itemCashback;
-        return {
-            product_id: item.product_id,
-            quantity: item.quantity,
-            name: item.name,
-            price: item.originalPrice,
-            discount: item.discountPercent,
-            cashback: item.cashback
-        };
-    });
-    
-    const items = cart.map(item => ({
-        product_id: item.product_id,
-        quantity: item.quantity
-    }));
-    
-    showAlert('Processing bill...', 'info');
-    
-    try {
-        const response = await apiCall('POST', '/bills', {
-            customer_id: parseInt(customerId),
-            items: items,
-            payment_method: 'cash'
-        });
-        
-        if (response.success) {
-            const customerSelect = document.getElementById('billCustomer');
-            const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-            const currentWallet = parseFloat(selectedOption.text.split('Wallet: ₹')[1] || 0);
-            const newWalletBalance = currentWallet + response.cashback;
-            
-            selectedOption.text = selectedOption.text.replace(/Wallet: ₹[\d.]+/, `Wallet: ₹${newWalletBalance}`);
-            
-            showAlert(`✅ Bill created successfully! Cashback: ₹${response.cashback.toFixed(2)} added to wallet!`, 'success');
-            
-            cart = [];
-            renderCart();
-            await loadAdminData();
-            printBillAfterCreate(customerId, billItems, totalAmount, totalCashback);
-        } else {
-            showAlert('Failed to create bill', 'error');
+        async function createBill() {
+            if(cart.length===0) return showAlert('Cart empty','error');
+            const cust = document.getElementById('billCustomer').value;
+            if(!cust) return showAlert('Select customer','error');
+            const items = cart.map(i=>({product_id:i.product_id,quantity:i.quantity}));
+            try {
+                const res = await apiCall('POST','/bills',{customer_id:parseInt(cust),items,payment_method:'cash'});
+                if(res.success) {
+                    showAlert(`Bill created! Cashback: ₹${res.cashback.toFixed(2)} added to wallet!`,'success');
+                    cart = []; renderCart(); await loadAdminData();
+                    const currentCart = [...cart];
+                    printBillAfterCreate(cust, currentCart);
+                }
+            } catch(e) { showAlert('Error: '+e.message,'error'); }
         }
-    } catch (error) {
-        console.error('Bill creation error:', error);
-        showAlert('Error creating bill: ' + error.message, 'error');
-    }
-}
 
         function printBill() {
-    if (cart.length === 0) {
-        showAlert('Cart is empty! Add some items first.', 'error');
-        return;
-    }
-    
-    const customerId = document.getElementById('billCustomer').value;
-    if (!customerId) {
-        showAlert('Please select a customer', 'error');
-        return;
-    }
-    
-    const customerSelect = document.getElementById('billCustomer');
-    const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-    const customerName = selectedOption.text.split(' (')[0];
-    
-    let totalAmount = 0;
-    let totalCashback = 0;
-    let billItemsHtml = '';
-    
-    cart.forEach(item => {
-        const itemTotal = item.originalPrice * item.quantity;
-        const itemCashback = (item.cashback || 0) * item.quantity;
-        totalAmount += itemTotal;
-        totalCashback += itemCashback;
-        
-        billItemsHtml += `<tr>
-            <td style="padding:8px; border-bottom:1px solid #ddd;">${item.name}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.quantity}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${item.originalPrice.toFixed(2)}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.discountPercent}%</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right; color:#27ae60;">+₹${itemCashback.toFixed(2)}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${itemTotal.toFixed(2)}</td>
-        </tr>`;
-    });
-    
-    const billNumber = `SB${Date.now()}`;
-    const date = new Date().toLocaleString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    });
-    
-    const printContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>SASTA BAZAR - Bill</title>
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: 'Courier New', Courier, monospace; background: white; margin: 0; padding: 20px; }
-                .bill { max-width: 350px; margin: 0 auto; background: white; }
-                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 12px; margin-bottom: 15px; }
-                .header h1 { font-size: 24px; color: #e67e22; margin: 0 0 5px 0; }
-                .shop-name { font-size: 12px; color: #666; margin: 3px 0; }
-                .details { margin-bottom: 15px; font-size: 11px; line-height: 1.5; }
-                .details p { margin: 3px 0; }
-                table { width: 100%; border-collapse: collapse; font-size: 10px; margin: 10px 0; }
-                th { background: #f5f5f5; padding: 6px; text-align: left; border-bottom: 1px solid #ddd; }
-                td { padding: 5px; border-bottom: 1px solid #eee; }
-                .text-right { text-align: right; }
-                .text-center { text-align: center; }
-                .total-section { border-top: 1px solid #333; margin-top: 10px; padding-top: 10px; }
-                .total-line { display: flex; justify-content: space-between; font-size: 12px; margin: 5px 0; }
-                .cashback-line { display: flex; justify-content: space-between; color: #27ae60; font-size: 12px; margin: 5px 0; }
-                .grand-total { font-size: 14px; font-weight: bold; margin-top: 8px; padding-top: 5px; border-top: 1px solid #ddd; }
-                .footer { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 1px dashed #999; font-size: 9px; color: #666; }
-                @media print { body { padding: 0; margin: 0; } }
-            </style>
-        </head>
-        <body>
-            <div class="bill">
-                <div class="header">
-                    <h1>🏪 SASTA BAZAR</h1>
-                    <div class="shop-name">सस्ता बाजार - आपका अपना दुकान</div>
-                    <div class="shop-name">123 Main Street, City</div>
-                    <div class="shop-name">GST: 27ABCDE1234F1Z5</div>
-                    <div class="shop-name">Ph: +91 98765 43210</div>
-                </div>
-                <div class="details">
-                    <p><strong>Bill No:</strong> ${billNumber}</p>
-                    <p><strong>Date:</strong> ${date}</p>
-                    <p><strong>Customer ID:</strong> ${customerId}</p>
-                    <p><strong>Customer:</strong> ${customerName}</p>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-right">Price</th>
-                            <th class="text-center">Disc%</th>
-                            <th class="text-right">Cashback</th>
-                            <th class="text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>${billItemsHtml}</tbody>
-                </table>
-                <div class="total-section">
-                    <div class="total-line"><span>Subtotal:</span><span>₹${totalAmount.toFixed(2)}</span></div>
-                    <div class="cashback-line"><span>🎁 Cashback Added to Wallet:</span><span>+₹${totalCashback.toFixed(2)}</span></div>
-                    <div class="grand-total"><div style="display: flex; justify-content: space-between;"><span>GRAND TOTAL:</span><span>₹${totalAmount.toFixed(2)}</span></div></div>
-                </div>
-                <div class="footer">
-                    <p>✨ Thank you for shopping! ✨</p>
-                    <p>📍 Visit Again | 🎁 Refer & Earn 0.5% Commission</p>
-                </div>
-            </div>
-            <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 1000); };<\/script>
-        </body>
-        </html>
-    `;
-    
-    const printWindow = window.open('', '_blank', 'width=450,height=650,scrollbars=yes');
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-}
-function printBillAfterCreate(customerId, billItems, totalAmount, totalCashback) {
-    const customerSelect = document.getElementById('billCustomer');
-    const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-    const customerName = selectedOption.text.split(' (')[0];
-    
-    let billItemsHtml = '';
-    
-    billItems.forEach(item => {
-        billItemsHtml += `<tr>
-            <td style="padding:8px; border-bottom:1px solid #ddd;">${item.name}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.quantity}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${item.price.toFixed(2)}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.discount}%</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right; color:#27ae60;">+₹${(item.cashback * item.quantity).toFixed(2)}</td>
-            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${(item.price * item.quantity).toFixed(2)}</td>
-        </tr>`;
-    });
-    
-    const billNumber = `SB${Date.now()}`;
-    const date = new Date().toLocaleString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    });
-    
-    const printContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>SASTA BAZAR - Bill</title>
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: 'Courier New', Courier, monospace; background: white; margin: 0; padding: 20px; }
-                .bill { max-width: 350px; margin: 0 auto; background: white; }
-                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 12px; margin-bottom: 15px; }
-                .header h1 { font-size: 24px; color: #e67e22; margin: 0 0 5px 0; }
-                .shop-name { font-size: 12px; color: #666; margin: 3px 0; }
-                .details { margin-bottom: 15px; font-size: 11px; line-height: 1.5; }
-                .details p { margin: 3px 0; }
-                table { width: 100%; border-collapse: collapse; font-size: 10px; margin: 10px 0; }
-                th { background: #f5f5f5; padding: 6px; text-align: left; border-bottom: 1px solid #ddd; }
-                td { padding: 5px; border-bottom: 1px solid #eee; }
-                .text-right { text-align: right; }
-                .text-center { text-align: center; }
-                .total-section { border-top: 1px solid #333; margin-top: 10px; padding-top: 10px; }
-                .total-line { display: flex; justify-content: space-between; font-size: 12px; margin: 5px 0; }
-                .cashback-line { display: flex; justify-content: space-between; color: #27ae60; font-size: 12px; margin: 5px 0; }
-                .grand-total { font-size: 14px; font-weight: bold; margin-top: 8px; padding-top: 5px; border-top: 1px solid #ddd; }
-                .footer { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 1px dashed #999; font-size: 9px; color: #666; }
-                @media print { body { padding: 0; margin: 0; } }
-            </style>
-        </head>
-        <body>
-            <div class="bill">
-                <div class="header">
-                    <h1>🏪 SASTA BAZAR</h1>
-                    <div class="shop-name">सस्ता बाजार - आपका अपना दुकान</div>
-                    <div class="shop-name">123 Main Street, City</div>
-                    <div class="shop-name">GST: 27ABCDE1234F1Z5</div>
-                    <div class="shop-name">Ph: +91 98765 43210</div>
-                </div>
-                <div class="details">
-                    <p><strong>Bill No:</strong> ${billNumber}</p>
-                    <p><strong>Date:</strong> ${date}</p>
-                    <p><strong>Customer:</strong> ${customerName}</p>
-                    <p><strong>Customer ID:</strong> ${customerId}</p>
-                </div>
-                </table>
-                    <thead><tr><th>Item</th><th class="text-center">Qty</th><th class="text-right">Price</th><th class="text-center">Disc%</th><th class="text-right">Cashback</th><th class="text-right">Total</th></tr></thead>
-                    <tbody>${billItemsHtml}</tbody>
-                </table>
-                <div class="total-section">
-                    <div class="total-line"><span>Subtotal:</span><span>₹${totalAmount.toFixed(2)}</span></div>
-                    <div class="cashback-line"><span>🎁 Cashback Added to Wallet:</span><span>+₹${totalCashback.toFixed(2)}</span></div>
-                    <div class="grand-total"><div style="display: flex; justify-content: space-between;"><span>GRAND TOTAL:</span><span>₹${totalAmount.toFixed(2)}</span></div></div>
-                </div>
-                <div class="footer">
-                    <p>✨ Thank you for shopping! ✨</p>
-                    <p>📍 Visit Again | 🎁 Refer & Earn 0.5% Commission</p>
-                </div>
-            </div>
-            <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 1000); };<\/script>
-        </body>
-        </html>
-    `;
-    
-    const printWindow = window.open('', '_blank', 'width=450,height=650,scrollbars=yes');
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-}
+            if(cart.length===0) return showAlert('Cart empty','error');
+            const cust = document.getElementById('billCustomer').value;
+            if(!cust) return showAlert('Select customer','error');
+            const cs = document.getElementById('billCustomer'), opt = cs.options[cs.selectedIndex], custName = opt.text.split(' (')[0];
+            let total=0, totalCashback=0, itemsHtml='';
+            cart.forEach(i=>{ const t = i.originalPrice * i.quantity; const cb = i.cashback * i.quantity; total+=t; totalCashback+=cb;
+                itemsHtml += `<tr>
+                    <td>${i.name}</td><td style="text-align:center">${i.quantity}</td><td style="text-align:right">₹${i.originalPrice}</td>
+                    <td style="text-align:center">${i.discountPercent}%</span></td>
+                    <td style="text-align:right; color:#27ae60;">+₹${cb.toFixed(2)}</span></td>
+                    <td style="text-align:right">₹${t.toFixed(2)}</span></td>
+                </tr>`;
+            });
+            const win = window.open('','_blank');
+            win.document.write(`<html><head><title>SASTA BAZAR Bill</title><style>body{font-family:'Courier New';margin:20px;}.bill{max-width:350px;margin:0 auto;}.header{text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;}</style></head><body onload="window.print();window.close();"><div class="bill"><div class="header"><h2>🏪 SASTA BAZAR</h2><p>123 Main Street, City | Ph: +91 98765 43210</p></div><p><strong>Bill No:</strong> SB${Date.now()}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p><p><strong>Customer:</strong> ${custName}</p><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></tr><div class="total"><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">🎁 Cashback Added: +₹${totalCashback}</p></div><div style="text-align:center;margin-top:15px;"><p>✨ Thank you! ✨</p></div></div></body></html>`);
+        }
 
+        function printBillAfterCreate(custId, cartItems) {
+            const cs = document.getElementById('billCustomer'), opt = cs.options[cs.selectedIndex], custName = opt ? opt.text.split(' (')[0] : 'Customer';
+            let total=0, totalCashback=0, itemsHtml='';
+            cartItems.forEach(i=>{ const t = i.originalPrice * i.quantity; const cb = i.cashback * i.quantity; total+=t; totalCashback+=cb;
+                itemsHtml += `<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`;
+            });
+            const win = window.open('','_blank');
+            win.document.write(`<html><head><title>SASTA BAZAR Bill</title><style>body{font-family:'Courier New';margin:20px;} .bill{max-width:350px;margin:0 auto;} .header{text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;}</style></head><body onload="window.print();window.close();"><div class="bill"><div class="header"><h2>🏪 SASTA BAZAR</h2><p>123 Main Street, City | Ph: +91 98765 43210</p></div><p><strong>Bill No:</strong> SB${Date.now()}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p><p><strong>Customer:</strong> ${custName}</p><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div class="total"><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">🎁 Cashback Added: +₹${totalCashback}</p></div><div style="text-align:center;margin-top:15px;"><p>✨ Thank you! ✨</p></div></div></body></html>`);
+        }
+
+        // ========== BARCODE SCANNER ==========
         function setupBarcodeScanner() {
             const input = document.getElementById('barcodeInput');
             if(!input) return;
@@ -1093,10 +863,11 @@ function printBillAfterCreate(customerId, billItems, totalAmount, totalCashback)
                 if(ex) ex.quantity++;
                 else cart.push({product_id:p.id,name:p.name,originalPrice:p.selling_price,discountPercent:p.discount_percent||0,cashback:cashback,quantity:1});
                 renderCart();
-                showAlert(`✅ ${p.name} added!`,'success');
+                showAlert(`✅ ${p.name} added via barcode!`,'success');
             } catch(e) { showAlert('Error: '+e.message,'error'); }
         }
 
+        // ========== CUSTOMER FUNCTIONS ==========
         async function loadCustomerData() {
             try {
                 const profile = await apiCall('GET','/customers/profile'), trans = await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust = await apiCall('GET','/customers');
@@ -1105,27 +876,59 @@ function printBillAfterCreate(customerId, billItems, totalAmount, totalCashback)
                 document.getElementById('myReferralCode').innerHTML = profile.referral_code;
                 document.getElementById('custReferrals').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
                 const wt = document.getElementById('walletTransactions'); wt.innerHTML = '';
-                trans.forEach(t=>{ wt.innerHTML += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td></tr>`; });
+                trans.forEach(t=>{ wt.innerHTML += `<tr>
+                    <td>${new Date(t.created_at).toLocaleDateString()}</td>
+                    <td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td>
+                    <td>₹${t.amount}</td>
+                    <td>${t.description||'-'}</td>
+                </tr>`; });
             } catch(e){ showAlert('Error loading profile','error'); }
         }
 
-    
-
         function copyReferralCode(){ navigator.clipboard.writeText(document.getElementById('myReferralCode').innerText); showAlert('Copied!','success'); }
-        function showAddProductModal(){ editingId=null; showModal('productModal'); }
-        function showAddCustomerModal(){ showModal('customerModal'); }
-    
-        function manageCustomerWallet(id){ showModal('walletControlModal'); loadWalletCustomers(); setTimeout(()=>{ document.getElementById('walletCustomerSelect').value=id; },100); }
 
+        // ========== ADMIN WALLET CONTROL ==========
+        function showWalletControlModal() { showModal('walletControlModal'); loadWalletCustomers(); }
+        
+        function showWalletControlForCustomer(id) {
+            showModal('walletControlModal');
+            loadWalletCustomers();
+            setTimeout(() => { document.getElementById('walletCustomerSelect').value = id; updateWalletBalanceDisplay(); }, 100);
+        }
+        
         async function loadWalletCustomers() {
-            try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange=function(){ document.getElementById('currentBalance').innerHTML=`₹${this.options[this.selectedIndex]?.dataset.balance||0}`; }; }catch(e){ showAlert('Error','error'); }
+            try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange = updateWalletBalanceDisplay; }catch(e){ showAlert('Error','error'); }
+        }
+        
+        function updateWalletBalanceDisplay() {
+            const sel = document.getElementById('walletCustomerSelect');
+            const opt = sel.options[sel.selectedIndex];
+            document.getElementById('currentBalance').innerHTML = `₹${opt?.dataset.balance || 0}`;
+        }
+        
+        async function adminAddMoney() {
+            const cid = document.getElementById('walletCustomerSelect').value, amt = parseFloat(document.getElementById('walletAmount').value), reason = document.getElementById('walletReason').value;
+            if(!cid||!amt) return showAlert('Select customer & amount','error');
+            try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); loadWalletCustomers(); document.getElementById('walletAmount').value=''; } catch(e){ showAlert('Error','error'); }
+        }
+        
+        async function adminDeductMoney() {
+            const cid = document.getElementById('walletCustomerSelect').value, amt = parseFloat(document.getElementById('walletAmount').value), reason = document.getElementById('walletReason').value;
+            if(!cid||!amt) return showAlert('Select customer & amount','error');
+            try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); loadWalletCustomers(); document.getElementById('walletAmount').value=''; } catch(e){ showAlert('Error','error'); }
         }
 
-        function showWalletControlModal(){ showModal('walletControlModal'); loadWalletCustomers(); }
-        async function adminAddMoney(){ const cid=document.getElementById('walletCustomerSelect').value, amt=parseFloat(document.getElementById('walletAmount').value), reason=document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } }
-        async function adminDeductMoney(){ const cid=document.getElementById('walletCustomerSelect').value, amt=parseFloat(document.getElementById('walletAmount').value), reason=document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } }
-
-        function logout(){ authToken=null; currentUser=null; cart=[]; document.getElementById('loginSection').style.display='block'; document.getElementById('adminDashboard').style.display='none'; document.getElementById('customerDashboard').style.display='none'; showAlert('Logged out','info'); }
+        // ========== UI FUNCTIONS ==========
+        function showAddProductModal(){ editingId=null; showModal('productModal'); }
+        function showAddCustomerModal(){ showModal('customerModal'); }
+        
+        function logout() {
+            authToken=null; currentUser=null; cart=[];
+            document.getElementById('loginSection').style.display='block';
+            document.getElementById('adminDashboard').style.display='none';
+            document.getElementById('customerDashboard').style.display='none';
+            showAlert('Logged out','info');
+        }
 
         checkBackend(); setInterval(checkBackend,30000);
     </script>
