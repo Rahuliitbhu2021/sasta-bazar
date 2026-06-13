@@ -8,7 +8,8 @@ app.use(cors());
 app.use(express.json());
 
 // ============ SIMPLE IN-MEMORY DATABASE ============
-// Admin user (email: admin@shop.com, password: Admin@123)
+// Admin user with your password: MyStrongPass@0424
+// Generate hash for "MyStrongPass@0424" using bcrypt
 const adminPasswordHash = '$2a$10$rQHjUzRZKXQZ5Z5Z5Z5ZuOZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5';
 
 // Sample products
@@ -58,9 +59,10 @@ app.get('/api/test', (req, res) => {
 // ============ ADMIN LOGIN ============
 app.post('/api/auth/admin/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log('Login attempt:', email, password);
+  console.log('Login attempt:', email);
   
-  if (email === 'admin@shop.com' && password === 'Admin@123') {
+  // Check if email is admin@shop.com and password is MyStrongPass@0424
+  if (email === 'admin@shop.com' && password === 'MyStrongPass@0424') {
     const token = jwt.sign({ id: 1, email: email, role: 'admin' }, 'mysecretkey', { expiresIn: '7d' });
     res.json({ 
       token, 
@@ -226,11 +228,42 @@ app.post('/api/wallet/add-money', authenticateToken, (req, res) => {
   }
 });
 
+// ============ ADMIN WALLET CONTROL ============
+app.get('/api/admin/wallet/:customerId', authenticateToken, (req, res) => {
+  const customer = customers.find(c => c.id == req.params.customerId);
+  res.json({ customer, transactions: [] });
+});
+
+app.post('/api/admin/wallet/add', authenticateToken, (req, res) => {
+  const { customer_id, amount, reason } = req.body;
+  const customer = customers.find(c => c.id === customer_id);
+  if (customer) {
+    customer.wallet_balance += amount;
+    res.json({ success: true, new_balance: customer.wallet_balance });
+  } else {
+    res.status(404).json({ error: 'Customer not found' });
+  }
+});
+
+app.post('/api/admin/wallet/deduct', authenticateToken, (req, res) => {
+  const { customer_id, amount, reason } = req.body;
+  const customer = customers.find(c => c.id === customer_id);
+  if (customer) {
+    if (customer.wallet_balance < amount) {
+      return res.status(400).json({ error: 'Insufficient balance' });
+    }
+    customer.wallet_balance -= amount;
+    res.json({ success: true, new_balance: customer.wallet_balance });
+  } else {
+    res.status(404).json({ error: 'Customer not found' });
+  }
+});
+
 // ============ START SERVER ============
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}`);
   console.log(`✅ Working! No database needed.`);
-  console.log(`\n📋 Admin Login: admin@shop.com / Admin@123`);
+  console.log(`\n📋 Admin Login: admin@shop.com / MyStrongPass@0424`);
   console.log(`📋 Customer: 9876543210 / 9876543210\n`);
 });
