@@ -785,32 +785,20 @@
     <div id="alert" class="alert-premium"></div>
 
     <!-- ============================================ -->
-    <!-- JAVASCRIPT SECTION -->
+    <!-- JAVASCRIPT SECTION - FIXED VERSION -->
     <!-- ============================================ -->
     <script>
-        console.log('=== DEBUGGING START ===');
-console.log('API_URL:', API_URL);
-console.log('Current URL:', window.location.href);
         // ============================================
-        // CONFIGURATION & GLOBAL VARIABLES
+        // CONFIGURATION - FIXED BACKEND URL
         // ============================================
+        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
+        const API_URL = `${BACKEND_URL}/api`;
         
-      // FORCE BACKEND URL - DIRECT SET
-const API_URL = 'https://sasta-bazar-backend.onrender.com/api';
-
-// Override fetch to always use correct URL
-window.fetch = new Proxy(window.fetch, {
-  apply: function(target, thisArg, args) {
-    if (args[0] && typeof args[0] === 'string' && args[0].startsWith('/')) {
-      args[0] = API_URL + args[0];
-    } else if (args[0] && typeof args[0] === 'string' && args[0].startsWith('http://localhost')) {
-      args[0] = args[0].replace('http://localhost:5000/api', API_URL);
-    }
-    return target.apply(thisArg, args);
-  }
-});
-
-console.log('✅ API_URL forced to:', API_URL);
+        console.log('=== DEBUGGING START ===');
+        console.log('BACKEND_URL:', BACKEND_URL);
+        console.log('API_URL:', API_URL);
+        console.log('Current URL:', window.location.href);
+        
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
 
         // Generate stars background
@@ -831,11 +819,19 @@ console.log('✅ API_URL forced to:', API_URL);
         generateStars();
 
         // ============================================
-        // HELPER FUNCTIONS
+        // HELPER FUNCTIONS - FIXED checkBackend
         // ============================================
         async function checkBackend() {
-            try { const res = await fetch('http://localhost:5000/'); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-connected"><i class="fas fa-check-circle"></i> Connected to Server</span>';
-            } catch(e) { document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-disconnected"><i class="fas fa-exclamation-circle"></i> Server not running! Start with: npm start</span>'; }
+            try { 
+                const res = await fetch(`${BACKEND_URL}/`);
+                if(res.ok) {
+                    document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-connected"><i class="fas fa-check-circle"></i> ✅ Connected to Server</span>';
+                } else {
+                    document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-disconnected"><i class="fas fa-exclamation-circle"></i> Server error</span>';
+                }
+            } catch(e) { 
+                document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-disconnected"><i class="fas fa-exclamation-circle"></i> ❌ Server not running! Backend may be waking up (takes 30-60 sec)</span>'; 
+            }
         }
 
         async function apiCall(method, endpoint, data = null) {
@@ -873,51 +869,52 @@ console.log('✅ API_URL forced to:', API_URL);
             document.getElementById('registrationForm').style.display = 'block';
         }
 
- async function adminLogin() {
-  const email = document.getElementById('adminEmail').value;
-  const password = document.getElementById('adminPassword').value;
-  
-  if (!email || !password) {
-    showAlert('Enter email and password', 'error');
-    return;
-  }
-  
-  // Force backend URL
-  const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
-  const loginUrl = `${BACKEND_URL}/api/auth/admin/login`;
-  
-  console.log('Attempting login to:', loginUrl);
-  
-  try {
-    const response = await fetch(loginUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password })
-    });
-    
-    console.log('Response status:', response.status);
-    
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Login success:', data);
-      authToken = data.token;
-      currentUser = { type: 'admin', name: 'Admin' };
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('adminDashboard').style.display = 'block';
-      await loadAdminData();
-      showAlert('Welcome Admin!', 'success');
-    } else {
-      const error = await response.json();
-      console.log('Login failed:', error);
-      showAlert(error.error || 'Login failed. Check console.', 'error');
-    }
-  } catch (error) {
-    console.error('Network error:', error);
-    showAlert('Network error: ' + error.message, 'error');
-  }
-}
+        // FIXED adminLogin function - working properly
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (!email || !password) {
+                showAlert('Enter email and password', 'error');
+                return;
+            }
+            
+            showAlert('Logging in...', 'info');
+            
+            const loginUrl = `${BACKEND_URL}/api/auth/admin/login`;
+            console.log('Attempting login to:', loginUrl);
+            
+            try {
+                const response = await fetch(loginUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Login success:', data);
+                    authToken = data.token;
+                    currentUser = { type: 'admin', name: 'Admin' };
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('adminDashboard').style.display = 'block';
+                    await loadAdminData();
+                    setupBarcodeScanner();
+                    showAlert('Welcome Admin!', 'success');
+                } else {
+                    const error = await response.json();
+                    console.log('Login failed:', error);
+                    showAlert(error.error || 'Login failed. Check credentials.', 'error');
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                showAlert('Network error: ' + error.message + '. Backend may be waking up. Wait 30 sec.', 'error');
+            }
+        }
 
         async function customerLogin() {
             const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value;
@@ -966,7 +963,7 @@ console.log('✅ API_URL forced to:', API_URL);
                 </tr>`; });
                 
                 const cl = document.getElementById('customersList'); cl.innerHTML = '';
-                customers.forEach(c => { cl.innerHTML += `<tr>
+                customers.forEach(c => { cl.innerHTML += `</tr>
                     <td>${c.name}</td>
                     <td>${c.mobile}</td>
                     <td><strong>${c.referral_code}</strong></td>
@@ -1074,7 +1071,6 @@ console.log('✅ API_URL forced to:', API_URL);
             
             barcodeInput.value = '';
             
-            // Handle enter key (barcode scanners press enter after scan)
             barcodeInput.addEventListener('keypress', async function(e) {
                 if (e.key === 'Enter') {
                     const barcode = this.value.trim();
@@ -1086,7 +1082,6 @@ console.log('✅ API_URL forced to:', API_URL);
                 }
             });
             
-            // Handle paste for manual entry
             barcodeInput.addEventListener('paste', async function(e) {
                 setTimeout(async () => {
                     const barcode = this.value.trim();
@@ -1151,7 +1146,6 @@ console.log('✅ API_URL forced to:', API_URL);
                 
                 renderCart();
                 
-                // Flash effect
                 const cartSection = document.querySelector('.cart-total-box');
                 if (cartSection) {
                     cartSection.style.transition = 'all 0.2s ease';
@@ -1180,7 +1174,6 @@ console.log('✅ API_URL forced to:', API_URL);
             } catch(e) { console.log('Beep not supported'); }
         }
 
-        // Auto-focus barcode input
         setInterval(() => {
             if (document.getElementById('adminDashboard').style.display === 'block') {
                 const barcodeInput = document.getElementById('barcodeInput');
@@ -1204,7 +1197,7 @@ console.log('✅ API_URL forced to:', API_URL);
                 let referrals=allCustomers.filter(c=>c.referred_by===profile.referral_code);
                 document.getElementById('custReferrals').innerHTML=referrals.length;
                 let wt=document.getElementById('walletTransactions'); wt.innerHTML='';
-                transactions.forEach(t=>{ wt.innerHTML+=`<td>
+                transactions.forEach(t=>{ wt.innerHTML+=`<tr>
                     <td>${new Date(t.created_at).toLocaleDateString()}</td>
                     <td style="color:${t.transaction_type==='CREDIT'?'#2ecc71':'#e74c3c'}">${t.transaction_type}</td>
                     <td>₹${t.amount}</td>
@@ -1233,7 +1226,8 @@ console.log('✅ API_URL forced to:', API_URL);
         function logout(){ authToken=null; currentUser=null; cart=[]; document.getElementById('loginSection').style.display='block'; document.getElementById('adminDashboard').style.display='none'; document.getElementById('customerDashboard').style.display='none'; showAlert('Logged out','info'); }
 
         // Initialize
-        checkBackend(); setInterval(checkBackend,10000);
+        checkBackend(); 
+        setInterval(checkBackend, 30000);
     </script>
 </body>
 </html>
