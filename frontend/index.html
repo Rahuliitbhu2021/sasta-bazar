@@ -803,25 +803,285 @@
 
         function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
 
-        async function createBill() {
-            if(cart.length===0) return showAlert('Cart empty','error');
-            const cust = document.getElementById('billCustomer').value;
-            if(!cust) return showAlert('Select customer','error');
-            const items = cart.map(i=>({product_id:i.product_id,quantity:i.quantity}));
-            try { await apiCall('POST','/bills',{customer_id:parseInt(cust),items,payment_method:'cash'}); showAlert('Bill created! Cashback added to wallet!','success'); cart=[]; renderCart(); await loadAdminData(); }
-            catch(e) { showAlert('Error: '+e.message,'error'); }
+      async function createBill() {
+    if (cart.length === 0) {
+        showAlert('Cart is empty! Add some items first.', 'error');
+        return;
+    }
+    
+    const customerId = document.getElementById('billCustomer').value;
+    if (!customerId) {
+        showAlert('Please select a customer', 'error');
+        return;
+    }
+    
+    let totalAmount = 0;
+    let totalCashback = 0;
+    const billItems = cart.map(item => {
+        const itemTotal = item.originalPrice * item.quantity;
+        const itemCashback = (item.cashback || 0) * item.quantity;
+        totalAmount += itemTotal;
+        totalCashback += itemCashback;
+        return {
+            product_id: item.product_id,
+            quantity: item.quantity,
+            name: item.name,
+            price: item.originalPrice,
+            discount: item.discountPercent,
+            cashback: item.cashback
+        };
+    });
+    
+    const items = cart.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity
+    }));
+    
+    showAlert('Processing bill...', 'info');
+    
+    try {
+        const response = await apiCall('POST', '/bills', {
+            customer_id: parseInt(customerId),
+            items: items,
+            payment_method: 'cash'
+        });
+        
+        if (response.success) {
+            const customerSelect = document.getElementById('billCustomer');
+            const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+            const currentWallet = parseFloat(selectedOption.text.split('Wallet: ₹')[1] || 0);
+            const newWalletBalance = currentWallet + response.cashback;
+            
+            selectedOption.text = selectedOption.text.replace(/Wallet: ₹[\d.]+/, `Wallet: ₹${newWalletBalance}`);
+            
+            showAlert(`✅ Bill created successfully! Cashback: ₹${response.cashback.toFixed(2)} added to wallet!`, 'success');
+            
+            cart = [];
+            renderCart();
+            await loadAdminData();
+            printBillAfterCreate(customerId, billItems, totalAmount, totalCashback);
+        } else {
+            showAlert('Failed to create bill', 'error');
         }
+    } catch (error) {
+        console.error('Bill creation error:', error);
+        showAlert('Error creating bill: ' + error.message, 'error');
+    }
+}
 
         function printBill() {
-            if(cart.length===0) return showAlert('Cart empty','error');
-            const cust = document.getElementById('billCustomer').value;
-            if(!cust) return showAlert('Select customer','error');
-            const cs = document.getElementById('billCustomer'), opt = cs.options[cs.selectedIndex], custName = opt.text.split(' (')[0];
-            let total=0, totalCashback=0, itemsHtml='';
-            cart.forEach(i=>{ const t = i.originalPrice * i.quantity, cb = i.cashback * i.quantity; total+=t; totalCashback+=cb; itemsHtml += `<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td>+₹${cb}</td><td>₹${t}</td></tr>`; });
-            const win = window.open('','_blank');
-            win.document.write(`<html><head><title>SASTA BAZAR Bill</title><style>body{font-family:'Courier New';margin:20px;}.bill{max-width:350px;margin:0 auto;}.header{text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;}.total{border-top:1px solid #000;padding-top:10px;}</style></head><body onload="window.print();window.close();"><div class="bill"><div class="header"><h2>🏪 SASTA BAZAR</h2><p>123 Main Street, City | Ph: +91 98765 43210</p></div><p><strong>Bill No:</strong> SB${Date.now()}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p><p><strong>Customer:</strong> ${custName}</p><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div class="total"><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">🎁 Cashback Added: +₹${totalCashback}</p></div><div style="text-align:center;margin-top:15px;"><p>✨ Thank you! ✨</p></div></div></body></html>`);
-        }
+    if (cart.length === 0) {
+        showAlert('Cart is empty! Add some items first.', 'error');
+        return;
+    }
+    
+    const customerId = document.getElementById('billCustomer').value;
+    if (!customerId) {
+        showAlert('Please select a customer', 'error');
+        return;
+    }
+    
+    const customerSelect = document.getElementById('billCustomer');
+    const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+    const customerName = selectedOption.text.split(' (')[0];
+    
+    let totalAmount = 0;
+    let totalCashback = 0;
+    let billItemsHtml = '';
+    
+    cart.forEach(item => {
+        const itemTotal = item.originalPrice * item.quantity;
+        const itemCashback = (item.cashback || 0) * item.quantity;
+        totalAmount += itemTotal;
+        totalCashback += itemCashback;
+        
+        billItemsHtml += `<tr>
+            <td style="padding:8px; border-bottom:1px solid #ddd;">${item.name}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.quantity}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${item.originalPrice.toFixed(2)}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.discountPercent}%</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right; color:#27ae60;">+₹${itemCashback.toFixed(2)}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${itemTotal.toFixed(2)}</td>
+        </tr>`;
+    });
+    
+    const billNumber = `SB${Date.now()}`;
+    const date = new Date().toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+    
+    const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>SASTA BAZAR - Bill</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Courier New', Courier, monospace; background: white; margin: 0; padding: 20px; }
+                .bill { max-width: 350px; margin: 0 auto; background: white; }
+                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 12px; margin-bottom: 15px; }
+                .header h1 { font-size: 24px; color: #e67e22; margin: 0 0 5px 0; }
+                .shop-name { font-size: 12px; color: #666; margin: 3px 0; }
+                .details { margin-bottom: 15px; font-size: 11px; line-height: 1.5; }
+                .details p { margin: 3px 0; }
+                table { width: 100%; border-collapse: collapse; font-size: 10px; margin: 10px 0; }
+                th { background: #f5f5f5; padding: 6px; text-align: left; border-bottom: 1px solid #ddd; }
+                td { padding: 5px; border-bottom: 1px solid #eee; }
+                .text-right { text-align: right; }
+                .text-center { text-align: center; }
+                .total-section { border-top: 1px solid #333; margin-top: 10px; padding-top: 10px; }
+                .total-line { display: flex; justify-content: space-between; font-size: 12px; margin: 5px 0; }
+                .cashback-line { display: flex; justify-content: space-between; color: #27ae60; font-size: 12px; margin: 5px 0; }
+                .grand-total { font-size: 14px; font-weight: bold; margin-top: 8px; padding-top: 5px; border-top: 1px solid #ddd; }
+                .footer { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 1px dashed #999; font-size: 9px; color: #666; }
+                @media print { body { padding: 0; margin: 0; } }
+            </style>
+        </head>
+        <body>
+            <div class="bill">
+                <div class="header">
+                    <h1>🏪 SASTA BAZAR</h1>
+                    <div class="shop-name">सस्ता बाजार - आपका अपना दुकान</div>
+                    <div class="shop-name">123 Main Street, City</div>
+                    <div class="shop-name">GST: 27ABCDE1234F1Z5</div>
+                    <div class="shop-name">Ph: +91 98765 43210</div>
+                </div>
+                <div class="details">
+                    <p><strong>Bill No:</strong> ${billNumber}</p>
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Customer ID:</strong> ${customerId}</p>
+                    <p><strong>Customer:</strong> ${customerName}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-right">Price</th>
+                            <th class="text-center">Disc%</th>
+                            <th class="text-right">Cashback</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>${billItemsHtml}</tbody>
+                </table>
+                <div class="total-section">
+                    <div class="total-line"><span>Subtotal:</span><span>₹${totalAmount.toFixed(2)}</span></div>
+                    <div class="cashback-line"><span>🎁 Cashback Added to Wallet:</span><span>+₹${totalCashback.toFixed(2)}</span></div>
+                    <div class="grand-total"><div style="display: flex; justify-content: space-between;"><span>GRAND TOTAL:</span><span>₹${totalAmount.toFixed(2)}</span></div></div>
+                </div>
+                <div class="footer">
+                    <p>✨ Thank you for shopping! ✨</p>
+                    <p>📍 Visit Again | 🎁 Refer & Earn 0.5% Commission</p>
+                </div>
+            </div>
+            <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 1000); };<\/script>
+        </body>
+        </html>
+    `;
+    
+    const printWindow = window.open('', '_blank', 'width=450,height=650,scrollbars=yes');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+}
+function printBillAfterCreate(customerId, billItems, totalAmount, totalCashback) {
+    const customerSelect = document.getElementById('billCustomer');
+    const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+    const customerName = selectedOption.text.split(' (')[0];
+    
+    let billItemsHtml = '';
+    
+    billItems.forEach(item => {
+        billItemsHtml += `<tr>
+            <td style="padding:8px; border-bottom:1px solid #ddd;">${item.name}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.quantity}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${item.price.toFixed(2)}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:center;">${item.discount}%</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right; color:#27ae60;">+₹${(item.cashback * item.quantity).toFixed(2)}</td>
+            <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹${(item.price * item.quantity).toFixed(2)}</td>
+        </tr>`;
+    });
+    
+    const billNumber = `SB${Date.now()}`;
+    const date = new Date().toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+    
+    const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>SASTA BAZAR - Bill</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Courier New', Courier, monospace; background: white; margin: 0; padding: 20px; }
+                .bill { max-width: 350px; margin: 0 auto; background: white; }
+                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 12px; margin-bottom: 15px; }
+                .header h1 { font-size: 24px; color: #e67e22; margin: 0 0 5px 0; }
+                .shop-name { font-size: 12px; color: #666; margin: 3px 0; }
+                .details { margin-bottom: 15px; font-size: 11px; line-height: 1.5; }
+                .details p { margin: 3px 0; }
+                table { width: 100%; border-collapse: collapse; font-size: 10px; margin: 10px 0; }
+                th { background: #f5f5f5; padding: 6px; text-align: left; border-bottom: 1px solid #ddd; }
+                td { padding: 5px; border-bottom: 1px solid #eee; }
+                .text-right { text-align: right; }
+                .text-center { text-align: center; }
+                .total-section { border-top: 1px solid #333; margin-top: 10px; padding-top: 10px; }
+                .total-line { display: flex; justify-content: space-between; font-size: 12px; margin: 5px 0; }
+                .cashback-line { display: flex; justify-content: space-between; color: #27ae60; font-size: 12px; margin: 5px 0; }
+                .grand-total { font-size: 14px; font-weight: bold; margin-top: 8px; padding-top: 5px; border-top: 1px solid #ddd; }
+                .footer { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 1px dashed #999; font-size: 9px; color: #666; }
+                @media print { body { padding: 0; margin: 0; } }
+            </style>
+        </head>
+        <body>
+            <div class="bill">
+                <div class="header">
+                    <h1>🏪 SASTA BAZAR</h1>
+                    <div class="shop-name">सस्ता बाजार - आपका अपना दुकान</div>
+                    <div class="shop-name">123 Main Street, City</div>
+                    <div class="shop-name">GST: 27ABCDE1234F1Z5</div>
+                    <div class="shop-name">Ph: +91 98765 43210</div>
+                </div>
+                <div class="details">
+                    <p><strong>Bill No:</strong> ${billNumber}</p>
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Customer:</strong> ${customerName}</p>
+                    <p><strong>Customer ID:</strong> ${customerId}</p>
+                </div>
+                </table>
+                    <thead><tr><th>Item</th><th class="text-center">Qty</th><th class="text-right">Price</th><th class="text-center">Disc%</th><th class="text-right">Cashback</th><th class="text-right">Total</th></tr></thead>
+                    <tbody>${billItemsHtml}</tbody>
+                </table>
+                <div class="total-section">
+                    <div class="total-line"><span>Subtotal:</span><span>₹${totalAmount.toFixed(2)}</span></div>
+                    <div class="cashback-line"><span>🎁 Cashback Added to Wallet:</span><span>+₹${totalCashback.toFixed(2)}</span></div>
+                    <div class="grand-total"><div style="display: flex; justify-content: space-between;"><span>GRAND TOTAL:</span><span>₹${totalAmount.toFixed(2)}</span></div></div>
+                </div>
+                <div class="footer">
+                    <p>✨ Thank you for shopping! ✨</p>
+                    <p>📍 Visit Again | 🎁 Refer & Earn 0.5% Commission</p>
+                </div>
+            </div>
+            <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 1000); };<\/script>
+        </body>
+        </html>
+    `;
+    
+    const printWindow = window.open('', '_blank', 'width=450,height=650,scrollbars=yes');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+}
 
         function setupBarcodeScanner() {
             const input = document.getElementById('barcodeInput');
