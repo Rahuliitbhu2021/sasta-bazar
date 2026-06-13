@@ -788,6 +788,9 @@
     <!-- JAVASCRIPT SECTION -->
     <!-- ============================================ -->
     <script>
+        console.log('=== DEBUGGING START ===');
+console.log('API_URL:', API_URL);
+console.log('Current URL:', window.location.href);
         // ============================================
         // CONFIGURATION & GLOBAL VARIABLES
         // ============================================
@@ -871,6 +874,10 @@ console.log('✅ API_URL forced to:', API_URL);
         }
 
         async function adminLogin() {
+            console.log('Login button clicked');
+console.log('Email:', email);
+console.log('Password:', password);
+console.log('API_URL:', API_URL);
             const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value;
             if (!email || !password) return showAlert('Enter credentials', 'error');
             try {
