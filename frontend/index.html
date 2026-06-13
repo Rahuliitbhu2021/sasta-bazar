@@ -791,7 +791,23 @@
         // ============================================
         // CONFIGURATION & GLOBAL VARIABLES
         // ============================================
-       const API_URL = 'https://sasta-bazar-backend.onrender.com/api';
+        
+      // FORCE BACKEND URL - DIRECT SET
+const API_URL = 'https://sasta-bazar-backend.onrender.com/api';
+
+// Override fetch to always use correct URL
+window.fetch = new Proxy(window.fetch, {
+  apply: function(target, thisArg, args) {
+    if (args[0] && typeof args[0] === 'string' && args[0].startsWith('/')) {
+      args[0] = API_URL + args[0];
+    } else if (args[0] && typeof args[0] === 'string' && args[0].startsWith('http://localhost')) {
+      args[0] = args[0].replace('http://localhost:5000/api', API_URL);
+    }
+    return target.apply(thisArg, args);
+  }
+});
+
+console.log('✅ API_URL forced to:', API_URL);
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
 
         // Generate stars background
