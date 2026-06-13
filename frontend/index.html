@@ -567,14 +567,10 @@
 
         <!-- Admin Dashboard -->
         <div id="adminDashboard" class="dashboard" style="display:none;">
-            <div class="dashboard-header">
-                <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-premium btn-primary-gold" style="padding:12px 20px;" onclick="showAddProductModal()"><i class="fas fa-plus"></i> Product</button>
-                    <button class="btn-premium btn-success-modern" style="padding:12px 20px;" onclick="showAddCustomerModal()"><i class="fas fa-user-plus"></i> Customer</button>
-                    <button class="btn-premium btn-danger-modern" style="padding:12px 20px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
-                </div>
-            </div>
+           <div class="dashboard-header">
+    <h1><i class="fas fa-user-circle"></i> My Portal</h1>
+    <div><button class="btn-premium btn-danger-modern" style="padding:12px 20px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button></div>
+</div>
 
             <div class="stat-grid">
                 <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-chart-simple"></i></div><h3>Total Revenue</h3><div class="stat-value" id="totalSales">₹0</div></div>
@@ -1118,17 +1114,12 @@ function printBillAfterCreate(customerId, billItems, totalAmount, totalCashback)
             } catch(e){ showAlert('Error loading profile','error'); }
         }
 
-        async function addMoney() {
-            const amt = parseFloat(document.getElementById('moneyAmount').value), pm = document.getElementById('paymentMethod').value;
-            if(!amt||amt<=0) return showAlert('Enter amount','error');
-            try{ const profile = await apiCall('GET','/customers/profile'); await apiCall('POST','/wallet/add-money',{customer_id:profile.id,amount:amt,payment_method:pm}); showAlert(`₹${amt} added!`,'success'); closeModal('moneyModal'); await loadCustomerData(); }
-            catch(e){ showAlert('Error','error'); }
-        }
+       
 
         function copyReferralCode(){ navigator.clipboard.writeText(document.getElementById('myReferralCode').innerText); showAlert('Copied!','success'); }
         function showAddProductModal(){ editingId=null; showModal('productModal'); }
         function showAddCustomerModal(){ showModal('customerModal'); }
-        function showAddMoneyModal(){ showModal('moneyModal'); }
+       
         function manageCustomerWallet(id){ showModal('walletControlModal'); loadWalletCustomers(); setTimeout(()=>{ document.getElementById('walletCustomerSelect').value=id; },100); }
 
         async function loadWalletCustomers() {
