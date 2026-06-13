@@ -36,9 +36,7 @@ function setCached(key, data, ttl = 30000) {
 app.get('/', (req, res) => {
   res.json({ message: 'Backend is running on port 5000' });
 });
-app.get('/', (req, res) => {
-  res.json({ message: 'Backend is running on port 5000' });
-});
+
 // Helper functions
 async function dbGet(sql, params = []) {
   const result = await pool.query(sql, params);
