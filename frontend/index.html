@@ -873,19 +873,51 @@ console.log('✅ API_URL forced to:', API_URL);
             document.getElementById('registrationForm').style.display = 'block';
         }
 
-        async function adminLogin() {
-            console.log('Login button clicked');
-console.log('Email:', email);
-console.log('Password:', password);
-console.log('API_URL:', API_URL);
-            const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value;
-            if (!email || !password) return showAlert('Enter credentials', 'error');
-            try {
-                const res = await fetch(`${API_URL}/auth/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                if (res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type: 'admin' }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!', 'success'); }
-                else showAlert('Invalid credentials', 'error');
-            } catch(e) { showAlert('Server error', 'error'); }
-        }
+ async function adminLogin() {
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
+  
+  if (!email || !password) {
+    showAlert('Enter email and password', 'error');
+    return;
+  }
+  
+  // Force backend URL
+  const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
+  const loginUrl = `${BACKEND_URL}/api/auth/admin/login`;
+  
+  console.log('Attempting login to:', loginUrl);
+  
+  try {
+    const response = await fetch(loginUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password })
+    });
+    
+    console.log('Response status:', response.status);
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Login success:', data);
+      authToken = data.token;
+      currentUser = { type: 'admin', name: 'Admin' };
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('adminDashboard').style.display = 'block';
+      await loadAdminData();
+      showAlert('Welcome Admin!', 'success');
+    } else {
+      const error = await response.json();
+      console.log('Login failed:', error);
+      showAlert(error.error || 'Login failed. Check console.', 'error');
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+    showAlert('Network error: ' + error.message, 'error');
+  }
+}
 
         async function customerLogin() {
             const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value;
