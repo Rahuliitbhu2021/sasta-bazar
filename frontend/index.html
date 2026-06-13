@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>SASTA BAZAR | Shop Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>SASTA BAZAR | Premium Shop Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,926 +14,874 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a0a0a;
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Premium Animated Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 20% 30%, #1a1a2e, #0a0a0a);
+            z-index: -2;
+        }
+
+        .animated-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 15s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: #e67e22; top: 10%; left: -100px; animation-delay: 0s; }
+        .orb-2 { width: 500px; height: 500px; background: #f39c12; bottom: 10%; right: -100px; animation-delay: -5s; }
+        .orb-3 { width: 300px; height: 300px; background: #d35400; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(50px, -50px) rotate(120deg); }
+            66% { transform: translate(-30px, 30px) rotate(240deg); }
+        }
+
+        /* Glassmorphic Container */
+        .glass-container {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 32px;
+            margin: 20px;
+            transition: all 0.5s ease;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }
 
-        /* Login Box */
-        .login-box {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 450px;
-            margin: 60px auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        /* Premium Login Card */
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 50px;
+            max-width: 500px;
+            margin: 80px auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
 
-        .login-box h1 {
+        .login-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(230, 126, 34, 0.3);
+            box-shadow: 0 35px 55px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo-section {
             text-align: center;
-            color: #e67e22;
-            font-size: 32px;
+            margin-bottom: 40px;
         }
 
-        .login-box .subtitle {
-            text-align: center;
-            color: #666;
-            font-size: 12px;
-            margin-bottom: 30px;
+        .logo-icon {
+            font-size: 60px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .toggle-buttons {
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        .logo-section h1 {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #e67e22);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-top: 15px;
+            letter-spacing: -1px;
+        }
+
+        .logo-section p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            letter-spacing: 2px;
+            margin-top: 8px;
+        }
+
+        /* Premium Toggle */
+        .premium-toggle {
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px;
+            border-radius: 60px;
+            margin-bottom: 35px;
+        }
+
+        .toggle-option {
+            flex: 1;
+            padding: 14px;
+            background: transparent;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .toggle-option.active {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        /* Premium Inputs */
+        .input-group-modern {
             margin-bottom: 25px;
         }
 
-        .toggle-btn {
-            flex: 1;
-            padding: 12px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
+        .input-group-modern label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
 
-        .toggle-btn.active {
-            background: #e67e22;
-            color: white;
-        }
-
-        input, select {
+        .input-group-modern input, .input-group-modern select {
             width: 100%;
-            padding: 12px 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 14px;
-        }
-
-        button {
-            padding: 12px 24px;
-            background: #e67e22;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            font-size: 15px;
             color: white;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .input-group-modern input:focus, .input-group-modern select:focus {
+            outline: none;
+            border-color: #e67e22;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1);
+        }
+
+        .input-group-modern input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Premium Button */
+        .btn-premium {
+            padding: 16px 28px;
             border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
+            border-radius: 40px;
+            font-size: 15px;
             font-weight: 600;
-            margin: 5px;
-            transition: all 0.3s;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
         }
 
-        button:hover {
-            background: #d35400;
-            transform: translateY(-2px);
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
         }
 
-        button.delete { background: #e74c3c; }
-        button.edit { background: #3498db; }
-        button.success { background: #27ae60; }
-        
-        .dashboard {
-            display: none;
+        .btn-premium:hover::before {
+            left: 100%;
         }
 
-        .header {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+        .btn-primary-gold {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        .btn-primary-gold:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
+        }
+
+        .btn-success-modern {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .btn-danger-modern {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 25px 35px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            color: #e67e22;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-card h3 {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .stat-card .value {
+        .dashboard-header h1 {
             font-size: 28px;
-            font-weight: bold;
-            color: #e67e22;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #e67e22);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        .section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        /* Stat Cards */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
         }
 
-        .section h2 {
-            margin-bottom: 20px;
-            color: #333;
-            border-left: 4px solid #e67e22;
-            padding-left: 15px;
+        .stat-card-premium {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        table {
+        .stat-card-premium::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(230,126,34,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card-premium:hover::after {
+            opacity: 1;
+        }
+
+        .stat-card-premium:hover {
+            transform: translateY(-8px);
+            border-color: rgba(230, 126, 34, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 35px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card-premium h3 {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #e67e22);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Sections */
+        .section-premium {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .section-premium:hover {
+            transform: translateY(-3px);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(230, 126, 34, 0.5);
+            display: inline-block;
+        }
+
+        /* Scanner Section */
+        .scanner-section {
+            background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(230,126,34,0.2);
+        }
+
+        /* Tables */
+        .premium-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        th, td {
-            padding: 12px;
+        .premium-table th, .premium-table td {
+            padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
         }
 
-        th {
-            background: #f8f9fa;
+        .premium-table th {
+            background: rgba(255, 255, 255, 0.03);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+        }
+
+        .premium-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Badges */
+        .badge-premium {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 11px;
             font-weight: 600;
         }
+        .badge-discount { background: linear-gradient(135deg, #e67e22, #f39c12); color: white; }
+        .badge-cashback { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
 
-        .modal {
+        /* Buttons */
+        .btn-icon {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 3px;
+            transition: all 0.2s ease;
+        }
+        .btn-edit { background: #3498db; color: white; }
+        .btn-delete { background: #e74c3c; color: white; }
+        .btn-discount { background: #e67e22; color: white; }
+
+        /* Modal */
+        .modal-premium {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(16px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            animation: fadeIn 0.3s ease;
         }
 
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content-premium {
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 32px;
             width: 90%;
             max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalPop 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
 
-        .alert {
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content-premium h2 {
+            color: white;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        /* Alert */
+        .alert-premium {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 10px;
+            top: 25px;
+            right: 25px;
+            padding: 16px 25px;
+            border-radius: 50px;
             display: none;
             z-index: 2000;
-            animation: slideIn 0.3s ease;
+            animation: slideInRight 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            font-weight: 500;
+            backdrop-filter: blur(20px);
         }
 
-        @keyframes slideIn {
+        @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
-        .alert.success { background: #d4edda; color: #155724; border-left: 4px solid #27ae60; }
-        .alert.error { background: #f8d7da; color: #721c24; border-left: 4px solid #e74c3c; }
-        .alert.info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
-
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
+        .alert-success {
+            background: rgba(39, 174, 96, 0.9);
+            color: white;
+            border-left: 3px solid #2ecc71;
+        }
+        .alert-error {
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            border-left: 3px solid #e74c3c;
         }
 
-        .status-connected { background: #27ae60; color: white; }
-        .status-disconnected { background: #e74c3c; color: white; }
+        /* Cart Total Box */
+        .cart-total-box {
+            background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
+            border-radius: 24px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(230,126,34,0.2);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #e67e22, #f39c12); border-radius: 10px; }
 
         @media (max-width: 768px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            table { font-size: 12px; }
-            th, td { padding: 8px; }
+            .container { padding: 12px; }
+            .stat-grid { gap: 15px; }
+            .premium-table { font-size: 11px; }
+            .premium-table th, .premium-table td { padding: 8px; }
+            .login-card { margin: 40px 20px; padding: 35px; }
+            .dashboard-header { padding: 20px; flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-gradient"></div>
+    <div class="animated-orb orb-1"></div>
+    <div class="animated-orb orb-2"></div>
+    <div class="animated-orb orb-3"></div>
+
     <div class="container">
         <!-- Login Section -->
-        <div id="loginSection" class="login-box">
-            <h1>🏪 SASTA BAZAR</h1>
-            <div class="subtitle">सस्ता बाजार - आपका अपना दुकान</div>
-            <div id="dbStatus" style="text-align: center; margin-bottom: 15px;"></div>
-            <div class="toggle-buttons">
-                <button class="toggle-btn active" onclick="showAdminLogin()">Admin Login</button>
-                <button class="toggle-btn" onclick="showCustomerLogin()">Customer Login</button>
+        <div id="loginSection" class="login-card">
+            <div class="logo-section">
+                <div class="logo-icon"><i class="fas fa-crown"></i></div>
+                <h1>SASTA BAZAR</h1>
+                <p>PREMIUM SHOP MANAGEMENT</p>
             </div>
+            <div id="dbStatus" style="text-align: center; margin-bottom: 20px;"></div>
+            
+            <div class="premium-toggle">
+                <button class="toggle-option active" onclick="showAdminLogin()"><i class="fas fa-crown"></i> Admin</button>
+                <button class="toggle-option" onclick="showCustomerLogin()"><i class="fas fa-user"></i> Customer</button>
+            </div>
+            
             <div id="adminLoginForm">
-                <input type="email" id="adminEmail" placeholder="Email">
-                <input type="password" id="adminPassword" placeholder="Password">
-                <button onclick="adminLogin()">Login as Admin</button>
+                <div class="input-group-modern">
+                    <label><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="adminEmail" placeholder="admin@shop.com">
+                </div>
+                <div class="input-group-modern">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter password">
+                </div>
+                <button class="btn-premium btn-primary-gold" style="width:100%" onclick="adminLogin()">Access Dashboard →</button>
             </div>
+            
             <div id="customerLoginForm" style="display:none;">
-                <input type="tel" id="custMobileLogin" placeholder="Mobile Number">
-                <input type="password" id="custPassword" placeholder="Password">
-                <button onclick="customerLogin()">Login</button>
-                <hr>
-                <button onclick="showRegistration()" style="background:#27ae60;">Create New Account</button>
+                <div class="input-group-modern">
+                    <label><i class="fas fa-phone"></i> Mobile Number</label>
+                    <input type="tel" id="custMobileLogin" placeholder="9876543210">
+                </div>
+                <div class="input-group-modern">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="custPassword" placeholder="Enter password">
+                </div>
+                <button class="btn-premium btn-primary-gold" style="width:100%" onclick="customerLogin()">Login →</button>
+                <hr style="margin: 25px 0; border-color: rgba(255,255,255,0.1);">
+                <button class="btn-premium" style="width:100%; background:linear-gradient(135deg,#27ae60,#2ecc71);" onclick="showRegistration()"><i class="fas fa-user-plus"></i> Create Account</button>
             </div>
+            
             <div id="registrationForm" style="display:none;">
-                <h3>Create New Account</h3>
-                <input type="text" id="regName" placeholder="Full Name">
-                <input type="tel" id="regMobile" placeholder="Mobile Number">
-                <input type="password" id="regPassword" placeholder="Password">
-                <input type="text" id="regReferral" placeholder="Referral Code (Optional)">
-                <button onclick="register()">Register</button>
-                <button onclick="showCustomerLogin()" style="background:#6c757d;">Back</button>
+                <h3 style="color:white; text-align:center; margin-bottom:25px;">Create Account</h3>
+                <div class="input-group-modern"><input type="text" id="regName" placeholder="Full Name"></div>
+                <div class="input-group-modern"><input type="tel" id="regMobile" placeholder="Mobile Number"></div>
+                <div class="input-group-modern"><input type="password" id="regPassword" placeholder="Password"></div>
+                <div class="input-group-modern"><input type="text" id="regReferral" placeholder="Referral Code (Optional)"></div>
+                <button class="btn-premium btn-success-modern" style="width:100%" onclick="register()">Register</button>
+                <button class="btn-premium" style="width:100%; margin-top:12px; background:rgba(255,255,255,0.1);" onclick="showCustomerLogin()">Back to Login</button>
             </div>
         </div>
 
         <!-- Admin Dashboard -->
-        <div id="adminDashboard" class="dashboard">
-            <div class="header">
-                <h1>🛍️ Admin Dashboard</h1>
-                <div>
-                    <button onclick="showAddProductModal()">➕ Add Product</button>
-                    <button onclick="showAddCustomerModal()">👤 Add Customer</button>
-                    <button onclick="logout()" style="background:#e74c3c">🚪 Logout</button>
+        <div id="adminDashboard" class="dashboard" style="display:none;">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-premium btn-primary-gold" style="padding:12px 20px;" onclick="showAddProductModal()"><i class="fas fa-plus"></i> Product</button>
+                    <button class="btn-premium btn-success-modern" style="padding:12px 20px;" onclick="showAddCustomerModal()"><i class="fas fa-user-plus"></i> Customer</button>
+                    <button class="btn-premium btn-danger-modern" style="padding:12px 20px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
                 </div>
             </div>
 
-            <div class="stats">
-                <div class="stat-card"><h3>💰 Total Sales</h3><div class="value" id="totalSales">₹0</div></div>
-                <div class="stat-card"><h3>👥 Total Customers</h3><div class="value" id="totalCustomers">0</div></div>
-                <div class="stat-card"><h3>🏆 Total Commission</h3><div class="value" id="totalCommission">₹0</div></div>
-                <div class="stat-card"><h3>⚠️ Low Stock</h3><div class="value" id="lowStock">0</div></div>
+            <div class="stat-grid">
+                <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-chart-simple"></i></div><h3>Total Revenue</h3><div class="stat-value" id="totalSales">₹0</div></div>
+                <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-users"></i></div><h3>Active Customers</h3><div class="stat-value" id="totalCustomers">0</div></div>
+                <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-gift"></i></div><h3>Commission Distributed</h3><div class="stat-value" id="totalCommission">₹0</div></div>
+                <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><h3>Low Stock Alerts</h3><div class="stat-value" id="lowStock">0</div></div>
             </div>
 
-            <div class="section">
-                <h2>📦 Products</h2>
-                <div style="overflow-x: auto;">
-                    <table id="productsTable">
-                        <thead><tr><th>Code</th><th>Name</th><th>Price</th><th>Discount</th><th>Stock</th><th>Actions</th></tr></thead>
-                        <tbody id="productsList"></tbody>
-                    </table>
-                </div>
+            <div class="section-premium">
+                <div class="section-title"><i class="fas fa-box"></i> Inventory Management</div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Code</th><th>Product</th><th>Price</th><th>Discount</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="productsList"></tbody></table></div>
             </div>
 
-            <div class="section">
-                <h2>👥 Customers</h2>
-                <div style="overflow-x: auto;">
-                    <table id="customersTable">
-                        <thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th></tr></thead>
-                        <tbody id="customersList"></tbody>
-                    </table>
-                </div>
+            <div class="section-premium">
+                <div class="section-title"><i class="fas fa-users"></i> Customer Directory</div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th></tr></thead><tbody id="customersList"></tbody></table></div>
             </div>
 
-            <div class="section">
-                <h2>🧾 Create Bill</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <select id="billCustomer"><option value="">Select Customer</option></select>
-                    <select id="billProduct"><option value="">Select Product</option></select>
-                    <input type="number" id="billQuantity" placeholder="Quantity" value="1">
-                    <button onclick="addToCart()">Add to Cart</button>
+            <div class="section-premium">
+                <div class="section-title"><i class="fas fa-receipt"></i> Billing System</div>
+                
+                <div class="scanner-section">
+                    <h3 style="color:#e67e22; margin-bottom:15px;"><i class="fas fa-qrcode"></i> Barcode Scanner</h3>
+                    <input type="text" id="barcodeInput" placeholder="Scan barcode → Auto add to cart" style="width:100%; padding:15px 20px; border-radius:40px; border:1px solid rgba(230,126,34,0.3); background:rgba(0,0,0,0.3); color:white; font-family:monospace; font-size:16px;">
+                    <p style="font-size:12px; margin-top:8px; color:rgba(255,255,255,0.4);"><i class="fas fa-info-circle"></i> Scan product barcode - automatically adds to cart</p>
                 </div>
                 
-                <h3 style="margin-top: 20px;">🛒 Cart</h3>
-                <div style="overflow-x: auto;">
-                    <table id="cartTable">
-                        <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Discount</th><th>Total</th><th></th></tr></thead>
-                        <tbody id="cartList"></tbody>
-                    </table>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <select id="billCustomer" class="input-group-modern"><option>Select Customer</option></select>
+                    <select id="billProduct" class="input-group-modern"><option>Select Product</option></select>
+                    <input type="number" id="billQuantity" placeholder="Quantity" value="1" class="input-group-modern">
+                    <button class="btn-premium btn-primary-gold" onclick="addToCartManual()"><i class="fas fa-cart-plus"></i> Add to Cart</button>
                 </div>
-                <h3>Total: ₹<span id="cartTotal">0</span></h3>
-                <button onclick="createBill()" class="success">✅ Generate Bill</button>
-                <button onclick="printBill()" class="edit">🖨️ Print Bill</button>
+                
+                <h3 style="color:white; margin: 20px 0 15px;"><i class="fas fa-shopping-cart"></i> Shopping Cart</h3>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Discount</th><th>Cashback</th><th>Total</th><th></th></tr></thead><tbody id="cartList"></tbody></table></div>
+                <div class="cart-total-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div><strong>Subtotal:</strong> ₹<span id="cartTotal">0</span></div>
+                        <div style="color:#27ae60;"><strong>🎁 Cashback to Wallet:</strong> +₹<span id="cartCashback">0</span></div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button class="btn-premium btn-success-modern" onclick="createBill()"><i class="fas fa-check-circle"></i> Generate Bill</button>
+                    <button class="btn-premium btn-primary-gold" onclick="printBill()"><i class="fas fa-print"></i> Print Bill</button>
+                </div>
             </div>
         </div>
 
         <!-- Customer Dashboard -->
-        <div id="customerDashboard" class="dashboard">
-            <div class="header">
-                <h1>👤 Customer Portal</h1>
-                <div>
-                    <button onclick="showAddMoneyModal()">💰 Add Money</button>
-                    <button onclick="logout()" style="background:#e74c3c">🚪 Logout</button>
-                </div>
+        <div id="customerDashboard" class="dashboard" style="display:none;">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-user-circle"></i> My Portal</h1>
+                <div><button class="btn-premium btn-primary-gold" style="padding:12px 20px;" onclick="showAddMoneyModal()"><i class="fas fa-plus-circle"></i> Add Money</button><button class="btn-premium btn-danger-modern" style="padding:12px 20px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button></div>
             </div>
-            
-            <div class="stats">
-                <div class="stat-card"><h3>💳 Wallet Balance</h3><div class="value" id="custWallet">₹0</div></div>
-                <div class="stat-card"><h3>🛍️ Total Purchases</h3><div class="value" id="custPurchases">₹0</div></div>
-                <div class="stat-card"><h3>👥 Referrals</h3><div class="value" id="custReferrals">0</div></div>
+            <div class="stat-grid">
+                <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-wallet"></i></div><h3>Wallet Balance</h3><div class="stat-value" id="custWallet">₹0</div></div>
+                <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-shopping-bag"></i></div><h3>Total Spent</h3><div class="stat-value" id="custPurchases">₹0</div></div>
+                <div class="stat-card-premium"><div class="stat-icon"><i class="fas fa-user-friends"></i></div><h3>Referrals</h3><div class="stat-value" id="custReferrals">0</div></div>
             </div>
-
-            <div class="section">
-                <h2>🔗 My Referral Code</h2>
-                <div style="background:#f0f0f0; padding:25px; text-align:center; border-radius:15px;">
-                    <p style="font-size:28px; font-weight:bold;" id="myReferralCode"></p>
-                    <button onclick="copyReferralCode()">📋 Copy Code</button>
-                </div>
+            <div class="section-premium">
+                <div class="section-title"><i class="fas fa-link"></i> My Referral Code</div>
+                <div style="background:linear-gradient(135deg,rgba(230,126,34,0.1),rgba(243,156,18,0.05)); padding:25px; text-align:center; border-radius:24px;"><p style="font-size:32px; font-weight:700; letter-spacing:2px; color:white;" id="myReferralCode"></p><button class="btn-premium btn-primary-gold" onclick="copyReferralCode()"><i class="fas fa-copy"></i> Copy Code</button></div>
             </div>
-
-            <div class="section">
-                <h2>💰 Wallet Transactions</h2>
-                <div style="overflow-x: auto;">
-                    <table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead>
-                    <tbody id="walletTransactions"></tbody></table>
-                </div>
-            </div>
+            <div class="section-premium"><div class="section-title"><i class="fas fa-history"></i> Transaction History</div><div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransactions"></tbody></table></div></div>
         </div>
     </div>
 
     <!-- Modals -->
-    <div id="productModal" class="modal"><div class="modal-content">
-        <h2 id="modalTitle">Add Product</h2>
-        <input type="text" id="productCode" placeholder="Product Code">
-        <input type="text" id="productName" placeholder="Product Name">
-        <input type="number" id="productPrice" placeholder="Price (₹)">
-        <input type="number" id="productDiscount" placeholder="Discount %" value="0">
-        <input type="number" id="productStock" placeholder="Stock">
-        <button onclick="saveProduct()">Save</button>
-        <button onclick="closeModal('productModal')">Cancel</button>
+    <div id="productModal" class="modal-premium"><div class="modal-content-premium"><h2><i class="fas fa-box"></i> Add Product</h2>
+        <div class="input-group-modern"><input type="text" id="productCode" placeholder="Product Code"></div>
+        <div class="input-group-modern"><input type="text" id="productName" placeholder="Product Name"></div>
+        <div class="input-group-modern"><input type="number" id="productPrice" placeholder="Price (₹)"></div>
+        <div class="input-group-modern"><input type="number" id="productDiscount" placeholder="Discount %" value="0"></div>
+        <div class="input-group-modern"><input type="number" id="productStock" placeholder="Stock"></div>
+        <button class="btn-premium btn-success-modern" onclick="saveProduct()">Save</button>
+        <button class="btn-premium" style="background:rgba(255,255,255,0.1);" onclick="closeModal('productModal')">Cancel</button>
     </div></div>
 
-    <div id="customerModal" class="modal"><div class="modal-content">
-        <h2>Add Customer</h2>
-        <input type="text" id="newCustName" placeholder="Full Name">
-        <input type="tel" id="newCustMobile" placeholder="Mobile">
-        <input type="password" id="newCustPassword" placeholder="Password">
-        <input type="text" id="newCustRef" placeholder="Referral Code">
-        <button onclick="saveCustomer()">Save</button>
-        <button onclick="closeModal('customerModal')">Cancel</button>
+    <div id="customerModal" class="modal-premium"><div class="modal-content-premium"><h2><i class="fas fa-user-plus"></i> Add Customer</h2>
+        <div class="input-group-modern"><input type="text" id="newCustName" placeholder="Full Name"></div>
+        <div class="input-group-modern"><input type="tel" id="newCustMobile" placeholder="Mobile"></div>
+        <div class="input-group-modern"><input type="password" id="newCustPassword" placeholder="Password (Optional)"></div>
+        <div class="input-group-modern"><input type="text" id="newCustRef" placeholder="Referral Code"></div>
+        <button class="btn-premium btn-success-modern" onclick="saveCustomer()">Save</button>
+        <button class="btn-premium" style="background:rgba(255,255,255,0.1);" onclick="closeModal('customerModal')">Cancel</button>
     </div></div>
 
-    <div id="moneyModal" class="modal"><div class="modal-content">
-        <h2>Add Money</h2>
-        <input type="number" id="moneyAmount" placeholder="Amount (₹)">
-        <select id="paymentMethod"><option value="cash">Cash</option><option value="card">Card</option><option value="upi">UPI</option></select>
-        <button onclick="addMoney()" class="success">Add Money</button>
-        <button onclick="closeModal('moneyModal')">Cancel</button>
+    <div id="moneyModal" class="modal-premium"><div class="modal-content-premium"><h2><i class="fas fa-plus-circle"></i> Add Money</h2>
+        <div class="input-group-modern"><input type="number" id="moneyAmount" placeholder="Amount (₹)"></div>
+        <div class="input-group-modern"><select id="paymentMethod"><option value="cash">Cash</option><option value="card">Card</option><option value="upi">UPI</option></select></div>
+        <button class="btn-premium btn-success-modern" onclick="addMoney()">Add</button>
+        <button class="btn-premium" style="background:rgba(255,255,255,0.1);" onclick="closeModal('moneyModal')">Cancel</button>
     </div></div>
 
-    <div id="alert" class="alert"></div>
+    <div id="alert" class="alert-premium"></div>
 
     <script>
-        // ========== CONFIGURATION ==========
         const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
         const API_URL = `${BACKEND_URL}/api`;
-        
-        let authToken = null;
-        let currentUser = null;
-        let cart = [];
-        let editingId = null;
+        let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
 
-        // ========== HELPER FUNCTIONS ==========
         async function checkBackend() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/`);
-                if (response.ok) {
-                    document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-connected">✅ Connected to Server</span>';
-                    return true;
-                }
-            } catch(e) {
-                document.getElementById('dbStatus').innerHTML = '<span class="status-badge status-disconnected">❌ Server not running</span>';
-                return false;
-            }
+            try { const res = await fetch(`${BACKEND_URL}/`); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">✅ Connected</span>';
+            } catch(e) { document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">❌ Offline</span>'; }
         }
 
         async function apiCall(method, endpoint, data = null) {
             const options = { method, headers: { 'Content-Type': 'application/json' } };
             if (authToken) options.headers['Authorization'] = `Bearer ${authToken}`;
             if (data) options.body = JSON.stringify(data);
-            
             const response = await fetch(`${API_URL}${endpoint}`, options);
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'API call failed');
-            }
+            if (!response.ok) { const error = await response.json(); throw new Error(error.error || 'API failed'); }
             return response.json();
         }
 
-        function showAlert(msg, type) {
-            const alert = document.getElementById('alert');
-            alert.textContent = msg;
-            alert.className = `alert ${type}`;
-            alert.style.display = 'block';
-            setTimeout(() => alert.style.display = 'none', 3000);
-        }
-
+        function showAlert(msg, type) { const a = document.getElementById('alert'); a.textContent = msg; a.className = `alert-premium alert-${type}`; a.style.display = 'block'; setTimeout(() => a.style.display = 'none', 3000); }
         function showModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // ========== AUTH FUNCTIONS ==========
-        function showAdminLogin() {
-            document.getElementById('adminLoginForm').style.display = 'block';
-            document.getElementById('customerLoginForm').style.display = 'none';
-            document.getElementById('registrationForm').style.display = 'none';
-        }
-        function showCustomerLogin() {
-            document.getElementById('adminLoginForm').style.display = 'none';
-            document.getElementById('customerLoginForm').style.display = 'block';
-            document.getElementById('registrationForm').style.display = 'none';
-        }
-        function showRegistration() {
-            document.getElementById('customerLoginForm').style.display = 'none';
-            document.getElementById('registrationForm').style.display = 'block';
-        }
+        function showAdminLogin() { document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'none'; }
+        function showCustomerLogin() { document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('customerLoginForm').style.display = 'block'; document.getElementById('registrationForm').style.display = 'none'; }
+        function showRegistration() { document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'block'; }
 
         async function adminLogin() {
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
-            if (!email || !password) { showAlert('Enter email and password', 'error'); return; }
-            
+            const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value;
+            if(!email||!password) return showAlert('Enter credentials','error');
             try {
-                const response = await fetch(`${API_URL}/auth/admin/login`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    authToken = data.token;
-                    currentUser = { type: 'admin' };
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('adminDashboard').style.display = 'block';
-                    await loadAdminData();
-                    showAlert('Welcome Admin!', 'success');
-                } else {
-                    showAlert('Invalid credentials', 'error');
-                }
-            } catch(e) {
-                showAlert('Cannot connect to server', 'error');
-            }
+                const res = await fetch(`${API_URL}/auth/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'admin' }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome to Premium Dashboard!','success'); }
+                else { const err = await res.json(); showAlert(err.error,'error'); }
+            } catch(e) { showAlert('Cannot connect to server','error'); }
         }
 
         async function customerLogin() {
-            const mobile = document.getElementById('custMobileLogin').value;
-            const password = document.getElementById('custPassword').value;
-            if (!mobile || !password) { showAlert('Enter credentials', 'error'); return; }
+            const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value;
+            if(!mobile||!password) return showAlert('Enter credentials','error');
             try {
-                const response = await fetch(`${API_URL}/auth/customer/login`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mobile, password })
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    authToken = data.token;
-                    currentUser = { type: 'customer', data: data.customer };
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('customerDashboard').style.display = 'block';
-                    await loadCustomerData();
-                    showAlert(`Welcome ${data.customer.name}!`, 'success');
-                } else {
-                    showAlert('Login failed', 'error');
-                }
-            } catch(e) {
-                showAlert('Server error', 'error');
-            }
+                const res = await fetch(`${API_URL}/auth/customer/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mobile,password}) });
+                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert(`Welcome back ${data.customer.name}!`,'success'); }
+                else { const err = await res.json(); showAlert(err.error,'error'); }
+            } catch(e) { showAlert('Server error','error'); }
         }
 
         async function register() {
-            const name = document.getElementById('regName').value;
-            const mobile = document.getElementById('regMobile').value;
-            const password = document.getElementById('regPassword').value;
-            const referralCode = document.getElementById('regReferral').value;
-            if (!name || !mobile || !password) { showAlert('Fill all fields', 'error'); return; }
+            const name = document.getElementById('regName').value, mobile = document.getElementById('regMobile').value, password = document.getElementById('regPassword').value, ref = document.getElementById('regReferral').value;
+            if(!name||!mobile||!password) return showAlert('Fill all fields','error');
             try {
-                const response = await fetch(`${API_URL}/auth/customer/register`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, mobile, password, referralCode })
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    authToken = data.token;
-                    currentUser = { type: 'customer', data: data.customer };
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('customerDashboard').style.display = 'block';
-                    await loadCustomerData();
-                    showAlert('Registration successful!', 'success');
-                } else {
-                    showAlert('Registration failed', 'error');
-                }
-            } catch(e) {
-                showAlert('Error', 'error');
-            }
+                const res = await fetch(`${API_URL}/auth/customer/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,mobile,password,referralCode:ref}) });
+                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert('Registration successful!','success'); }
+                else { const err = await res.json(); showAlert(err.error,'error'); }
+            } catch(e) { showAlert('Registration failed','error'); }
         }
 
-        // ========== ADMIN FUNCTIONS ==========
         async function loadAdminData() {
             try {
-                const products = await apiCall('GET', '/products');
-                const customers = await apiCall('GET', '/customers');
-                const reports = await apiCall('GET', '/reports/dashboard');
-                
+                const products = await apiCall('GET','/products'), customers = await apiCall('GET','/customers'), reports = await apiCall('GET','/reports/dashboard');
+                allProducts = products;
                 document.getElementById('totalSales').innerHTML = `₹${reports.total_sales}`;
                 document.getElementById('totalCustomers').innerHTML = reports.total_customers;
                 document.getElementById('totalCommission').innerHTML = `₹${reports.total_commission}`;
                 document.getElementById('lowStock').innerHTML = reports.low_stock_alerts;
                 
-                const productsList = document.getElementById('productsList');
-                productsList.innerHTML = '';
-                products.forEach(p => {
-                    productsList.innerHTML += `<tr>
-                        <td>${p.product_code}</td>
-                        <td>${p.name}</td>
-                        <td>₹${p.selling_price}</td>
-                        <td><span style="background:#e67e22;color:white;padding:2px 6px;border-radius:10px;">${p.discount_percent || 0}%</span></td>
-                        <td style="color:${p.current_stock < 5 ? 'red' : 'green'}">${p.current_stock}</td>
-                        <td>
-                            <button class="edit" onclick="editProduct(${p.id})">Edit</button>
-                            <button class="delete" onclick="deleteProduct(${p.id})">Delete</button>
-                        </td>
-                    </tr>`;
-                });
+                const pl = document.getElementById('productsList'); pl.innerHTML = '';
+                products.forEach(p => { pl.innerHTML += `<tr>
+                    <td style="font-weight:600;">${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td>
+                    <td><span class="badge-premium badge-discount">${p.discount_percent||0}%</span></td>
+                    <td style="color:${p.current_stock<5?'#e74c3c':'#27ae60'}">${p.current_stock}</td>
+                    <td><button class="btn-icon btn-edit" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button> <button class="btn-icon btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button></td>
+                </tr>`; });
                 
-                const customersList = document.getElementById('customersList');
-                customersList.innerHTML = '';
-                customers.forEach(c => {
-                    customersList.innerHTML += `<tr>
-                        <td>${c.name}</td>
-                        <td>${c.mobile}</td>
-                        <td>${c.referral_code}</td>
-                        <td>₹${c.wallet_balance}</td>
-                        <td>₹${c.total_purchases}</td>
-                    </tr>`;
-                });
+                const cl = document.getElementById('customersList'); cl.innerHTML = '';
+                customers.forEach(c => { cl.innerHTML += `<tr><td>${c.name}</td><td>${c.mobile}</td><td><code>${c.referral_code}</code></td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button class="btn-icon btn-edit" onclick="manageCustomerWallet(${c.id})"><i class="fas fa-wallet"></i></button></td></tr>`; });
                 
-                const customerSelect = document.getElementById('billCustomer');
-                customerSelect.innerHTML = '<option value="">Select Customer</option>';
-                customers.forEach(c => {
-                    customerSelect.innerHTML += `<option value="${c.id}">${c.name} (${c.mobile}) - Wallet: ₹${c.wallet_balance}</option>`;
-                });
+                const cs = document.getElementById('billCustomer'); cs.innerHTML = '<option>Select Customer</option>';
+                customers.forEach(c => { cs.innerHTML += `<option value="${c.id}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; });
                 
-                const productSelect = document.getElementById('billProduct');
-                productSelect.innerHTML = '<option value="">Select Product</option>';
-                products.forEach(p => {
-                    const finalPrice = p.selling_price - ((p.selling_price * (p.discount_percent || 0)) / 100);
-                    productSelect.innerHTML += `<option value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent || 0}" data-final="${finalPrice}" data-stock="${p.current_stock}">
-                        ${p.name} - ₹${p.selling_price} ${p.discount_percent ? `(${p.discount_percent}% OFF → ₹${finalPrice})` : ''}
-                    </option>`;
-                });
-            } catch(e) {
-                showAlert('Error loading data', 'error');
-            }
+                const ps = document.getElementById('billProduct'); ps.innerHTML = '<option>Select Product</option>';
+                products.forEach(p => { const cashback = (p.selling_price * (p.discount_percent||0))/100; ps.innerHTML += `<option value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cashback}" data-stock="${p.current_stock}">${p.name} - ₹${p.selling_price} (${p.discount_percent||0}% off → +₹${cashback} cashback)</option>`; });
+            } catch(e) { showAlert('Error loading data','error'); }
         }
 
         async function saveProduct() {
-            const code = document.getElementById('productCode').value;
-            const name = document.getElementById('productName').value;
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const discount = parseFloat(document.getElementById('productDiscount').value) || 0;
-            const stock = parseInt(document.getElementById('productStock').value);
-            
-            if (!code || !name || !price) { showAlert('Fill all fields', 'error'); return; }
-            
+            const code = document.getElementById('productCode').value, name = document.getElementById('productName').value, price = parseFloat(document.getElementById('productPrice').value), discount = parseFloat(document.getElementById('productDiscount').value)||0, stock = parseInt(document.getElementById('productStock').value);
+            if(!code||!name||!price) return showAlert('Fill all fields','error');
             try {
-                if (editingId) {
-                    await apiCall('PUT', `/products/${editingId}`, {
-                        product_code: code, name, purchase_price: price * 0.7,
-                        selling_price: price, min_stock_level: 5, discount_percent: discount
-                    });
-                    showAlert('Product updated!', 'success');
-                } else {
-                    await apiCall('POST', '/products', {
-                        product_code: code, name, purchase_price: price * 0.7,
-                        selling_price: price, current_stock: stock, min_stock_level: 5, discount_percent: discount
-                    });
-                    showAlert('Product added!', 'success');
-                }
-                closeModal('productModal');
-                await loadAdminData();
-            } catch(e) {
-                showAlert('Error: ' + e.message, 'error');
-            }
+                if(editingId) await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,min_stock_level:5,discount_percent:discount});
+                else await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,min_stock_level:5,discount_percent:discount});
+                showAlert('Product saved!','success'); closeModal('productModal'); await loadAdminData();
+            } catch(e) { showAlert('Error saving','error'); }
         }
 
-        async function deleteProduct(id) {
-            if (confirm('Delete this product?')) {
-                try {
-                    await apiCall('DELETE', `/products/${id}`);
-                    showAlert('Product deleted!', 'success');
-                    await loadAdminData();
-                } catch(e) {
-                    showAlert('Error deleting', 'error');
-                }
-            }
-        }
-
-        function editProduct(id) {
-            editingId = id;
-            document.getElementById('modalTitle').innerHTML = 'Edit Product';
-            document.getElementById('productCode').value = '';
-            document.getElementById('productName').value = '';
-            document.getElementById('productPrice').value = '';
-            document.getElementById('productDiscount').value = '';
-            document.getElementById('productStock').value = '';
-            showModal('productModal');
-        }
+        async function deleteProduct(id) { if(confirm('Delete this product?')){ try{ await apiCall('DELETE',`/products/${id}`); showAlert('Deleted','success'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } } }
+        function editProduct(id){ editingId=id; showModal('productModal'); }
 
         async function saveCustomer() {
-            const name = document.getElementById('newCustName').value;
-            const mobile = document.getElementById('newCustMobile').value;
-            const password = document.getElementById('newCustPassword').value;
-            const referredBy = document.getElementById('newCustRef').value;
-            
-            if (!name || !mobile || !password) { showAlert('Fill name, mobile and password', 'error'); return; }
-            
+            const name = document.getElementById('newCustName').value, mobile = document.getElementById('newCustMobile').value, password = document.getElementById('newCustPassword').value, ref = document.getElementById('newCustRef').value;
+            if(!name||!mobile) return showAlert('Fill name and mobile','error');
+            const finalPassword = password || mobile;
             try {
-                await apiCall('POST', '/customers', { name, mobile, password, referred_by: referredBy || null });
-                showAlert('Customer added!', 'success');
-                closeModal('customerModal');
-                await loadAdminData();
-            } catch(e) {
-                showAlert('Error: ' + e.message, 'error');
-            }
+                await apiCall('POST','/customers',{name,mobile,password:finalPassword,referred_by:ref||null});
+                showAlert(`Customer added! Login: ${mobile} / Password: ${finalPassword}`,'success');
+                closeModal('customerModal'); await loadAdminData();
+            } catch(e) { showAlert('Error: '+e.message,'error'); }
         }
 
-        // ========== CART FUNCTIONS ==========
-        function addToCart() {
-            const customerId = document.getElementById('billCustomer').value;
-            const productSelect = document.getElementById('billProduct');
-            const productId = productSelect.value;
-            const quantity = parseInt(document.getElementById('billQuantity').value);
-            
-            if (!customerId) { showAlert('Select customer', 'error'); return; }
-            if (!productId) { showAlert('Select product', 'error'); return; }
-            if (!quantity || quantity < 1) { showAlert('Enter quantity', 'error'); return; }
-            
-            const selected = productSelect.options[productSelect.selectedIndex];
-            const name = selected.text.split(' - ')[0];
-            const originalPrice = parseFloat(selected.dataset.price);
-            const discountPercent = parseFloat(selected.dataset.discount);
-            const finalPrice = parseFloat(selected.dataset.final);
-            const stock = parseInt(selected.dataset.stock);
-            
-            if (stock < quantity) { showAlert(`Only ${stock} left!`, 'error'); return; }
-            
-            const existing = cart.find(item => item.product_id === parseInt(productId));
-            if (existing) {
-                existing.quantity += quantity;
-            } else {
-                cart.push({ product_id: parseInt(productId), name, originalPrice, discountPercent, finalPrice, quantity });
-            }
-            renderCart();
-            document.getElementById('billQuantity').value = '1';
-            showAlert(`${name} added to cart!`, 'success');
+        function addToCartManual() {
+            const cust = document.getElementById('billCustomer').value, prod = document.getElementById('billProduct'), pid = prod.value, qty = parseInt(document.getElementById('billQuantity').value);
+            if(!cust) return showAlert('Select customer','error'); if(!pid) return showAlert('Select product','error'); if(!qty||qty<1) return showAlert('Enter quantity','error');
+            const sel = prod.options[prod.selectedIndex], name = sel.text.split(' - ')[0], price = parseFloat(sel.dataset.price), disc = parseFloat(sel.dataset.discount), cashback = parseFloat(sel.dataset.cashback), stock = parseInt(sel.dataset.stock);
+            if(stock<qty) return showAlert(`Only ${stock} left`,'error');
+            const ex = cart.find(i=>i.product_id===parseInt(pid));
+            if(ex) ex.quantity+=qty;
+            else cart.push({product_id:parseInt(pid),name,originalPrice:price,discountPercent:disc,cashback,quantity:qty});
+            renderCart(); document.getElementById('billQuantity').value='1'; showAlert(`${name} added to cart!`,'success');
         }
 
         function renderCart() {
-            const tbody = document.getElementById('cartList');
-            let subtotal = 0;
-            let totalDiscount = 0;
-            tbody.innerHTML = '';
-            
-            cart.forEach((item, idx) => {
-                const itemOriginal = item.originalPrice * item.quantity;
-                const itemFinal = item.finalPrice * item.quantity;
-                const itemDiscount = itemOriginal - itemFinal;
-                subtotal += itemOriginal;
-                totalDiscount += itemDiscount;
-                
-                tbody.innerHTML += `<tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>₹${item.originalPrice}</td>
-                    <td style="color:#e67e22">${item.discountPercent}%</td>
-                    <td>₹${itemFinal.toFixed(2)}</td>
-                    <td><button class="delete" onclick="removeFromCart(${idx})">Remove</button></td>
-                </tr>`;
+            const tbody = document.getElementById('cartList'); let total = 0, totalCashback = 0; tbody.innerHTML = '';
+            cart.forEach((item,idx)=>{ const itemTotal = item.originalPrice * item.quantity; const itemCashback = item.cashback * item.quantity; total += itemTotal; totalCashback += itemCashback;
+                tbody.innerHTML += `<tr><td>${item.name}</td><td style="text-align:center">${item.quantity}</td><td>₹${item.originalPrice}</td><td><span class="badge-premium badge-discount">${item.discountPercent}%</span></td><td><span class="badge-premium badge-cashback">+₹${itemCashback}</span></td><td>₹${itemTotal}</td><td><button class="btn-icon btn-delete" onclick="removeFromCart(${idx})"><i class="fas fa-trash"></i></button></td></tr>`;
             });
-            document.getElementById('cartTotal').innerHTML = (subtotal - totalDiscount).toFixed(2);
+            document.getElementById('cartTotal').innerHTML = total;
+            document.getElementById('cartCashback').innerHTML = totalCashback;
         }
 
-        function removeFromCart(idx) {
-            cart.splice(idx, 1);
-            renderCart();
-        }
+        function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
 
         async function createBill() {
-            if (cart.length === 0) { showAlert('Cart empty', 'error'); return; }
-            const customerId = document.getElementById('billCustomer').value;
-            const items = cart.map(item => ({ product_id: item.product_id, quantity: item.quantity }));
-            
-            try {
-                await apiCall('POST', '/bills', { customer_id: parseInt(customerId), items, payment_method: 'cash' });
-                showAlert('Bill created! Cashback added to wallet!', 'success');
-                cart = [];
-                renderCart();
-                await loadAdminData();
-                showAlert('Bill generated successfully!', 'success');
-            } catch(e) {
-                showAlert('Error: ' + e.message, 'error');
-            }
+            if(cart.length===0) return showAlert('Cart empty','error');
+            const cust = document.getElementById('billCustomer').value;
+            if(!cust) return showAlert('Select customer','error');
+            const items = cart.map(i=>({product_id:i.product_id,quantity:i.quantity}));
+            try { await apiCall('POST','/bills',{customer_id:parseInt(cust),items,payment_method:'cash'}); showAlert('Bill created! Cashback added to wallet!','success'); cart=[]; renderCart(); await loadAdminData(); }
+            catch(e) { showAlert('Error: '+e.message,'error'); }
         }
 
         function printBill() {
-            if (cart.length === 0) { showAlert('Cart empty', 'error'); return; }
-            const customerId = document.getElementById('billCustomer').value;
-            if (!customerId) { showAlert('Select customer', 'error'); return; }
-            
-            const customerSelect = document.getElementById('billCustomer');
-            const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-            const customerName = selectedOption.text.split(' (')[0];
-            
-            let subtotal = 0;
-            let totalDiscount = 0;
-            let billItemsHtml = '';
-            
-            cart.forEach(item => {
-                const itemOriginal = item.originalPrice * item.quantity;
-                const itemFinal = item.finalPrice * item.quantity;
-                const itemDiscount = itemOriginal - itemFinal;
-                subtotal += itemOriginal;
-                totalDiscount += itemDiscount;
-                billItemsHtml += `<tr>
-                    <td>${item.name}</td>
-                    <td style="text-align:center">${item.quantity}</td>
-                    <td style="text-align:right">₹${item.originalPrice}</td>
-                    <td style="text-align:center">${item.discountPercent}%</td>
-                    <td style="text-align:right">₹${itemFinal.toFixed(2)}</td>
-                </tr>`;
-            });
-            
-            const billNo = `SB${Date.now()}`;
-            const date = new Date().toLocaleString();
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>SASTA BAZAR - Bill</title>
-                    <style>
-                        body { font-family: 'Courier New', monospace; margin: 0; padding: 20px; }
-                        .bill { max-width: 300px; margin: 0 auto; }
-                        .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
-                        .header h1 { margin: 0; color: #e67e22; }
-                        .shop-name { font-size: 11px; margin: 5px 0; }
-                        .details { margin-bottom: 10px; font-size: 11px; }
-                        table { width: 100%; border-collapse: collapse; font-size: 11px; }
-                        th, td { padding: 5px; text-align: left; border-bottom: 1px solid #ddd; }
-                        .total { border-top: 1px solid #000; padding-top: 8px; margin-top: 8px; }
-                        .footer { text-align: center; margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px; font-size: 10px; }
-                        .cashback { color: #27ae60; }
-                    </style>
-                </head>
-                <body onload="window.print(); window.close();">
-                    <div class="bill">
-                        <div class="header">
-                            <h1>🏪 SASTA BAZAR</h1>
-                            <div class="shop-name">सस्ता बाजार - आपका अपना दुकान</div>
-                            <div>123 Main Street, City | Ph: +91 98765 43210</div>
-                        </div>
-                        <div class="details">
-                            <p><strong>Bill No:</strong> ${billNo}</p>
-                            <p><strong>Date:</strong> ${date}</p>
-                            <p><strong>Customer:</strong> ${customerName}</p>
-                            <p><strong>Customer ID:</strong> ${customerId}</p>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Total</th></tr>
-                            </thead>
-                            <tbody>${billItemsHtml}</tbody>
-                        </table>
-                        <div class="total">
-                            <p style="display:flex; justify-content:space-between; margin:3px 0;">
-                                <strong>Subtotal:</strong> <span>₹${subtotal.toFixed(2)}</span>
-                            </p>
-                            <p style="display:flex; justify-content:space-between; margin:3px 0; color:#e67e22;">
-                                <strong>Discount:</strong> <span>-₹${totalDiscount.toFixed(2)}</span>
-                            </p>
-                            <p style="display:flex; justify-content:space-between; margin:3px 0; font-size:16px; font-weight:bold;">
-                                <strong>GRAND TOTAL:</strong> <span>₹${(subtotal - totalDiscount).toFixed(2)}</span>
-                            </p>
-                            <p class="cashback" style="display:flex; justify-content:space-between; margin:3px 0;">
-                                <strong>🎁 Cashback Added to Wallet:</strong> <span>+₹${totalDiscount.toFixed(2)}</span>
-                            </p>
-                        </div>
-                        <div class="footer">
-                            <p>✨ Thank you for shopping at SASTA BAZAR! ✨</p>
-                            <p>📍 Visit Again | 🎁 Refer & Earn 0.5% Commission</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
+            if(cart.length===0) return showAlert('Cart empty','error');
+            const cust = document.getElementById('billCustomer').value;
+            if(!cust) return showAlert('Select customer','error');
+            const cs = document.getElementById('billCustomer'), opt = cs.options[cs.selectedIndex], custName = opt.text.split(' (')[0];
+            let total=0, totalCashback=0, itemsHtml='';
+            cart.forEach(i=>{ const t = i.originalPrice * i.quantity, cb = i.cashback * i.quantity; total+=t; totalCashback+=cb; itemsHtml += `<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td>+₹${cb}</td><td>₹${t}</td></tr>`; });
+            const win = window.open('','_blank');
+            win.document.write(`<html><head><title>SASTA BAZAR Bill</title><style>body{font-family:'Courier New';margin:20px;}.bill{max-width:350px;margin:0 auto;}.header{text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;}.total{border-top:1px solid #000;padding-top:10px;}</style></head><body onload="window.print();window.close();"><div class="bill"><div class="header"><h2>🏪 SASTA BAZAR</h2><p>123 Main Street, City | Ph: +91 98765 43210</p></div><p><strong>Bill No:</strong> SB${Date.now()}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p><p><strong>Customer:</strong> ${custName}</p><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div class="total"><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">🎁 Cashback Added: +₹${totalCashback}</p></div><div style="text-align:center;margin-top:15px;"><p>✨ Thank you! ✨</p></div></div></body></html>`);
         }
 
-        // ========== CUSTOMER FUNCTIONS ==========
+        function setupBarcodeScanner() {
+            const input = document.getElementById('barcodeInput');
+            if(!input) return;
+            input.addEventListener('keypress', async function(e) { if(e.key === 'Enter') { const barcode = this.value.trim(); if(barcode) await processBarcode(barcode); this.value = ''; } });
+        }
+
+        async function processBarcode(barcode) {
+            const cust = document.getElementById('billCustomer').value;
+            if(!cust) { showAlert('Select customer first!','error'); return; }
+            try {
+                const products = allProducts.length ? allProducts : await apiCall('GET','/products');
+                const p = products.find(p => p.product_code === barcode);
+                if(!p) { showAlert(`Product not found!`,'error'); return; }
+                if(p.current_stock<1) { showAlert(`${p.name} out of stock!`,'error'); return; }
+                const cashback = (p.selling_price * (p.discount_percent||0))/100;
+                const ex = cart.find(i=>i.product_id===p.id);
+                if(ex) ex.quantity++;
+                else cart.push({product_id:p.id,name:p.name,originalPrice:p.selling_price,discountPercent:p.discount_percent||0,cashback:cashback,quantity:1});
+                renderCart();
+                showAlert(`✅ ${p.name} added!`,'success');
+            } catch(e) { showAlert('Error: '+e.message,'error'); }
+        }
+
         async function loadCustomerData() {
             try {
-                const profile = await apiCall('GET', '/customers/profile');
-                const transactions = await apiCall('GET', `/wallet/transactions/${profile.id}`);
-                
+                const profile = await apiCall('GET','/customers/profile'), trans = await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust = await apiCall('GET','/customers');
                 document.getElementById('custWallet').innerHTML = `₹${profile.wallet_balance}`;
                 document.getElementById('custPurchases').innerHTML = `₹${profile.total_purchases}`;
                 document.getElementById('myReferralCode').innerHTML = profile.referral_code;
-                
-                // Count referrals
-                const allCustomers = await apiCall('GET', '/customers');
-                const referrals = allCustomers.filter(c => c.referred_by === profile.referral_code);
-                document.getElementById('custReferrals').innerHTML = referrals.length;
-                
-                const walletTbody = document.getElementById('walletTransactions');
-                walletTbody.innerHTML = '';
-                transactions.forEach(t => {
-                    walletTbody.innerHTML += `<tr>
-                        <td>${new Date(t.created_at).toLocaleDateString()}</td>
-                        <td style="color:${t.transaction_type === 'CREDIT' ? 'green' : 'red'}">${t.transaction_type}</td>
-                        <td>₹${t.amount}</td>
-                        <td>${t.description || '-'}</td>
-                    </tr>`;
-                });
-            } catch(e) {
-                showAlert('Error loading profile', 'error');
-            }
+                document.getElementById('custReferrals').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
+                const wt = document.getElementById('walletTransactions'); wt.innerHTML = '';
+                trans.forEach(t=>{ wt.innerHTML += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td></tr>`; });
+            } catch(e){ showAlert('Error loading profile','error'); }
         }
 
         async function addMoney() {
-            const amount = parseFloat(document.getElementById('moneyAmount').value);
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            if (!amount || amount <= 0) { showAlert('Enter valid amount', 'error'); return; }
-            try {
-                const profile = await apiCall('GET', '/customers/profile');
-                await apiCall('POST', '/wallet/add-money', { customer_id: profile.id, amount, payment_method: paymentMethod });
-                showAlert(`₹${amount} added to wallet!`, 'success');
-                closeModal('moneyModal');
-                await loadCustomerData();
-                document.getElementById('moneyAmount').value = '';
-            } catch(e) {
-                showAlert('Error: ' + e.message, 'error');
-            }
+            const amt = parseFloat(document.getElementById('moneyAmount').value), pm = document.getElementById('paymentMethod').value;
+            if(!amt||amt<=0) return showAlert('Enter amount','error');
+            try{ const profile = await apiCall('GET','/customers/profile'); await apiCall('POST','/wallet/add-money',{customer_id:profile.id,amount:amt,payment_method:pm}); showAlert(`₹${amt} added!`,'success'); closeModal('moneyModal'); await loadCustomerData(); }
+            catch(e){ showAlert('Error','error'); }
         }
 
-        function copyReferralCode() {
-            const code = document.getElementById('myReferralCode').innerText;
-            navigator.clipboard.writeText(code);
-            showAlert('Referral code copied!', 'success');
+        function copyReferralCode(){ navigator.clipboard.writeText(document.getElementById('myReferralCode').innerText); showAlert('Copied!','success'); }
+        function showAddProductModal(){ editingId=null; showModal('productModal'); }
+        function showAddCustomerModal(){ showModal('customerModal'); }
+        function showAddMoneyModal(){ showModal('moneyModal'); }
+        function manageCustomerWallet(id){ showModal('walletControlModal'); loadWalletCustomers(); setTimeout(()=>{ document.getElementById('walletCustomerSelect').value=id; },100); }
+
+        async function loadWalletCustomers() {
+            try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange=function(){ document.getElementById('currentBalance').innerHTML=`₹${this.options[this.selectedIndex]?.dataset.balance||0}`; }; }catch(e){ showAlert('Error','error'); }
         }
 
-        // ========== UI FUNCTIONS ==========
-        function showAddProductModal() {
-            editingId = null;
-            document.getElementById('modalTitle').innerHTML = 'Add Product';
-            document.getElementById('productCode').value = '';
-            document.getElementById('productName').value = '';
-            document.getElementById('productPrice').value = '';
-            document.getElementById('productDiscount').value = '0';
-            document.getElementById('productStock').value = '';
-            showModal('productModal');
-        }
-        
-        function showAddCustomerModal() {
-            document.getElementById('newCustName').value = '';
-            document.getElementById('newCustMobile').value = '';
-            document.getElementById('newCustPassword').value = '';
-            document.getElementById('newCustRef').value = '';
-            showModal('customerModal');
-        }
-        
-        function showAddMoneyModal() { showModal('moneyModal'); }
-        
-        function logout() {
-            authToken = null;
-            currentUser = null;
-            cart = [];
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('customerDashboard').style.display = 'none';
-            showAlert('Logged out', 'info');
-        }
+        function showWalletControlModal(){ showModal('walletControlModal'); loadWalletCustomers(); }
+        async function adminAddMoney(){ const cid=document.getElementById('walletCustomerSelect').value, amt=parseFloat(document.getElementById('walletAmount').value), reason=document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } }
+        async function adminDeductMoney(){ const cid=document.getElementById('walletCustomerSelect').value, amt=parseFloat(document.getElementById('walletAmount').value), reason=document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } }
 
-        // Initialize
-        checkBackend();
-        setInterval(checkBackend, 30000);
+        function logout(){ authToken=null; currentUser=null; cart=[]; document.getElementById('loginSection').style.display='block'; document.getElementById('adminDashboard').style.display='none'; document.getElementById('customerDashboard').style.display='none'; showAlert('Logged out','info'); }
+
+        checkBackend(); setInterval(checkBackend,30000);
     </script>
 </body>
 </html>

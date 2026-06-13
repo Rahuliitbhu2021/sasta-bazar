@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ============ IN-MEMORY DATABASE ============
+// ============ DATABASE ============
 let products = [
   { id: 1, product_code: 'P001', name: 'Smartphone', purchase_price: 15000, selling_price: 19999, current_stock: 25, min_stock_level: 5, discount_percent: 10 },
   { id: 2, product_code: 'P002', name: 'Laptop', purchase_price: 45000, selling_price: 54999, current_stock: 10, min_stock_level: 3, discount_percent: 15 },
@@ -17,8 +17,12 @@ let products = [
 ];
 
 let customers = [
-  { id: 1, customer_id: 'CUST001', name: 'John Doe', mobile: '9876543210', address: '123 Main Street', referral_code: 'REF123', referred_by: null, password_hash: bcrypt.hashSync('9876543210', 10), wallet_balance: 500, total_purchases: 0, transactions: [], created_at: new Date().toISOString() },
-  { id: 2, customer_id: 'CUST002', name: 'Jane Smith', mobile: '9876543211', address: '456 Park Avenue', referral_code: 'REF456', referred_by: 'REF123', password_hash: bcrypt.hashSync('9876543211', 10), wallet_balance: 0, total_purchases: 0, transactions: [], created_at: new Date().toISOString() }
+  { 
+    id: 1, customer_id: 'CUST001', name: 'John Doe', mobile: '9876543210', address: '123 Main Street',
+    referral_code: 'REF123', referred_by: null, 
+    password_hash: bcrypt.hashSync('9876543210', 10),
+    wallet_balance: 500, total_purchases: 0, transactions: [], created_at: new Date().toISOString()
+  }
 ];
 
 let bills = [];
@@ -26,7 +30,7 @@ let commissions = [];
 let walletTransactions = [];
 
 let nextProductId = 6;
-let nextCustomerId = 3;
+let nextCustomerId = 2;
 let nextBillId = 1;
 
 // ============ HELPER FUNCTIONS ============
@@ -35,7 +39,7 @@ function generateReferralCode() {
 }
 
 function generateCustomerId() {
-  return 'CUST' + Date.now().toString().slice(-8);
+  return 'CUST' + String(nextCustomerId).padStart(3, '0');
 }
 
 function generateBillNumber() {
@@ -76,19 +80,33 @@ app.post('/api/auth/admin/login', (req, res) => {
 
 app.post('/api/auth/customer/login', async (req, res) => {
   const { mobile, password } = req.body;
+  console.log('Login attempt - Mobile:', mobile, 'Password:', password);
+  
   const customer = customers.find(c => c.mobile === mobile);
-  if (!customer) return res.status(401).json({ error: 'Customer not found' });
+  if (!customer) {
+    return res.status(401).json({ error: 'Customer not found. Please register first.' });
+  }
+  
   const isValid = await bcrypt.compare(password, customer.password_hash);
-  if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
+  console.log('Password valid?', isValid);
+  
+  if (!isValid) {
+    return res.status(401).json({ error: 'Invalid password. Please try again.' });
+  }
+  
   const token = jwt.sign({ id: customer.id, role: 'customer' }, 'mysecretkey', { expiresIn: '7d' });
   res.json({ token, customer });
 });
 
 app.post('/api/auth/customer/register', async (req, res) => {
   const { name, mobile, password, referralCode } = req.body;
-  if (customers.find(c => c.mobile === mobile)) {
-    return res.status(400).json({ error: 'Mobile number already registered' });
+  console.log('Registration attempt:', { name, mobile, password, referralCode });
+  
+  const existing = customers.find(c => c.mobile === mobile);
+  if (existing) {
+    return res.status(400).json({ error: 'Mobile number already registered. Please login.' });
   }
+  
   const hashedPassword = await bcrypt.hash(password, 10);
   const newCustomer = {
     id: nextCustomerId++,
@@ -104,6 +122,8 @@ app.post('/api/auth/customer/register', async (req, res) => {
     created_at: new Date().toISOString()
   };
   customers.push(newCustomer);
+  console.log('Customer registered successfully:', { id: newCustomer.id, name: newCustomer.name, mobile: newCustomer.mobile });
+  
   const token = jwt.sign({ id: newCustomer.id, role: 'customer' }, 'mysecretkey', { expiresIn: '7d' });
   res.json({ token, customer: newCustomer });
 });
@@ -145,7 +165,7 @@ app.delete('/api/products/:id', authenticateToken, (req, res) => {
   const index = products.findIndex(p => p.id == req.params.id);
   if (index !== -1) {
     products.splice(index, 1);
-    res.json({ message: 'Product deleted' });
+    res.json({ message: 'Product deleted successfully' });
   } else {
     res.status(404).json({ error: 'Product not found' });
   }
@@ -163,7 +183,13 @@ app.patch('/api/products/:id/discount', authenticateToken, (req, res) => {
 
 // ============ CUSTOMER ROUTES ============
 app.get('/api/customers', authenticateToken, (req, res) => {
-  res.json(customers);
+  const customersList = customers.map(c => ({
+    id: c.id, customer_id: c.customer_id, name: c.name, mobile: c.mobile,
+    referral_code: c.referral_code, referred_by: c.referred_by,
+    wallet_balance: c.wallet_balance, total_purchases: c.total_purchases,
+    address: c.address, created_at: c.created_at
+  }));
+  res.json(customersList);
 });
 
 app.get('/api/customers/profile', authenticateToken, (req, res) => {
@@ -174,8 +200,20 @@ app.get('/api/customers/profile', authenticateToken, (req, res) => {
 });
 
 app.post('/api/customers', authenticateToken, async (req, res) => {
-  const { name, mobile, address, referred_by } = req.body;
-  const hashedPassword = await bcrypt.hash(mobile, 10);
+  const { name, mobile, address, referred_by, password } = req.body;
+  
+  console.log('Admin adding customer:', { name, mobile, password });
+  
+  // Check if customer already exists
+  const existing = customers.find(c => c.mobile === mobile);
+  if (existing) {
+    return res.status(400).json({ error: 'Customer with this mobile already exists' });
+  }
+  
+  // Use provided password or default to mobile number
+  const customerPassword = password || mobile;
+  const hashedPassword = await bcrypt.hash(customerPassword, 10);
+  
   const newCustomer = {
     id: nextCustomerId++,
     customer_id: generateCustomerId(),
@@ -190,7 +228,13 @@ app.post('/api/customers', authenticateToken, async (req, res) => {
     created_at: new Date().toISOString()
   };
   customers.push(newCustomer);
-  res.json(newCustomer);
+  console.log('Admin added customer:', { id: newCustomer.id, name: newCustomer.name, mobile: newCustomer.mobile, password: customerPassword });
+  
+  res.json({ 
+    success: true, 
+    customer: newCustomer,
+    message: `Customer added! They can login with Mobile: ${mobile} / Password: ${customerPassword}`
+  });
 });
 
 // ============ BILL ROUTES ============
@@ -199,37 +243,19 @@ app.post('/api/bills', authenticateToken, (req, res) => {
   const customer = customers.find(c => c.id === customer_id);
   if (!customer) return res.status(404).json({ error: 'Customer not found' });
 
-  let subtotal = 0;
-  let totalDiscount = 0;
-  let totalCashback = 0;
-  const billItems = [];
+  let totalAmount = 0;      // Customer pays FULL amount (no discount on bill)
+  let totalCashback = 0;    // Discount amount goes to wallet
 
   for (const item of items) {
     const product = products.find(p => p.id === item.product_id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     if (product.current_stock < item.quantity) return res.status(400).json({ error: 'Insufficient stock' });
 
-    const discountAmount = (product.selling_price * (product.discount_percent || 0)) / 100;
-    const finalPrice = product.selling_price - discountAmount;
-    const itemTotal = finalPrice * item.quantity;
+    const cashbackAmount = (product.selling_price * (product.discount_percent || 0)) / 100;
     
-    subtotal += product.selling_price * item.quantity;
-    totalDiscount += discountAmount * item.quantity;
-    totalCashback += discountAmount * item.quantity;
-    
+    totalAmount += product.selling_price * item.quantity;
+    totalCashback += cashbackAmount * item.quantity;
     product.current_stock -= item.quantity;
-    
-    billItems.push({
-      product_id: product.id,
-      product_name: product.name,
-      product_code: product.product_code,
-      quantity: item.quantity,
-      unit_price: product.selling_price,
-      discount_percent: product.discount_percent,
-      discount_amount: discountAmount,
-      final_price: finalPrice,
-      total_price: itemTotal
-    });
   }
 
   const billNumber = generateBillNumber();
@@ -238,17 +264,15 @@ app.post('/api/bills', authenticateToken, (req, res) => {
     bill_number: billNumber,
     customer_id: customer.id,
     customer_name: customer.name,
-    subtotal: subtotal,
-    discount: totalDiscount,
-    total_amount: subtotal - totalDiscount,
+    total_amount: totalAmount,
     cashback: totalCashback,
-    items: billItems,
+    items: items,
     payment_method: payment_method || 'cash',
     created_at: new Date().toISOString()
   };
   bills.push(newBill);
 
-  customer.total_purchases += (subtotal - totalDiscount);
+  customer.total_purchases += totalAmount;
   
   if (totalCashback > 0) {
     customer.wallet_balance += totalCashback;
@@ -257,16 +281,16 @@ app.post('/api/bills', authenticateToken, (req, res) => {
       customer_id: customer.id,
       amount: totalCashback,
       transaction_type: 'CREDIT',
-      description: `Cashback from bill ${billNumber}`,
+      description: `🎁 Cashback from bill ${billNumber}`,
       created_at: new Date().toISOString()
     });
   }
 
-  // Referral commission
+  // Referral commission (0.5% of total amount)
   if (customer.referred_by) {
     const referrer = customers.find(c => c.referral_code === customer.referred_by);
     if (referrer) {
-      const commissionAmount = ((subtotal - totalDiscount) * 0.5) / 100;
+      const commissionAmount = (totalAmount * 0.5) / 100;
       if (commissionAmount > 0) {
         referrer.wallet_balance += commissionAmount;
         walletTransactions.push({
@@ -274,7 +298,7 @@ app.post('/api/bills', authenticateToken, (req, res) => {
           customer_id: referrer.id,
           amount: commissionAmount,
           transaction_type: 'CREDIT',
-          description: `Referral commission from bill ${billNumber}`,
+          description: `🎁 Referral commission from bill ${billNumber}`,
           created_at: new Date().toISOString()
         });
         commissions.push({
@@ -315,7 +339,16 @@ app.get('/api/reports/dashboard', authenticateToken, (req, res) => {
   });
 });
 
+app.get('/api/reports/commissions', authenticateToken, (req, res) => {
+  res.json(commissions);
+});
+
 // ============ WALLET ROUTES ============
+app.get('/api/wallet/balance', authenticateToken, (req, res) => {
+  const customer = customers.find(c => c.id === req.user.id);
+  res.json({ balance: customer?.wallet_balance || 0 });
+});
+
 app.get('/api/wallet/transactions/:customerId', authenticateToken, (req, res) => {
   res.json(walletTransactions.filter(t => t.customer_id == req.params.customerId));
 });
@@ -386,6 +419,7 @@ app.post('/api/admin/wallet/deduct', authenticateToken, (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`✅ Admin: admin@shop.com / MyStrongPass@0424`);
-  console.log(`✅ Customer: 9876543210 / 9876543210\n`);
+  console.log(`📋 Admin Login: admin@shop.com / MyStrongPass@0424`);
+  console.log(`📋 Demo Customer: 9876543210 / 9876543210`);
+  console.log(`📋 Note: Admin added customers can login with mobile number as password\n`);
 });
