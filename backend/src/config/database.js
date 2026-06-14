@@ -1,30 +1,27 @@
 const { Pool } = require('pg');
 
-// Connection pool with retry logic
 const pool = new Pool({
-  host: process.env.DB_HOST || 'aws-1-ap-southeast-1.pooler.supabase.com',
-  user: process.env.DB_USER || 'postgres',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME || 'postgres',
+  database: process.env.DB_NAME,
   port: process.env.DB_PORT || 5432,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-  max: 20, // Maximum number of clients in pool
+  ssl: { rejectUnauthorized: false },
+  max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 10000,
 });
 
 // Test connection
 pool.connect((err, client, release) => {
   if (err) {
     console.error('❌ Database connection error:', err.message);
-    console.error('⚠️ Please check your DATABASE_URL or environment variables');
   } else {
     console.log('✅ PostgreSQL connected successfully');
     release();
   }
 });
 
-// Helper functions for database operations
 async function query(text, params) {
   const start = Date.now();
   try {
@@ -40,8 +37,4 @@ async function query(text, params) {
   }
 }
 
-async function getClient() {
-  return await pool.connect();
-}
-
-module.exports = { pool, query, getClient };
+module.exports = { pool, query };

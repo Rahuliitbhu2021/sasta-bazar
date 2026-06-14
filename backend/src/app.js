@@ -2,7 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 const { query } = require('./config/database');
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -25,21 +28,34 @@ app.get('/', (req, res) => {
   res.json({ message: 'Backend is running with PostgreSQL!' });
 });
 
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Backend is reachable!', success: true });
+});
+
 // ============ AUTH ROUTES ============
 app.post('/api/auth/admin/login', async (req, res) => {
   const { email, password } = req.body;
   
-  if (email !== 'admin@shop.com') {
-    return res.status(401).json({ error: 'Invalid credentials' });
+  try {
+    let result = await query('SELECT * FROM users WHERE email = $1', [email]);
+    let user = result.rows[0];
+    
+    if (!user) {
+      const hashedPassword = await bcrypt.hash('MyStrongPass@0424', 10);
+      await query('INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3)', [email, hashedPassword, 'admin']);
+      user = { id: 1, email, role: 'admin' };
+    }
+    
+    if (email === 'admin@shop.com' && password === 'MyStrongPass@0424') {
+      const token = jwt.sign({ id: user.id, email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+      res.json({ token, user: { id: user.id, email, role: 'admin', name: 'Admin' } });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ error: error.message });
   }
-  
-  // Verify password with stored hash
-  if (password === 'MyStrongPass@0424') {
-    const token = jwt.sign({ id: 1, email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    return res.json({ token, user: { id: 1, email, role: 'admin', name: 'Admin' } });
-  }
-  
-  res.status(401).json({ error: 'Invalid credentials' });
 });
 
 app.post('/api/auth/customer/login', async (req, res) => {
@@ -103,13 +119,13 @@ app.get('/api/products', authenticateToken, async (req, res) => {
 });
 
 app.post('/api/products', authenticateToken, async (req, res) => {
-  const { product_code, name, purchase_price, selling_price, current_stock, min_stock_level, discount_percent } = req.body;
+  const { product_code, name, purchase_price, selling_price, current_stock, discount_percent } = req.body;
   
   try {
     const result = await query(
-      `INSERT INTO products (product_code, name, purchase_price, selling_price, current_stock, min_stock_level, discount_percent)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [product_code, name, purchase_price || selling_price * 0.7, selling_price, current_stock || 0, min_stock_level || 5, discount_percent || 0]
+      `INSERT INTO products (product_code, name, purchase_price, selling_price, current_stock, discount_percent)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [product_code, name, purchase_price || selling_price * 0.7, selling_price, current_stock || 0, discount_percent || 0]
     );
     res.json(result.rows[0]);
   } catch (error) {
@@ -119,13 +135,12 @@ app.post('/api/products', authenticateToken, async (req, res) => {
 
 app.put('/api/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { product_code, name, purchase_price, selling_price, min_stock_level, discount_percent } = req.body;
+  const { product_code, name, purchase_price, selling_price, discount_percent } = req.body;
   
   try {
     await query(
-      `UPDATE products SET product_code=$1, name=$2, purchase_price=$3, selling_price=$4, min_stock_level=$5, discount_percent=$6, updated_at=NOW()
-       WHERE id=$7`,
-      [product_code, name, purchase_price, selling_price, min_stock_level, discount_percent, id]
+      `UPDATE products SET product_code=$1, name=$2, purchase_price=$3, selling_price=$4, discount_percent=$5 WHERE id=$6`,
+      [product_code, name, purchase_price, selling_price, discount_percent, id]
     );
     const result = await query('SELECT * FROM products WHERE id = $1', [id]);
     res.json(result.rows[0]);
@@ -186,10 +201,11 @@ app.post('/api/customers', authenticateToken, async (req, res) => {
     const result = await query(
       `INSERT INTO customers (customer_id, name, mobile, address, referral_code, referred_by, password_hash)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [customerId, name, mobile, address, referralCode, referred_by || null, hashedPassword]
+      [customerId, name, mobile, address || '', referralCode, referred_by || null, hashedPassword]
     );
     res.json(result.rows[0]);
   } catch (error) {
+    console.error('Add customer error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -201,7 +217,6 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
   try {
     let totalAmount = 0;
     let totalCashback = 0;
-    const billItems = [];
     
     for (const item of items) {
       const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
@@ -218,27 +233,16 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       totalAmount += p.selling_price * item.quantity;
       totalCashback += cashbackAmount * item.quantity;
       
-      billItems.push({
-        product_id: p.id,
-        product_name: p.name,
-        quantity: item.quantity,
-        unit_price: p.selling_price,
-        discount_percent: p.discount_percent,
-        cashback_amount: cashbackAmount,
-        total_price: p.selling_price * item.quantity
-      });
-      
       await query('UPDATE products SET current_stock = current_stock - $1 WHERE id = $2', [item.quantity, p.id]);
     }
     
     const billNumber = `INV${Date.now()}`;
     const billResult = await query(
-      `INSERT INTO bills (bill_number, customer_id, total_amount, cashback, payment_method, items)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [billNumber, customer_id, totalAmount, totalCashback, payment_method || 'cash', JSON.stringify(billItems)]
+      `INSERT INTO bills (bill_number, customer_id, total_amount, cashback, payment_method)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [billNumber, customer_id, totalAmount, totalCashback, payment_method || 'cash']
     );
     
-    // Update customer total purchases and wallet
     await query('UPDATE customers SET total_purchases = total_purchases + $1 WHERE id = $2', [totalAmount, customer_id]);
     
     if (totalCashback > 0) {
@@ -250,7 +254,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       );
     }
     
-    // Check for referral commission
+    // Referral commission
     const customer = await query('SELECT referred_by FROM customers WHERE id = $1', [customer_id]);
     if (customer.rows[0]?.referred_by) {
       const referrer = await query('SELECT id FROM customers WHERE referral_code = $1', [customer.rows[0].referred_by]);
@@ -263,17 +267,13 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
              VALUES ($1, $2, $3, $4)`,
             [referrer.rows[0].id, commissionAmount, 'CREDIT', `Commission from bill ${billNumber}`]
           );
-          await query(
-            `INSERT INTO commissions (customer_id, referred_customer_id, bill_id, amount, percentage)
-             VALUES ($1, $2, $3, $4, $5)`,
-            [referrer.rows[0].id, customer_id, billResult.rows[0].id, commissionAmount, 0.5]
-          );
         }
       }
     }
     
     res.json({ success: true, bill: billResult.rows[0], cashback: totalCashback });
   } catch (error) {
+    console.error('Bill creation error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -298,12 +298,12 @@ app.get('/api/reports/dashboard', authenticateToken, async (req, res) => {
     const totalSales = await query('SELECT COALESCE(SUM(total_amount), 0) as total FROM bills');
     const totalCustomers = await query('SELECT COUNT(*) as total FROM customers');
     const totalCommission = await query('SELECT COALESCE(SUM(amount), 0) as total FROM commissions');
-    const lowStock = await query('SELECT COUNT(*) as total FROM products WHERE current_stock <= min_stock_level');
+    const lowStock = await query('SELECT COUNT(*) as total FROM products WHERE current_stock <= 5');
     
     res.json({
       total_sales: parseFloat(totalSales.rows[0].total),
       total_customers: parseInt(totalCustomers.rows[0].total),
-      total_commission: parseFloat(totalCommission.rows[0].total),
+      total_commission: parseFloat(totalCommission.rows[0].total || 0),
       low_stock_alerts: parseInt(lowStock.rows[0].total)
     });
   } catch (error) {
@@ -322,20 +322,18 @@ app.get('/api/wallet/transactions/:customerId', authenticateToken, async (req, r
 });
 
 app.post('/api/wallet/add-money', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admin can add money' });
+  }
   const { customer_id, amount, payment_method } = req.body;
-  
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Only admin can add money' });
-    }
     await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [amount, customer_id]);
     await query(
       `INSERT INTO wallet_transactions (customer_id, amount, transaction_type, description)
        VALUES ($1, $2, $3, $4)`,
       [customer_id, amount, 'CREDIT', `Added via ${payment_method} by admin`]
     );
-    const result = await query('SELECT wallet_balance FROM customers WHERE id = $1', [customer_id]);
-    res.json({ success: true, new_balance: parseFloat(result.rows[0].wallet_balance) });
+    res.json({ success: true, message: 'Money added successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -363,8 +361,7 @@ app.post('/api/admin/wallet/add', authenticateToken, async (req, res) => {
        VALUES ($1, $2, $3, $4)`,
       [customer_id, amount, 'CREDIT', reason || `Admin added ₹${amount}`]
     );
-    const result = await query('SELECT wallet_balance FROM customers WHERE id = $1', [customer_id]);
-    res.json({ success: true, new_balance: parseFloat(result.rows[0].wallet_balance) });
+    res.json({ success: true, message: 'Money added successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -384,17 +381,102 @@ app.post('/api/admin/wallet/deduct', authenticateToken, async (req, res) => {
        VALUES ($1, $2, $3, $4)`,
       [customer_id, amount, 'DEBIT', reason || `Admin deducted ₹${amount}`]
     );
-    const result = await query('SELECT wallet_balance FROM customers WHERE id = $1', [customer_id]);
-    res.json({ success: true, new_balance: parseFloat(result.rows[0].wallet_balance) });
+    res.json({ success: true, message: 'Money deducted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+// ============ CREATE TABLES IF NOT EXISTS ==========
+async function initTables() {
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE,
+        password_hash VARCHAR(255),
+        role VARCHAR(50) DEFAULT 'admin'
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS customers (
+        id SERIAL PRIMARY KEY,
+        customer_id VARCHAR(50) UNIQUE,
+        name VARCHAR(255),
+        mobile VARCHAR(20) UNIQUE,
+        address TEXT,
+        referral_code VARCHAR(50) UNIQUE,
+        referred_by VARCHAR(50),
+        password_hash VARCHAR(255),
+        wallet_balance DECIMAL DEFAULT 0,
+        total_purchases DECIMAL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        product_code VARCHAR(50) UNIQUE,
+        name VARCHAR(255),
+        purchase_price DECIMAL,
+        selling_price DECIMAL,
+        current_stock INT DEFAULT 0,
+        discount_percent DECIMAL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS bills (
+        id SERIAL PRIMARY KEY,
+        bill_number VARCHAR(50) UNIQUE,
+        customer_id INT,
+        total_amount DECIMAL,
+        cashback DECIMAL,
+        payment_method VARCHAR(20),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id SERIAL PRIMARY KEY,
+        customer_id INT,
+        amount DECIMAL,
+        transaction_type VARCHAR(20),
+        description TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS commissions (
+        id SERIAL PRIMARY KEY,
+        customer_id INT,
+        referred_customer_id INT,
+        bill_id INT,
+        amount DECIMAL,
+        percentage DECIMAL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    console.log('✅ Tables created successfully');
+  } catch (error) {
+    console.error('Table creation error:', error.message);
+  }
+}
+
+// ============ START SERVER ============
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`✅ PostgreSQL Database Connected`);
-  console.log(`📋 Admin: admin@shop.com / MyStrongPass@0424`);
-  console.log(`📋 Customer: 9876543210 / 9876543210\n`);
+
+initTables().then(() => {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Server running on port ${PORT}`);
+    console.log(`✅ PostgreSQL Database Connected`);
+    console.log(`📋 Admin: admin@shop.com / MyStrongPass@0424`);
+    console.log(`📋 Customer: 9876543210 / 9876543210\n`);
+  });
 });
