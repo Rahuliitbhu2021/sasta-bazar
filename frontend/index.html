@@ -7,19 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Space Grotesk', sans-serif;
             background: #0a0a0a;
             min-height: 100vh;
             overflow-x: hidden;
         }
-
         .bg-gradient {
             position: fixed;
             top: 0;
@@ -29,7 +23,6 @@
             background: radial-gradient(ellipse at 20% 30%, #1a1a2e, #0a0a0a);
             z-index: -2;
         }
-
         .animated-orb {
             position: fixed;
             border-radius: 50%;
@@ -38,17 +31,14 @@
             animation: float 15s ease-in-out infinite;
             z-index: -1;
         }
-
         .orb-1 { width: 400px; height: 400px; background: #e67e22; top: 10%; left: -100px; }
         .orb-2 { width: 500px; height: 500px; background: #f39c12; bottom: 10%; right: -100px; animation-delay: -5s; }
         .orb-3 { width: 300px; height: 300px; background: #d35400; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
-
         @keyframes float {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
             33% { transform: translate(50px, -50px) rotate(120deg); }
             66% { transform: translate(-30px, 30px) rotate(240deg); }
         }
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -56,8 +46,6 @@
             position: relative;
             z-index: 10;
         }
-
-        /* Login Card */
         .login-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -69,17 +57,14 @@
             box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
             transition: transform 0.4s ease;
         }
-
         .login-card:hover {
             transform: translateY(-8px);
             border-color: rgba(230, 126, 34, 0.3);
         }
-
         .logo-section {
             text-align: center;
             margin-bottom: 40px;
         }
-
         .logo-icon {
             font-size: 60px;
             background: linear-gradient(135deg, #e67e22, #f39c12);
@@ -89,12 +74,10 @@
             display: inline-block;
             animation: pulse 2s ease-in-out infinite;
         }
-
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.05); opacity: 0.9; }
         }
-
         .logo-section h1 {
             font-size: 42px;
             font-weight: 700;
@@ -104,15 +87,12 @@
             color: transparent;
             margin-top: 15px;
         }
-
         .logo-section p {
             color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
             letter-spacing: 2px;
             margin-top: 8px;
         }
-
-        /* Premium Toggle */
         .premium-toggle {
             display: flex;
             gap: 12px;
@@ -121,7 +101,6 @@
             border-radius: 60px;
             margin-bottom: 35px;
         }
-
         .toggle-option {
             flex: 1;
             padding: 14px;
@@ -134,18 +113,14 @@
             transition: all 0.3s ease;
             color: rgba(255, 255, 255, 0.6);
         }
-
         .toggle-option.active {
             background: linear-gradient(135deg, #e67e22, #f39c12);
             color: white;
             box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
         }
-
-        /* Input Groups */
         .input-group-modern {
             margin-bottom: 25px;
         }
-
         .input-group-modern label {
             display: block;
             font-size: 12px;
@@ -153,7 +128,6 @@
             color: rgba(255, 255, 255, 0.6);
             margin-bottom: 8px;
         }
-
         .input-group-modern input, .input-group-modern select {
             width: 100%;
             padding: 16px 20px;
@@ -165,19 +139,15 @@
             transition: all 0.3s ease;
             font-family: 'Space Grotesk', sans-serif;
         }
-
         .input-group-modern input:focus, .input-group-modern select:focus {
             outline: none;
             border-color: #e67e22;
             background: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1);
         }
-
         .input-group-modern input::placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
-
-        /* Buttons */
         .btn-premium {
             padding: 16px 28px;
             border: none;
@@ -188,44 +158,35 @@
             transition: all 0.3s ease;
             font-family: 'Space Grotesk', sans-serif;
         }
-
         .btn-primary-gold {
             background: linear-gradient(135deg, #e67e22, #f39c12);
             color: white;
             box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
         }
-
         .btn-primary-gold:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
         }
-
         .btn-success-modern {
             background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
         }
-
         .btn-danger-modern {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
         }
-
         .btn-warning-modern {
             background: linear-gradient(135deg, #f39c12, #e67e22);
             color: white;
         }
-
-        /* Dashboard */
         .dashboard {
             display: none;
             animation: fadeInUp 0.5s ease;
         }
-
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .dashboard-header {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -239,7 +200,6 @@
             gap: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-
         .dashboard-header h1 {
             font-size: 28px;
             font-weight: 700;
@@ -248,15 +208,12 @@
             background-clip: text;
             color: transparent;
         }
-
-        /* Stats Cards */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 25px;
             margin-bottom: 35px;
         }
-
         .stat-card-premium {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -265,17 +222,14 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.4s ease;
         }
-
         .stat-card-premium:hover {
             transform: translateY(-8px);
             border-color: rgba(230, 126, 34, 0.3);
         }
-
         .stat-icon {
             font-size: 35px;
             margin-bottom: 15px;
         }
-
         .stat-card-premium h3 {
             font-size: 13px;
             font-weight: 500;
@@ -284,7 +238,6 @@
             letter-spacing: 1px;
             margin-bottom: 8px;
         }
-
         .stat-value {
             font-size: 36px;
             font-weight: 700;
@@ -293,8 +246,6 @@
             background-clip: text;
             color: transparent;
         }
-
-        /* Sections */
         .section-premium {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -303,7 +254,6 @@
             margin-bottom: 30px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-
         .section-title {
             font-size: 20px;
             font-weight: 700;
@@ -313,7 +263,6 @@
             border-bottom: 2px solid rgba(230, 126, 34, 0.5);
             display: inline-block;
         }
-
         .scanner-section {
             background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
             border-radius: 24px;
@@ -321,32 +270,25 @@
             margin-bottom: 25px;
             border: 1px solid rgba(230,126,34,0.2);
         }
-
-        /* Tables */
         .premium-table {
             width: 100%;
             border-collapse: collapse;
         }
-
         .premium-table th, .premium-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             color: rgba(255, 255, 255, 0.8);
         }
-
         .premium-table th {
             background: rgba(255, 255, 255, 0.03);
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
             font-size: 13px;
         }
-
         .premium-table tr:hover {
             background: rgba(255, 255, 255, 0.03);
         }
-
-        /* Badges */
         .badge-premium {
             display: inline-block;
             padding: 5px 12px;
@@ -356,8 +298,6 @@
         }
         .badge-discount { background: linear-gradient(135deg, #e67e22, #f39c12); color: white; }
         .badge-cashback { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
-
-        /* Buttons Small */
         .btn-icon {
             padding: 6px 14px;
             border: none;
@@ -371,8 +311,6 @@
         .btn-edit { background: #3498db; color: white; }
         .btn-delete { background: #e74c3c; color: white; }
         .btn-wallet { background: #f39c12; color: white; }
-
-        /* Cart Total Box */
         .cart-total-box {
             background: linear-gradient(135deg, rgba(230,126,34,0.1), rgba(243,156,18,0.05));
             border-radius: 24px;
@@ -380,8 +318,6 @@
             margin-top: 20px;
             border: 1px solid rgba(230,126,34,0.2);
         }
-
-        /* Modal */
         .modal-premium {
             display: none;
             position: fixed;
@@ -395,7 +331,6 @@
             align-items: center;
             z-index: 1000;
         }
-
         .modal-content-premium {
             background: rgba(15, 15, 25, 0.95);
             backdrop-filter: blur(20px);
@@ -406,19 +341,15 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             animation: modalPop 0.4s ease;
         }
-
         @keyframes modalPop {
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
-
         .modal-content-premium h2 {
             color: white;
             margin-bottom: 25px;
             font-size: 24px;
         }
-
-        /* Alert */
         .alert-premium {
             position: fixed;
             top: 25px;
@@ -431,21 +362,16 @@
             font-weight: 500;
             backdrop-filter: blur(20px);
         }
-
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-
         .alert-success { background: rgba(39, 174, 96, 0.9); color: white; border-left: 3px solid #2ecc71; }
         .alert-error { background: rgba(231, 76, 60, 0.9); color: white; border-left: 3px solid #e74c3c; }
         .alert-info { background: rgba(52, 152, 219, 0.9); color: white; border-left: 3px solid #3498db; }
-
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #e67e22, #f39c12); border-radius: 10px; }
-
         @media (max-width: 768px) {
             .container { padding: 12px; }
             .stat-grid { gap: 15px; }
@@ -463,7 +389,7 @@
     <div class="animated-orb orb-3"></div>
 
     <div class="container">
-        <!-- ========== LOGIN SECTION (Visible Initially) ========== -->
+        <!-- LOGIN SECTION -->
         <div id="loginSection" class="login-card">
             <div class="logo-section">
                 <div class="logo-icon"><i class="fas fa-crown"></i></div>
@@ -514,7 +440,7 @@
             </div>
         </div>
 
-        <!-- ========== ADMIN DASHBOARD (Hidden Initially) ========== -->
+        <!-- ADMIN DASHBOARD -->
         <div id="adminDashboard" class="dashboard" style="display:none;">
             <div class="dashboard-header">
                 <h1><i class="fas fa-chart-line"></i> Admin Dashboard</h1>
@@ -540,7 +466,7 @@
 
             <div class="section-premium">
                 <div class="section-title"><i class="fas fa-users"></i> Customer Directory</div>
-                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th><th>Action</th></tr></thead><tbody id="customersList"></tbody></table></div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th><th>Action</th></tr></thead><tbody id="customersList"></tbody></td></div>
             </div>
 
             <div class="section-premium">
@@ -574,7 +500,7 @@
             </div>
         </div>
 
-        <!-- ========== CUSTOMER DASHBOARD (Hidden Initially) ========== -->
+        <!-- CUSTOMER DASHBOARD -->
         <div id="customerDashboard" class="dashboard" style="display:none;">
             <div class="dashboard-header">
                 <h1><i class="fas fa-user-circle"></i> My Portal</h1>
@@ -597,12 +523,12 @@
             
             <div class="section-premium">
                 <div class="section-title"><i class="fas fa-history"></i> Transaction History</div>
-                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransactions"></tbody></table></div>
+                <div style="overflow-x: auto;"><table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></td></thead><tbody id="walletTransactions"></tbody></table></div>
             </div>
         </div>
     </div>
 
-    <!-- ========== MODALS ========== -->
+    <!-- MODALS -->
     <div id="productModal" class="modal-premium"><div class="modal-content-premium"><h2><i class="fas fa-box"></i> Add Product</h2>
         <div class="input-group-modern"><input type="text" id="productCode" placeholder="Product Code"></div>
         <div class="input-group-modern"><input type="text" id="productName" placeholder="Product Name"></div>
@@ -634,15 +560,23 @@
     <div id="alert" class="alert-premium"></div>
 
     <script>
-        // ========== CONFIGURATION ==========
+        // ========== CONFIGURATION - YOUR DETAILS ==========
         const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
         const API_URL = `${BACKEND_URL}/api`;
+        const SUPABASE_URL = 'https://zxunkltmnncmrwneudlq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dW5rbHRtbm5jbXJ3bmV1ZGxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMTk1OTksImV4cCI6MjA5Njg5NTU5OX0.qPae_mTWsLSpHsEzLb6eyeui_iDdgc6UgIqyGhCInZA';
+        
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
 
         // ========== HELPER FUNCTIONS ==========
         async function checkBackend() {
-            try { const res = await fetch(`${BACKEND_URL}/`); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">✅ Connected</span>';
-            } catch(e) { document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">❌ Offline</span>'; }
+            try { 
+                const res = await fetch(`${BACKEND_URL}/`); 
+                if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">✅ Connected to Server</span>';
+                else document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">❌ Server Error</span>';
+            } catch(e) { 
+                document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px; font-size:12px;">❌ Backend Offline</span>'; 
+            }
         }
 
         async function apiCall(method, endpoint, data = null) {
@@ -650,11 +584,20 @@
             if (authToken) options.headers['Authorization'] = `Bearer ${authToken}`;
             if (data) options.body = JSON.stringify(data);
             const response = await fetch(`${API_URL}${endpoint}`, options);
-            if (!response.ok) { const error = await response.json(); throw new Error(error.error || 'API failed'); }
+            if (!response.ok) { 
+                const error = await response.json(); 
+                throw new Error(error.error || 'API failed'); 
+            }
             return response.json();
         }
 
-        function showAlert(msg, type) { const a = document.getElementById('alert'); a.textContent = msg; a.className = `alert-premium alert-${type}`; a.style.display = 'block'; setTimeout(() => a.style.display = 'none', 3000); }
+        function showAlert(msg, type) { 
+            const a = document.getElementById('alert'); 
+            a.textContent = msg; 
+            a.className = `alert-premium alert-${type}`; 
+            a.style.display = 'block'; 
+            setTimeout(() => a.style.display = 'none', 3000); 
+        }
         function showModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -683,9 +626,22 @@
             if(!email||!password) return showAlert('Enter credentials','error');
             try {
                 const res = await fetch(`${API_URL}/auth/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
-                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'admin' }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!','success'); }
-                else { const err = await res.json(); showAlert(err.error,'error'); }
-            } catch(e) { showAlert('Cannot connect to server','error'); }
+                if(res.ok) { 
+                    const data = await res.json(); 
+                    authToken = data.token; 
+                    currentUser = { type:'admin' }; 
+                    document.getElementById('loginSection').style.display = 'none'; 
+                    document.getElementById('adminDashboard').style.display = 'block'; 
+                    await loadAdminData(); 
+                    setupBarcodeScanner(); 
+                    showAlert('Welcome Admin!','success'); 
+                } else { 
+                    const err = await res.json(); 
+                    showAlert(err.error,'error'); 
+                }
+            } catch(e) { 
+                showAlert('Cannot connect to server. Make sure backend is running.','error'); 
+            }
         }
 
         async function customerLogin() {
@@ -693,9 +649,21 @@
             if(!mobile||!password) return showAlert('Enter credentials','error');
             try {
                 const res = await fetch(`${API_URL}/auth/customer/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mobile,password}) });
-                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert(`Welcome ${data.customer.name}!`,'success'); }
-                else { const err = await res.json(); showAlert(err.error,'error'); }
-            } catch(e) { showAlert('Server error','error'); }
+                if(res.ok) { 
+                    const data = await res.json(); 
+                    authToken = data.token; 
+                    currentUser = { type:'customer', data:data.customer }; 
+                    document.getElementById('loginSection').style.display = 'none'; 
+                    document.getElementById('customerDashboard').style.display = 'block'; 
+                    await loadCustomerData(); 
+                    showAlert(`Welcome ${data.customer.name}!`,'success'); 
+                } else { 
+                    const err = await res.json(); 
+                    showAlert(err.error,'error'); 
+                }
+            } catch(e) { 
+                showAlert('Server error','error'); 
+            }
         }
 
         async function register() {
@@ -703,47 +671,71 @@
             if(!name||!mobile||!password) return showAlert('Fill all fields','error');
             try {
                 const res = await fetch(`${API_URL}/auth/customer/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,mobile,password,referralCode:ref}) });
-                if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert('Registration successful!','success'); }
-                else { const err = await res.json(); showAlert(err.error,'error'); }
-            } catch(e) { showAlert('Registration failed','error'); }
+                if(res.ok) { 
+                    const data = await res.json(); 
+                    authToken = data.token; 
+                    currentUser = { type:'customer', data:data.customer }; 
+                    document.getElementById('loginSection').style.display = 'none'; 
+                    document.getElementById('customerDashboard').style.display = 'block'; 
+                    await loadCustomerData(); 
+                    showAlert('Registration successful!','success'); 
+                } else { 
+                    const err = await res.json(); 
+                    showAlert(err.error,'error'); 
+                }
+            } catch(e) { 
+                showAlert('Registration failed','error'); 
+            }
         }
 
         // ========== ADMIN FUNCTIONS ==========
         async function loadAdminData() {
             try {
-                const products = await apiCall('GET','/products'), customers = await apiCall('GET','/customers'), reports = await apiCall('GET','/reports/dashboard');
+                const products = await apiCall('GET','/products');
+                const customers = await apiCall('GET','/customers');
+                const reports = await apiCall('GET','/reports/dashboard');
                 allProducts = products;
+                
                 document.getElementById('totalSales').innerHTML = `₹${reports.total_sales}`;
                 document.getElementById('totalCustomers').innerHTML = reports.total_customers;
                 document.getElementById('totalCommission').innerHTML = `₹${reports.total_commission}`;
                 document.getElementById('lowStock').innerHTML = reports.low_stock_alerts;
                 
                 const pl = document.getElementById('productsList'); pl.innerHTML = '';
-                products.forEach(p => { pl.innerHTML += `<tr>
-                    <td style="font-weight:600;">${p.product_code}</td>
-                    <td>${p.name}</td>
-                    <td>₹${p.selling_price}</td>
-                    <td><span class="badge-premium badge-discount">${p.discount_percent||0}%</span></td>
-                    <td style="color:${p.current_stock<5?'#e74c3c':'#27ae60'}">${p.current_stock}</td>
-                    <td><button class="btn-icon btn-edit" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button> <button class="btn-icon btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button></td>
-                </tr>`; });
+                products.forEach(p => { 
+                    pl.innerHTML += `<tr>
+                        <td style="font-weight:600;">${p.product_code}</td>
+                        <td>${p.name}</td>
+                        <td>₹${p.selling_price}</td>
+                        <td><span class="badge-premium badge-discount">${p.discount_percent||0}%</span></td>
+                        <td style="color:${p.current_stock<5?'#e74c3c':'#27ae60'}">${p.current_stock}</td>
+                        <td><button class="btn-icon btn-edit" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button> <button class="btn-icon btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button></td>
+                    </tr>`;
+                });
                 
                 const cl = document.getElementById('customersList'); cl.innerHTML = '';
-                customers.forEach(c => { cl.innerHTML += `<tr>
-                    <td>${c.name}</td>
-                    <td>${c.mobile}</td>
-                    <td><code>${c.referral_code}</code></td>
-                    <td>₹${c.wallet_balance}</td>
-                    <td>₹${c.total_purchases}</td>
-                    <td><button class="btn-icon btn-wallet" onclick="showWalletControlForCustomer(${c.id})"><i class="fas fa-wallet"></i> Manage</button></td>
-                </tr>`; });
+                customers.forEach(c => { 
+                    cl.innerHTML += `<tr>
+                        <td>${c.name}</td>
+                        <td>${c.mobile}</td>
+                        <td><code>${c.referral_code}</code></td>
+                        <td>₹${c.wallet_balance}</td>
+                        <td>₹${c.total_purchases}</td>
+                        <td><button class="btn-icon btn-wallet" onclick="showWalletControlForCustomer(${c.id})"><i class="fas fa-wallet"></i> Manage</button></td>
+                    </tr>`;
+                });
                 
                 const cs = document.getElementById('billCustomer'); cs.innerHTML = '<option>Select Customer</option>';
                 customers.forEach(c => { cs.innerHTML += `<option value="${c.id}">${c.name} (${c.mobile}) - Wallet: ₹${c.wallet_balance}</option>`; });
                 
                 const ps = document.getElementById('billProduct'); ps.innerHTML = '<option>Select Product</option>';
-                products.forEach(p => { const cashback = (p.selling_price * (p.discount_percent||0))/100; ps.innerHTML += `<option value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cashback}" data-stock="${p.current_stock}">${p.name} - ₹${p.selling_price} (${p.discount_percent||0}% off → +₹${cashback} cashback)</option>`; });
-            } catch(e) { showAlert('Error loading data','error'); }
+                products.forEach(p => { 
+                    const cashback = (p.selling_price * (p.discount_percent||0))/100; 
+                    ps.innerHTML += `<option value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cashback}" data-stock="${p.current_stock}">${p.name} - ₹${p.selling_price} (${p.discount_percent||0}% off → +₹${cashback} cashback)</option>`; 
+                });
+            } catch(e) { 
+                showAlert('Error loading data: ' + e.message,'error'); 
+            }
         }
 
         async function saveProduct() {
@@ -752,11 +744,25 @@
             try {
                 if(editingId) await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,min_stock_level:5,discount_percent:discount});
                 else await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,min_stock_level:5,discount_percent:discount});
-                showAlert('Product saved!','success'); closeModal('productModal'); await loadAdminData();
-            } catch(e) { showAlert('Error saving','error'); }
+                showAlert('Product saved!','success'); 
+                closeModal('productModal'); 
+                await loadAdminData();
+            } catch(e) { 
+                showAlert('Error saving: '+e.message,'error'); 
+            }
         }
 
-        async function deleteProduct(id) { if(confirm('Delete this product?')){ try{ await apiCall('DELETE',`/products/${id}`); showAlert('Deleted','success'); await loadAdminData(); }catch(e){ showAlert('Error','error'); } } }
+        async function deleteProduct(id) { 
+            if(confirm('Delete this product?')){ 
+                try{ 
+                    await apiCall('DELETE',`/products/${id}`); 
+                    showAlert('Deleted','success'); 
+                    await loadAdminData(); 
+                } catch(e){ 
+                    showAlert('Error','error'); 
+                } 
+            } 
+        }
         function editProduct(id){ editingId=id; showModal('productModal'); }
 
         async function saveCustomer() {
@@ -766,27 +772,42 @@
             try {
                 await apiCall('POST','/customers',{name,mobile,password:finalPassword,referred_by:ref||null});
                 showAlert(`Customer added! Login: ${mobile} / Password: ${finalPassword}`,'success');
-                closeModal('customerModal'); await loadAdminData();
-            } catch(e) { showAlert('Error: '+e.message,'error'); }
+                closeModal('customerModal'); 
+                await loadAdminData();
+            } catch(e) { 
+                showAlert('Error: '+e.message,'error'); 
+            }
         }
 
         // ========== CART FUNCTIONS ==========
         function addToCartManual() {
             const cust = document.getElementById('billCustomer').value, prod = document.getElementById('billProduct'), pid = prod.value, qty = parseInt(document.getElementById('billQuantity').value);
-            if(!cust) return showAlert('Select customer','error'); if(!pid) return showAlert('Select product','error'); if(!qty||qty<1) return showAlert('Enter quantity','error');
+            if(!cust) return showAlert('Select customer','error'); 
+            if(!pid) return showAlert('Select product','error'); 
+            if(!qty||qty<1) return showAlert('Enter quantity','error');
             const sel = prod.options[prod.selectedIndex], name = sel.text.split(' - ')[0], price = parseFloat(sel.dataset.price), disc = parseFloat(sel.dataset.discount), cashback = parseFloat(sel.dataset.cashback), stock = parseInt(sel.dataset.stock);
             if(stock<qty) return showAlert(`Only ${stock} left`,'error');
             const ex = cart.find(i=>i.product_id===parseInt(pid));
             if(ex) ex.quantity+=qty;
             else cart.push({product_id:parseInt(pid),name,originalPrice:price,discountPercent:disc,cashback,quantity:qty});
-            renderCart(); document.getElementById('billQuantity').value='1'; showAlert(`${name} added to cart!`,'success');
+            renderCart(); 
+            document.getElementById('billQuantity').value='1'; 
+            showAlert(`${name} added to cart!`,'success');
         }
 
         function renderCart() {
-            const tbody = document.getElementById('cartList'); let total = 0, totalCashback = 0; tbody.innerHTML = '';
-            cart.forEach((item,idx)=>{ const itemTotal = item.originalPrice * item.quantity; const itemCashback = item.cashback * item.quantity; total += itemTotal; totalCashback += itemCashback;
+            const tbody = document.getElementById('cartList'); 
+            let total = 0, totalCashback = 0; 
+            tbody.innerHTML = '';
+            cart.forEach((item,idx)=>{ 
+                const itemTotal = item.originalPrice * item.quantity; 
+                const itemCashback = item.cashback * item.quantity; 
+                total += itemTotal; 
+                totalCashback += itemCashback;
                 tbody.innerHTML += `<tr>
-                    <td>${item.name}</td><td style="text-align:center">${item.quantity}</td><td style="text-align:right">₹${item.originalPrice}</td>
+                    <td>${item.name}</td>
+                    <td style="text-align:center">${item.quantity}</td>
+                    <td style="text-align:right">₹${item.originalPrice}</td>
                     <td style="text-align:center"><span class="badge-premium badge-discount">${item.discountPercent}%</span></td>
                     <td style="text-align:right; color:#27ae60;">+₹${itemCashback.toFixed(2)}</span></td>
                     <td style="text-align:right">₹${itemTotal.toFixed(2)}</span></td>
@@ -808,11 +829,13 @@
                 const res = await apiCall('POST','/bills',{customer_id:parseInt(cust),items,payment_method:'cash'});
                 if(res.success) {
                     showAlert(`Bill created! Cashback: ₹${res.cashback.toFixed(2)} added to wallet!`,'success');
-                    cart = []; renderCart(); await loadAdminData();
-                    const currentCart = [...cart];
-                    printBillAfterCreate(cust, currentCart);
+                    cart = []; 
+                    renderCart(); 
+                    await loadAdminData();
                 }
-            } catch(e) { showAlert('Error: '+e.message,'error'); }
+            } catch(e) { 
+                showAlert('Error: '+e.message,'error'); 
+            }
         }
 
         function printBill() {
@@ -821,33 +844,43 @@
             if(!cust) return showAlert('Select customer','error');
             const cs = document.getElementById('billCustomer'), opt = cs.options[cs.selectedIndex], custName = opt.text.split(' (')[0];
             let total=0, totalCashback=0, itemsHtml='';
-            cart.forEach(i=>{ const t = i.originalPrice * i.quantity; const cb = i.cashback * i.quantity; total+=t; totalCashback+=cb;
+            cart.forEach(i=>{ 
+                const t = i.originalPrice * i.quantity; 
+                const cb = i.cashback * i.quantity; 
+                total+=t; 
+                totalCashback+=cb;
                 itemsHtml += `<tr>
-                    <td>${i.name}</td><td style="text-align:center">${i.quantity}</td><td style="text-align:right">₹${i.originalPrice}</td>
+                    <td>${i.name}</td><td style="text-align:center">${i.quantity}</td>
+                    <td style="text-align:right">₹${i.originalPrice}</td>
                     <td style="text-align:center">${i.discountPercent}%</span></td>
                     <td style="text-align:right; color:#27ae60;">+₹${cb.toFixed(2)}</span></td>
                     <td style="text-align:right">₹${t.toFixed(2)}</span></td>
                 </tr>`;
             });
             const win = window.open('','_blank');
-            win.document.write(`<html><head><title>SASTA BAZAR Bill</title><style>body{font-family:'Courier New';margin:20px;}.bill{max-width:350px;margin:0 auto;}.header{text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;}</style></head><body onload="window.print();window.close();"><div class="bill"><div class="header"><h2>🏪 SASTA BAZAR</h2><p>123 Main Street, City | Ph: +91 98765 43210</p></div><p><strong>Bill No:</strong> SB${Date.now()}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p><p><strong>Customer:</strong> ${custName}</p><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></tr><div class="total"><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">🎁 Cashback Added: +₹${totalCashback}</p></div><div style="text-align:center;margin-top:15px;"><p>✨ Thank you! ✨</p></div></div></body></html>`);
-        }
-
-        function printBillAfterCreate(custId, cartItems) {
-            const cs = document.getElementById('billCustomer'), opt = cs.options[cs.selectedIndex], custName = opt ? opt.text.split(' (')[0] : 'Customer';
-            let total=0, totalCashback=0, itemsHtml='';
-            cartItems.forEach(i=>{ const t = i.originalPrice * i.quantity; const cb = i.cashback * i.quantity; total+=t; totalCashback+=cb;
-                itemsHtml += `<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`;
-            });
-            const win = window.open('','_blank');
-            win.document.write(`<html><head><title>SASTA BAZAR Bill</title><style>body{font-family:'Courier New';margin:20px;} .bill{max-width:350px;margin:0 auto;} .header{text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;}</style></head><body onload="window.print();window.close();"><div class="bill"><div class="header"><h2>🏪 SASTA BAZAR</h2><p>123 Main Street, City | Ph: +91 98765 43210</p></div><p><strong>Bill No:</strong> SB${Date.now()}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p><p><strong>Customer:</strong> ${custName}</p><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div class="total"><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">🎁 Cashback Added: +₹${totalCashback}</p></div><div style="text-align:center;margin-top:15px;"><p>✨ Thank you! ✨</p></div></div></body></html>`);
+            win.document.write(`<html><head><title>SASTA BAZAR Bill</title>
+            <style>body{font-family:'Courier New';margin:20px;}.bill{max-width:350px;margin:0 auto;}.header{text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;}</style>
+            </head><body onload="window.print();window.close();">
+            <div class="bill"><div class="header"><h2>🏪 SASTA BAZAR</h2><p>123 Main Street, City | Ph: +91 98765 43210</p></div>
+            <p><strong>Bill No:</strong> SB${Date.now()}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Customer:</strong> ${custName}</p>
+            <table style="width:100%;border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr></thead>
+            <tbody>${itemsHtml}</tbody></table>
+            <div class="total"><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">🎁 Cashback Added: +₹${totalCashback}</p></div>
+            <div style="text-align:center;margin-top:15px;"><p>✨ Thank you! ✨</p></div></div></body></html>`);
         }
 
         // ========== BARCODE SCANNER ==========
         function setupBarcodeScanner() {
             const input = document.getElementById('barcodeInput');
             if(!input) return;
-            input.addEventListener('keypress', async function(e) { if(e.key === 'Enter') { const barcode = this.value.trim(); if(barcode) await processBarcode(barcode); this.value = ''; } });
+            input.addEventListener('keypress', async function(e) { 
+                if(e.key === 'Enter') { 
+                    const barcode = this.value.trim(); 
+                    if(barcode) await processBarcode(barcode); 
+                    this.value = ''; 
+                } 
+            });
         }
 
         async function processBarcode(barcode) {
@@ -864,40 +897,67 @@
                 else cart.push({product_id:p.id,name:p.name,originalPrice:p.selling_price,discountPercent:p.discount_percent||0,cashback:cashback,quantity:1});
                 renderCart();
                 showAlert(`✅ ${p.name} added via barcode!`,'success');
-            } catch(e) { showAlert('Error: '+e.message,'error'); }
+            } catch(e) { 
+                showAlert('Error: '+e.message,'error'); 
+            }
         }
 
         // ========== CUSTOMER FUNCTIONS ==========
         async function loadCustomerData() {
             try {
-                const profile = await apiCall('GET','/customers/profile'), trans = await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust = await apiCall('GET','/customers');
+                const profile = await apiCall('GET','/customers/profile');
+                const transactions = await apiCall('GET',`/wallet/transactions/${profile.id}`);
+                const allCust = await apiCall('GET','/customers');
                 document.getElementById('custWallet').innerHTML = `₹${profile.wallet_balance}`;
                 document.getElementById('custPurchases').innerHTML = `₹${profile.total_purchases}`;
                 document.getElementById('myReferralCode').innerHTML = profile.referral_code;
                 document.getElementById('custReferrals').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
                 const wt = document.getElementById('walletTransactions'); wt.innerHTML = '';
-                trans.forEach(t=>{ wt.innerHTML += `<tr>
-                    <td>${new Date(t.created_at).toLocaleDateString()}</td>
-                    <td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td>
-                    <td>₹${t.amount}</td>
-                    <td>${t.description||'-'}</td>
-                </tr>`; });
-            } catch(e){ showAlert('Error loading profile','error'); }
+                transactions.forEach(t=>{ 
+                    wt.innerHTML += `<tr>
+                        <td>${new Date(t.created_at).toLocaleDateString()}</td>
+                        <td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td>
+                        <td>₹${t.amount}</td>
+                        <td>${t.description||'-'}</td>
+                    </tr>`;
+                });
+            } catch(e){ 
+                showAlert('Error loading profile','error'); 
+            }
         }
 
-        function copyReferralCode(){ navigator.clipboard.writeText(document.getElementById('myReferralCode').innerText); showAlert('Copied!','success'); }
+        function copyReferralCode(){ 
+            navigator.clipboard.writeText(document.getElementById('myReferralCode').innerText); 
+            showAlert('Copied!','success'); 
+        }
 
         // ========== ADMIN WALLET CONTROL ==========
-        function showWalletControlModal() { showModal('walletControlModal'); loadWalletCustomers(); }
+        function showWalletControlModal() { 
+            showModal('walletControlModal'); 
+            loadWalletCustomers(); 
+        }
         
         function showWalletControlForCustomer(id) {
             showModal('walletControlModal');
             loadWalletCustomers();
-            setTimeout(() => { document.getElementById('walletCustomerSelect').value = id; updateWalletBalanceDisplay(); }, 100);
+            setTimeout(() => { 
+                document.getElementById('walletCustomerSelect').value = id; 
+                updateWalletBalanceDisplay(); 
+            }, 100);
         }
         
         async function loadWalletCustomers() {
-            try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange = updateWalletBalanceDisplay; }catch(e){ showAlert('Error','error'); }
+            try{ 
+                const cust = await apiCall('GET','/customers'); 
+                const sel = document.getElementById('walletCustomerSelect'); 
+                sel.innerHTML='<option>Select Customer</option>'; 
+                cust.forEach(c=>{ 
+                    sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; 
+                }); 
+                sel.onchange = updateWalletBalanceDisplay; 
+            } catch(e){ 
+                showAlert('Error loading customers','error'); 
+            }
         }
         
         function updateWalletBalanceDisplay() {
@@ -909,13 +969,29 @@
         async function adminAddMoney() {
             const cid = document.getElementById('walletCustomerSelect').value, amt = parseFloat(document.getElementById('walletAmount').value), reason = document.getElementById('walletReason').value;
             if(!cid||!amt) return showAlert('Select customer & amount','error');
-            try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); loadWalletCustomers(); document.getElementById('walletAmount').value=''; } catch(e){ showAlert('Error','error'); }
+            try{ 
+                await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); 
+                showAlert(`₹${amt} added!`,'success'); 
+                await loadAdminData(); 
+                loadWalletCustomers(); 
+                document.getElementById('walletAmount').value=''; 
+            } catch(e){ 
+                showAlert('Error: '+e.message,'error'); 
+            }
         }
         
         async function adminDeductMoney() {
             const cid = document.getElementById('walletCustomerSelect').value, amt = parseFloat(document.getElementById('walletAmount').value), reason = document.getElementById('walletReason').value;
             if(!cid||!amt) return showAlert('Select customer & amount','error');
-            try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); loadWalletCustomers(); document.getElementById('walletAmount').value=''; } catch(e){ showAlert('Error','error'); }
+            try{ 
+                await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); 
+                showAlert(`₹${amt} deducted!`,'success'); 
+                await loadAdminData(); 
+                loadWalletCustomers(); 
+                document.getElementById('walletAmount').value=''; 
+            } catch(e){ 
+                showAlert('Error: '+e.message,'error'); 
+            }
         }
 
         // ========== UI FUNCTIONS ==========
@@ -930,7 +1006,8 @@
             showAlert('Logged out','info');
         }
 
-        checkBackend(); setInterval(checkBackend,30000);
+        checkBackend(); 
+        setInterval(checkBackend, 30000);
     </script>
 </body>
 </html>
