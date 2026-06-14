@@ -14,262 +14,188 @@
             min-height: 100vh; 
             overflow-x: hidden; 
         }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000"><circle cx="500" cy="500" r="300" fill="rgba(255,255,255,0.05)"/><circle cx="1500" cy="1000" r="400" fill="rgba(255,255,255,0.03)"/><circle cx="1000" cy="1500" r="250" fill="rgba(255,255,255,0.04)"/></svg>');
-            pointer-events: none;
-            animation: floatBg 20s ease-in-out infinite;
-        }
-        @keyframes floatBg { 0%,100%{ transform: translate(0,0); } 50%{ transform: translate(-20px,-20px); } }
         
-        /* Dancing Elements */
-        @keyframes dance { 0%,100%{ transform: translateY(0) rotate(0deg); } 25%{ transform: translateY(-10px) rotate(5deg); } 75%{ transform: translateY(10px) rotate(-5deg); } }
-        @keyframes bounce { 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(15px); } }
-        @keyframes pulse { 0%,100%{ opacity: 1; transform: scale(1); } 50%{ opacity: 0.7; transform: scale(1.05); } }
-        .dance { animation: dance 2s ease-in-out infinite; display: inline-block; }
-        .bounce { animation: bounce 1.5s ease-in-out infinite; display: inline-block; }
-        .pulse { animation: pulse 2s ease-in-out infinite; }
-        
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; }
+        /* Dashboard Layout */
+        .dashboard-container { display: none; min-height: 100vh; }
+        .customer-container { display: none; }
         
         /* Navbar */
-        .navbar { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 60px; padding: 15px 30px; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .logo-icon { font-size: 32px; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .logo-text { font-size: 24px; font-weight: 700; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; }
-        .nav-links a { color: #333; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.3s; cursor: pointer; }
-        .nav-links a:hover { color: #e67e22; transform: translateY(-2px); }
-        .login-btn { padding: 10px 24px; border-radius: 40px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; }
-        .login-admin { background: transparent; border: 1px solid #e67e22; color: #e67e22; }
-        .login-admin:hover { background: #e67e22; color: white; transform: translateY(-2px); }
-        .login-customer { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; box-shadow: 0 4px 15px rgba(230,126,34,0.3); }
-        .login-customer:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(230,126,34,0.4); }
+        .navbar { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 60px; padding: 12px 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { font-size: 28px; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-text { font-size: 20px; font-weight: 700; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .wallet-box { background: linear-gradient(135deg,#e67e22,#f39c12); padding: 8px 18px; border-radius: 40px; color: white; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .wallet-box i { font-size: 18px; }
+        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-btn { padding: 10px 20px; border-radius: 40px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; background: #f0f0f0; color: #333; }
+        .nav-btn.active { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; }
+        .nav-btn:hover { transform: translateY(-2px); background: #e67e22; color: white; }
+        .logout-btn { background: #e74c3c; color: white; padding: 10px 20px; border-radius: 40px; border: none; cursor: pointer; font-weight: 600; }
         
-        /* Hero */
-        .hero { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 50px; margin-bottom: 80px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 40px; padding: 40px; }
-        .hero-content { flex: 1; }
-        .hero-badge { display: inline-block; background: linear-gradient(135deg,#e67e22,#f39c12); padding: 6px 16px; border-radius: 40px; font-size: 12px; color: white; margin-bottom: 20px; }
-        .hero h1 { font-size: 52px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        .hero h1 span { color: #f39c12; }
-        .hero p { color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.6; margin-bottom: 30px; }
-        .hero-stats { display: flex; gap: 30px; margin-top: 30px; }
-        .stat-number { font-size: 28px; font-weight: 700; color: #f39c12; }
-        .stat-label { font-size: 12px; color: rgba(255,255,255,0.8); }
-        .hero-image { flex: 1; position: relative; }
-        .hero-image img { width: 100%; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .floating-card { position: absolute; background: rgba(255,255,255,0.95); border-radius: 16px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; animation: dance 3s ease-in-out infinite; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .floating-card-1 { top: -20px; right: 20px; }
-        .floating-card-2 { bottom: 40px; left: -30px; animation-delay: 1s; }
+        /* Content Sections */
+        .content-section { display: none; background: rgba(255,255,255,0.95); border-radius: 28px; padding: 25px; margin-top: 20px; min-height: 500px; }
+        .content-section.active-section { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Features */
-        .section-title { font-size: 36px; font-weight: 700; color: white; text-align: center; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        .section-subtitle { color: rgba(255,255,255,0.8); text-align: center; margin-bottom: 50px; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 30px; margin-bottom: 80px; }
-        .feature-card { background: rgba(255,255,255,0.95); border-radius: 28px; padding: 30px; text-align: center; transition: all 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .feature-card:hover { transform: translateY(-10px) scale(1.02); }
-        .feature-icon { font-size: 48px; margin-bottom: 20px; display: inline-block; animation: bounce 2s ease-in-out infinite; }
-        .feature-card h3 { color: #333; font-size: 20px; margin-bottom: 10px; }
-        .feature-card p { color: #666; font-size: 14px; }
+        .section-title { font-size: 24px; font-weight: 700; color: #e67e22; margin-bottom: 20px; border-left: 4px solid #e67e22; padding-left: 15px; }
         
-        /* Products */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-top: 30px; }
-        .product-card { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 20px; text-align: center; transition: all 0.4s; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .product-card:hover { transform: translateY(-8px) scale(1.03); }
-        .product-img { width: 80px; height: 80px; margin: 0 auto 15px; border-radius: 20px; overflow: hidden; background: linear-gradient(135deg,#e67e22,#f39c12); display: flex; align-items: center; justify-content: center; }
-        .product-img i { font-size: 48px; color: white; }
+        /* Products Grid */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .product-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: all 0.3s; cursor: pointer; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .product-img { width: 80px; height: 80px; margin: 0 auto 15px; background: linear-gradient(135deg,#e67e22,#f39c12); border-radius: 20px; display: flex; align-items: center; justify-content: center; }
+        .product-img i { font-size: 40px; color: white; }
         .product-card h4 { color: #333; font-size: 16px; margin-bottom: 8px; }
-        .product-price { color: #e67e22; font-weight: 700; margin-bottom: 5px; }
+        .product-price { color: #e67e22; font-weight: 700; }
         .product-discount { font-size: 11px; color: #27ae60; }
         
-        /* Super Discount */
-        .super-discount { background: linear-gradient(135deg, #e67e22, #d35400, #e74c3c); border-radius: 32px; padding: 40px; text-align: center; margin: 40px 0; animation: pulse 3s ease-in-out infinite; }
-        .super-discount h2 { font-size: 36px; color: white; margin-bottom: 10px; }
-        .super-discount p { color: rgba(255,255,255,0.9); margin-bottom: 20px; }
-        .discount-tag { display: inline-block; background: white; color: #e67e22; padding: 8px 20px; border-radius: 40px; font-weight: 700; font-size: 18px; }
-        .super-products { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 30px; }
-        .super-product-card { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px; text-align: center; transition: all 0.3s; }
-        .super-product-card:hover { transform: scale(1.05); }
+        /* Super Products */
+        .super-products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+        .super-card { background: linear-gradient(135deg, #e67e22, #d35400); border-radius: 20px; padding: 20px; text-align: center; color: white; transition: all 0.3s; }
+        .super-card:hover { transform: scale(1.03); }
+        .super-card .old-price { text-decoration: line-through; font-size: 12px; opacity: 0.8; margin-right: 8px; }
+        .super-card .price { font-size: 20px; font-weight: 700; }
+        .offer-badge { background: #27ae60; display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; margin-top: 8px; }
         
-        /* Login Card */
-        .login-card { background: rgba(255,255,255,0.98); border-radius: 48px; padding: 40px; max-width: 480px; margin: 40px auto; box-shadow: 0 25px 45px rgba(0,0,0,0.2); display: none; }
-        .input-group-modern { margin-bottom: 20px; }
-        .input-group-modern input, .input-group-modern select { width: 100%; padding: 14px 20px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 28px; font-size: 15px; color: #333; }
-        .premium-toggle { display: flex; gap: 12px; margin-bottom: 25px; }
-        .toggle-option { flex: 1; padding: 12px; background: #f0f0f0; border: none; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; color: #666; }
-        .toggle-option.active { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; }
-        .btn-premium { padding: 12px 20px; border: none; border-radius: 40px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
-        .btn-primary-gold { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; }
-        .btn-success-modern { background: #27ae60; color: white; }
-        .btn-danger-modern { background: #e74c3c; color: white; }
-        .btn-warning-modern { background: #f39c12; color: white; }
-        .btn-outline { background: transparent; border: 1px solid #e67e22; color: #e67e22; }
+        /* Jobs Grid */
+        .jobs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .job-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .job-card h3 { color: #e67e22; margin-bottom: 10px; }
+        .apply-btn { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; margin-top: 15px; font-weight: 600; }
         
-        /* Dashboard */
-        .dashboard { display: none; }
-        .dashboard-header { background: rgba(255,255,255,0.95); border-radius: 28px; padding: 20px 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .dashboard-header h1 { font-size: 24px; color: #e67e22; }
-        .header-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .header-buttons .btn-premium { padding: 10px 18px; font-size: 13px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        /* Contact Grid */
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; text-align: center; }
+        .contact-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .contact-card i { font-size: 35px; color: #e67e22; margin-bottom: 15px; }
+        .contact-card h3 { color: #333; margin-bottom: 8px; }
+        .contact-card p { color: #666; }
+        
+        /* Job Application Form */
+        .job-form { background: #f5f5f5; border-radius: 20px; padding: 25px; margin-top: 20px; display: none; }
+        .job-form input, .job-form select, .job-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 28px; font-family: inherit; }
+        .btn-submit { background: #27ae60; color: white; border: none; padding: 12px; border-radius: 40px; cursor: pointer; font-weight: 600; width: 100%; }
+        
+        /* Stats Cards */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
         .stat-card h3 { font-size: 13px; color: #666; margin-bottom: 8px; }
         .stat-value { font-size: 28px; font-weight: 700; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .section { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .section h2 { font-size: 18px; color: #333; margin-bottom: 20px; border-left: 3px solid #e67e22; padding-left: 12px; }
-        .premium-table { width: 100%; border-collapse: collapse; }
-        .premium-table th, .premium-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; color: #333; }
-        .premium-table th { background: #f5f5f5; font-weight: 600; font-size: 12px; }
-        .btn-icon { padding: 6px 12px; border-radius: 30px; font-size: 12px; margin: 0 2px; background: #3498db; color: white; border: none; cursor: pointer; }
-        .btn-delete { background: #e74c3c; }
-        .btn-wallet { background: #f39c12; }
-        .cart-total-box { background: linear-gradient(135deg,#fef5e7,#fff); border-radius: 20px; padding: 15px; margin-top: 15px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; align-items: center; }
-        .scanner-section input { width: 100%; padding: 14px 18px; border-radius: 40px; background: #f5f5f5; border: 1px solid #e67e22; color: #333; font-family: monospace; font-size: 16px; margin-bottom: 15px; }
-        .modal-premium { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(16px); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content-premium { background: white; padding: 30px; border-radius: 32px; width: 90%; max-width: 500px; }
-        .alert-premium { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 40px; display: none; z-index: 2000; animation: slideIn 0.3s ease; }
+        
+        /* Admin Dashboard */
+        .admin-container { display: none; }
+        .admin-header { background: rgba(255,255,255,0.95); border-radius: 28px; padding: 20px 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .admin-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .admin-btn { padding: 10px 18px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
+        .admin-btn-primary { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; }
+        .admin-btn-success { background: #27ae60; color: white; }
+        .admin-btn-warning { background: #f39c12; color: white; }
+        .admin-btn-danger { background: #e74c3c; color: white; }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f5f5f5; }
+        .cart-total-box { background: #fef5e7; border-radius: 20px; padding: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .scanner-input { width: 100%; padding: 14px; border-radius: 40px; border: 1px solid #e67e22; margin-bottom: 15px; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 32px; width: 90%; max-width: 500px; }
+        .alert { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 40px; display: none; z-index: 2000; }
         .alert-success { background: #27ae60; color: white; }
         .alert-error { background: #e74c3c; color: white; }
         
-        /* Job Page */
-        .job-page { display: none; background: rgba(255,255,255,0.95); border-radius: 32px; padding: 30px; margin: 20px 0; }
-        .job-page h2 { color: #e67e22; margin-bottom: 20px; }
-        .apply-job-btn { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; padding: 12px 24px; border: none; border-radius: 40px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
-        .job-apply-section { background: #f5f5f5; padding: 20px; border-radius: 20px; margin-top: 20px; display: none; }
-        
-        @media (max-width: 768px) { 
-            .hero h1 { font-size: 32px; } 
-            .navbar { flex-direction: column; text-align: center; } 
-            .product-img { width: 60px; height: 60px; }
-            .header-buttons { justify-content: center; }
-            .dashboard-header { flex-direction: column; text-align: center; }
-        }
+        @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- LANDING PAGE -->
-        <div id="landingPage" class="landing-page">
-            <nav class="navbar">
-                <div class="logo"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
-                <div class="nav-links"><a onclick="scrollToSection('home')">🏠 Home</a><a onclick="scrollToSection('products')">🛍️ Products</a><a onclick="showJobPage()">💼 Careers</a><a onclick="scrollToSection('contact')">📞 Contact</a><a onclick="showSuperDiscountPage()">🔥 Super Offers</a></div>
-                <div class="login-buttons"><button class="login-btn login-admin" onclick="showAdminLoginForm()">👑 Admin Login</button><button class="login-btn login-customer" onclick="showCustomerLoginForm()">👤 Customer Login</button></div>
-            </nav>
-
-            <section id="home" class="hero">
-                <div class="hero-content"><span class="hero-badge pulse">✨ India's Most Trusted</span><h1>सस्ता बाजार<br><span class="dance">Smart Shop Management</span></h1><p>देश का सबसे उन्नत दुकान प्रबंधन प्रणाली। आसान बिलिंग, स्मार्ट रेफरल कमीशन, और त्वरित कैशबैक।</p><div class="hero-stats"><div class="stat"><div class="stat-number bounce">5000+</div><div class="stat-label">Happy Shops</div></div><div class="stat"><div class="stat-number bounce" style="animation-delay:0.5s;">1M+</div><div class="stat-label">Transactions</div></div><div class="stat"><div class="stat-number bounce" style="animation-delay:1s;">50k+</div><div class="stat-label">Active Users</div></div></div></div>
-                <div class="hero-image"><img src="https://placehold.co/500x400/ffffff/e67e22?text=SASTA+BAZAR" alt="Shopping"><div class="floating-card floating-card-1 dance"><i class="fas fa-wallet" style="color:#e67e22;"></i><span>💰 Wallet: ₹500</span></div><div class="floating-card floating-card-2 dance" style="animation-delay:1s;"><i class="fas fa-gift" style="color:#27ae60;"></i><span>🎁 10% Cashback</span></div></div>
-            </section>
-
-            <div class="features"><h2 class="section-title">Why Choose SASTA BAZAR?</h2><p class="section-subtitle">आधुनिक सुविधाओं से लैस</p><div class="features-grid"><div class="feature-card"><div class="feature-icon bounce"><i class="fas fa-bolt"></i></div><h3>Fast Billing</h3><p>बारकोड स्कैनर से तुरंत बिलिंग</p></div><div class="feature-card"><div class="feature-icon bounce" style="animation-delay:0.3s;"><i class="fas fa-wallet"></i></div><h3>Wallet System</h3><p>कैशबैक सीधे वॉलेट में</p></div><div class="feature-card"><div class="feature-icon bounce" style="animation-delay:0.6s;"><i class="fas fa-users"></i></div><h3>Referral Rewards</h3><p>0.5% कमीशन हर रेफरल पर</p></div><div class="feature-card"><div class="feature-icon bounce" style="animation-delay:0.9s;"><i class="fas fa-chart-line"></i></div><h3>Analytics</h3><p>रियल टाइम सेल्स रिपोर्ट</p></div></div></div>
-
-            <div id="superDiscountPage" style="display:none;"><div class="super-discount"><h2 class="dance">🔥 सुपर डिस्काउंट जोन 🔥</h2><p>75% तक की छूट! सीमित समय के ऑफर</p><div class="discount-tag pulse">UPTO 75% OFF</div><div id="superDiscountProductsFull" class="super-products"></div><button onclick="closeSuperDiscountPage()" class="btn-premium btn-outline" style="margin-top:20px;">← Back to Home</button></div></div>
-
-            <div id="normalProductsView"><section id="products" class="products-preview"><h2 class="section-title">🔥 हॉट डील्स</h2><div id="previewProductsList" class="products-grid"></div></section>
-            <div class="super-discount" style="background: linear-gradient(135deg, #27ae60, #2ecc71, #3498db);"><h2>🎉 साप्ताहिक ऑफर 🎉</h2><p>पहली खरीद पर 10% कैशबैक + रेफरल पर 0.5% कमीशन</p><span class="discount-tag">आज ही रजिस्टर करें →</span></div>
-
-            <!-- Contact Section with correct number -->
-            <section id="contact" style="background: rgba(255,255,255,0.95); border-radius: 32px; padding: 40px; text-align: center; margin-top: 40px;">
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:30px; margin-bottom:30px;">
-                    <div><i class="fas fa-map-marker-alt" style="font-size:28px; color:#e67e22;"></i><h3 style="color:#333; margin:10px 0;">Address</h3><p style="color:#666;">Ramlakshan, Rudrapur Road,<br>Deoria, U.P.</p></div>
-                    <div><i class="fas fa-phone bounce" style="font-size:28px; color:#e67e22;"></i><h3 style="color:#333; margin:10px 0;">Phone</h3><p style="color:#666; font-size:18px; font-weight:bold;">📞 6306088261</p></div>
-                    <div><i class="fas fa-envelope dance" style="font-size:28px; color:#e67e22;"></i><h3 style="color:#333; margin:10px 0;">Email</h3><p style="color:#666;">rahulmaurya274202@gmail.com</p></div>
-                    <div><i class="fas fa-user-tie pulse" style="font-size:28px; color:#e67e22;"></i><h3 style="color:#333; margin:10px 0;">Shop Admin</h3><p style="color:#666;">Rohit Maurya</p></div>
-                </div>
-                <div><i class="fab fa-whatsapp" style="color:#25D366; font-size:24px; margin:0 10px;"></i><i class="fab fa-instagram" style="color:#E4405F; font-size:24px; margin:0 10px;"></i><i class="fab fa-facebook" style="color:#1877F2; font-size:24px; margin:0 10px;"></i><i class="fab fa-twitter" style="color:#1DA1F2; font-size:24px; margin:0 10px;"></i></div>
-                <div class="copyright" style="margin-top:20px; color:#666;">© 2025 SASTA BAZAR | Shop Admin: Rohit Maurya</div>
-            </section></div>
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+        
+        <!-- ========== LANDING PAGE (Before Login) ========== -->
+        <div id="landingPage">
+            <div class="navbar">
+                <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
+                <div class="nav-buttons"><button class="nav-btn active" onclick="scrollToSection('home')">🏠 Home</button><button class="nav-btn" onclick="scrollToSection('products')">🛍️ Products</button><button class="nav-btn" onclick="showLandingJobPage()">💼 Careers</button><button class="nav-btn" onclick="scrollToSection('contact')">📞 Contact</button><button class="nav-btn" onclick="showLandingSuperPage()">🔥 Super Offers</button></div>
+                <div><button class="login-btn login-admin" onclick="showAdminLoginForm()" style="background:transparent; border:1px solid #e67e22; color:#e67e22; padding:10px 20px; border-radius:40px; margin-right:10px;">👑 Admin</button><button class="login-btn login-customer" onclick="showCustomerLoginForm()" style="background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; padding:10px 20px; border-radius:40px;">👤 Customer</button></div>
+            </div>
+            <div id="homeSection"><div class="hero" style="display:flex; flex-wrap:wrap; gap:40px; background:rgba(255,255,255,0.1); border-radius:40px; padding:40px;"><div style="flex:1;"><span class="hero-badge" style="background:#e67e22; padding:5px 15px; border-radius:40px; display:inline-block; color:white;">✨ India's Most Trusted</span><h1 style="font-size:48px; color:white; margin:20px 0;">सस्ता बाजार<br><span style="color:#f39c12;">Smart Shop Management</span></h1><p style="color:rgba(255,255,255,0.9);">देश का सबसे उन्नत दुकान प्रबंधन प्रणाली।</p><div style="display:flex; gap:30px; margin-top:30px;"><div><div class="stat-number" style="font-size:28px; color:#f39c12;">5000+</div><div style="color:white;">Happy Shops</div></div><div><div class="stat-number" style="font-size:28px; color:#f39c12;">1M+</div><div style="color:white;">Transactions</div></div></div></div><div style="flex:1;"><img src="https://placehold.co/500x400/ffffff/e67e22?text=SASTA+BAZAR" style="width:100%; border-radius:30px;"></div></div></div>
+            <div id="landingProductsSection" style="display:none;"><div class="section-title">🔥 हॉट डील्स</div><div id="landingProductsList" class="products-grid"></div></div>
+            <div id="landingSuperSection" style="display:none;"><div class="section-title">🔥 सुपर डिस्काउंट जोन</div><div id="landingSuperList" class="super-products-grid"></div></div>
+            <div id="landingJobSection" style="display:none;"><div class="section-title">💼 Career Opportunities</div><div id="landingJobList" class="jobs-grid"></div></div>
+            <div id="contactSection" style="display:none;"><div class="section-title">📞 Contact Us</div><div class="contact-grid"><div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>Address</h3><p>Ramlakshan, Rudrapur Road,<br>Deoria, U.P.</p></div><div class="contact-card"><i class="fas fa-phone"></i><h3>Phone</h3><p>📞 6306088261</p></div><div class="contact-card"><i class="fas fa-envelope"></i><h3>Email</h3><p>rahulmaurya274202@gmail.com</p></div><div class="contact-card"><i class="fas fa-user-tie"></i><h3>Shop Admin</h3><p>Rohit Maurya</p></div></div></div>
         </div>
 
-        <!-- JOB PAGE (Customer View) -->
-        <div id="jobPage" class="job-page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2>💼 Career Opportunities</h2><button onclick="closeJobPage()" class="btn-premium btn-danger-modern" style="padding:8px 20px;">✖ Close</button></div>
-            <div id="jobListingsCustomer" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px;"></div>
+        <!-- ========== LOGIN SECTION ========== -->
+        <div id="loginSection" style="background:white; border-radius:48px; padding:40px; max-width:480px; margin:40px auto; display:none;">
+            <h2 style="text-align:center; color:#e67e22;">🔐 Login</h2>
+            <div id="dbStatus" style="text-align:center; margin:15px 0;"></div>
+            <div style="display:flex; gap:12px; margin-bottom:25px;"><button id="adminTab" class="toggle-option" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:50px; cursor:pointer;" onclick="showAdminLoginForm()">Admin</button><button id="customerTab" class="toggle-option" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:50px; cursor:pointer;" onclick="showCustomerLoginForm()">Customer</button></div>
+            <div id="adminLoginForm"><input type="email" id="adminEmail" placeholder="admin@shop.com" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="password" id="adminPassword" placeholder="Password" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><button class="btn-premium" onclick="adminLogin()" style="width:100%; padding:14px; background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; border-radius:40px; cursor:pointer;">Login as Admin</button><button onclick="goBackToLanding()" style="margin-top:15px; width:100%; padding:12px; background:#f0f0f0; border:none; border-radius:28px;">← Back to Home</button></div>
+            <div id="customerLoginForm" style="display:none;"><input type="tel" id="custMobileLogin" placeholder="9876543210" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="password" id="custPassword" placeholder="Password" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><button onclick="customerLogin()" style="width:100%; padding:14px; background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; border-radius:40px; cursor:pointer;">Login</button><button onclick="showRegistration()" style="margin-top:12px; width:100%; padding:12px; background:#27ae60; color:white; border:none; border-radius:28px;">Create Account</button><button onclick="goBackToLanding()" style="margin-top:12px; width:100%; padding:12px; background:#f0f0f0; border:none; border-radius:28px;">← Back</button></div>
+            <div id="registrationForm" style="display:none;"><h3 style="color:#333;">Create Account</h3><input type="text" id="regName" placeholder="Full Name" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="tel" id="regMobile" placeholder="Mobile" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="password" id="regPassword" placeholder="Password" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="text" id="regReferral" placeholder="Referral Code" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><button onclick="register()" style="width:100%; padding:14px; background:#27ae60; color:white; border:none; border-radius:40px;">Register</button><button onclick="showCustomerLoginForm()" style="margin-top:12px; width:100%; padding:12px; background:#f0f0f0; border:none; border-radius:28px;">Back</button></div>
+        </div>
+
+        <!-- ========== CUSTOMER DASHBOARD ========== -->
+        <div id="customerDashboard" class="dashboard-container">
+            <div class="navbar">
+                <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
+                <div class="wallet-box"><i class="fas fa-wallet"></i><span id="custWalletAmt">₹0</span></div>
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="showCustomerSection('home')">🏠 Home</button>
+                    <button class="nav-btn" onclick="showCustomerSection('products')">🛍️ Products</button>
+                    <button class="nav-btn" onclick="showCustomerSection('careers')">💼 Careers</button>
+                    <button class="nav-btn" onclick="showCustomerSection('contact')">📞 Contact</button>
+                    <button class="nav-btn" onclick="showCustomerSection('super')">🔥 Super Offers</button>
+                </div>
+                <button class="logout-btn" onclick="customerLogout()">🚪 Exit</button>
+            </div>
+            
+            <div id="customerHomeSection" class="content-section active-section">
+                <div class="stats-row"><div class="stat-card"><h3>Wallet Balance</h3><div class="stat-value" id="custWalletVal">₹0</div></div><div class="stat-card"><h3>Total Purchases</h3><div class="stat-value" id="custTotalPurchases">₹0</div></div><div class="stat-card"><h3>Referrals</h3><div class="stat-value" id="custReferralCount">0</div></div></div>
+                <div class="section-title">🔗 My Referral Code</div><div style="background:#fef5e7; padding:20px; text-align:center; border-radius:20px; margin-bottom:20px;"><p style="font-size:28px; font-weight:700; color:#e67e22;" id="myRefCode"></p><button onclick="copyRefCode()" style="background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; padding:10px 20px; border-radius:40px;">📋 Copy Code</button></div>
+                <div class="section-title">💰 Recent Transactions</div><div style="overflow-x:auto;"><table style="width:100%;"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransList"></tbody></table></div>
+            </div>
+            
+            <div id="customerProductsSection" class="content-section"><div class="section-title">📦 All Products</div><div id="customerAllProducts" class="products-grid"></div></div>
+            
+            <div id="customerCareersSection" class="content-section"><div class="section-title">💼 Job Openings</div><div id="customerJobsList" class="jobs-grid"></div>
+                <div id="customerJobForm" class="job-form"><h3>Apply for Job</h3><select id="applyJobSelect"><option>Select Position</option></select><input type="text" id="applicantName" placeholder="Full Name"><input type="tel" id="applicantMobile" placeholder="Mobile"><input type="email" id="applicantEmail" placeholder="Email"><textarea id="applicantMsg" rows="3" placeholder="Why should we hire you?"></textarea><button class="btn-submit" onclick="submitCustomerJobApp()">Submit Application</button><button onclick="closeJobForm()" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div>
+            </div>
+            
+            <div id="customerContactSection" class="content-section"><div class="section-title">📞 Contact Us</div><div class="contact-grid"><div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>Address</h3><p>Ramlakshan, Rudrapur Road,<br>Deoria, U.P.</p></div><div class="contact-card"><i class="fas fa-phone"></i><h3>Phone</h3><p>📞 6306088261</p></div><div class="contact-card"><i class="fas fa-envelope"></i><h3>Email</h3><p>rahulmaurya274202@gmail.com</p></div><div class="contact-card"><i class="fas fa-user-tie"></i><h3>Shop Admin</h3><p>Rohit Maurya</p></div></div></div>
+            
+            <div id="customerSuperSection" class="content-section"><div class="section-title">🔥 Super Discount Zone</div><div id="customerSuperList" class="super-products-grid"></div></div>
+        </div>
+
+        <!-- ========== ADMIN DASHBOARD ========== -->
+        <div id="adminDashboard" class="admin-container">
+            <div class="admin-header">
+                <h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1>
+                <div class="admin-buttons">
+                    <button class="admin-btn admin-btn-primary" onclick="showAddProductModal()">➕ Product</button>
+                    <button class="admin-btn admin-btn-success" onclick="showAddCustomerModal()">👤 Customer</button>
+                    <button class="admin-btn admin-btn-warning" onclick="showWalletControlModal()">💰 Wallet</button>
+                    <button class="admin-btn admin-btn-primary" onclick="showAdminJobPage()">💼 Jobs</button>
+                    <button class="admin-btn admin-btn-danger" onclick="adminLogout()">🚪 Exit</button>
+                </div>
+            </div>
+            <div class="stats-row"><div class="stat-card"><h3>Revenue</h3><div class="stat-value" id="adminTotalSales">₹0</div></div><div class="stat-card"><h3>Customers</h3><div class="stat-value" id="adminTotalCustomers">0</div></div><div class="stat-card"><h3>Commission</h3><div class="stat-value" id="adminTotalCommission">₹0</div></div><div class="stat-card"><h3>Low Stock</h3><div class="stat-value" id="adminLowStock">0</div></div></div>
+            <div class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px;"><h2 style="color:#e67e22; margin-bottom:15px;">Products</h2><div class="table-responsive"><table style="width:100%;"><thead><tr><th>Image</th><th>Code</th><th>Name</th><th>Price</th><th>Discount</th><th>Stock</th><th>Super</th><th>Actions</th></tr></thead><tbody id="adminProductsList"></tbody></table></div></div>
+            <div class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px;"><h2 style="color:#e67e22; margin-bottom:15px;">Customers</h2><div class="table-responsive"><table style="width:100%;"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th><th>Action</th></tr></thead><tbody id="adminCustomersList"></tbody></table></div></div>
+            <div class="admin-section" style="background:white; border-radius:24px; padding:20px;"><h2 style="color:#e67e22; margin-bottom:15px;">Billing System</h2><input type="text" id="barcodeInput" placeholder="📷 Scan barcode → Enter" class="scanner-input"><div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;"><select id="billCustomer"><option>Select Customer</option></select><select id="billProduct"><option>Select Product</option></select><input type="number" id="billQuantity" placeholder="Quantity" value="1"><button onclick="addToCart()" style="background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; padding:12px; border-radius:40px;">Add to Cart</button></div>
+                <h3 style="margin:15px 0;">🛒 Cart</h3><div class="table-responsive"><table style="width:100%;"><thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Discount</th><th>Cashback</th><th>Total</th><th></th></tr></thead><tbody id="cartList"></tbody></table></div>
+                <div class="cart-total-box"><span><strong>Total:</strong> ₹<span id="cartTotal">0</span></span><span><strong style="color:#27ae60;">Cashback:</strong> +₹<span id="cartCashback">0</span></span><div><button onclick="createBill()" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:40px;">Generate Bill</button><button onclick="printBill()" style="background:#3498db; color:white; border:none; padding:10px 20px; border-radius:40px; margin-left:10px;">Print Bill</button></div></div>
+            </div>
         </div>
 
         <!-- ADMIN JOB PAGE -->
-        <div id="adminJobPage" class="job-page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2>📋 Job Management</h2><button onclick="closeAdminJobPage()" class="btn-premium btn-danger-modern" style="padding:8px 20px;">✖ Close</button></div>
-            <div><div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px;"><input type="text" id="jobTitle" placeholder="Job Title" style="flex:1; padding:12px; border-radius:28px; border:1px solid #ddd;"><input type="text" id="jobDesc" placeholder="Job Description" style="flex:2; padding:12px; border-radius:28px; border:1px solid #ddd;"><button class="btn-premium btn-success-modern" onclick="addJobVacancy()">➕ Add Vacancy</button></div>
-            <div id="jobListAdmin"></div>
-            <div style="margin-top:20px;"><button class="btn-premium btn-primary-gold" onclick="showApplications()">📋 View Applications (<span id="appCount">0</span>)</button></div>
-            <div id="applicationsList" style="margin-top:20px; display:none;"><h3>Job Applications Received</h3><div id="applicationsContainer"></div></div></div>
-        </div>
+        <div id="adminJobPage" class="admin-container"><div class="admin-header"><h1 style="color:#e67e22;">📋 Job Management</h1><button onclick="closeAdminJobPage()" class="admin-btn admin-btn-danger">✖ Close</button></div><div style="background:white; border-radius:24px; padding:20px;"><div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px;"><input type="text" id="jobTitle" placeholder="Job Title" style="flex:1; padding:12px; border-radius:28px; border:1px solid #ddd;"><input type="text" id="jobDesc" placeholder="Job Description" style="flex:2; padding:12px; border-radius:28px; border:1px solid #ddd;"><button onclick="addJobVacancy()" style="background:#27ae60; color:white; border:none; padding:12px 20px; border-radius:40px;">➕ Add</button></div><div id="adminJobsList"></div><button onclick="showAppList()" style="background:#e67e22; color:white; border:none; padding:12px 20px; border-radius:40px; margin-top:15px;">📋 View Applications (<span id="appCount">0</span>)</button><div id="applicationsList" style="margin-top:20px; display:none;"></div></div></div>
 
-        <!-- LOGIN SECTION -->
-        <div id="loginSection" class="login-card">
-            <h2 style="text-align:center; color:#e67e22;">🔐 Login</h2>
-            <div id="dbStatus" style="text-align:center; margin:15px 0;"></div>
-            <div class="premium-toggle"><button class="toggle-option active" onclick="showAdminLoginForm()">Admin</button><button class="toggle-option" onclick="showCustomerLoginForm()">Customer</button></div>
-            <div id="adminLoginForm"><input type="email" id="adminEmail" placeholder="admin@shop.com"><input type="password" id="adminPassword" placeholder="Password"><button class="btn-premium btn-primary-gold" onclick="adminLogin()">Login as Admin</button><button onclick="goBackToLanding()" class="btn-premium btn-outline" style="margin-top:15px; width:100%;">← Back to Home</button></div>
-            <div id="customerLoginForm" style="display:none;"><input type="tel" id="custMobileLogin" placeholder="9876543210"><input type="password" id="custPassword" placeholder="Password"><button class="btn-premium btn-primary-gold" onclick="customerLogin()">Login</button><button onclick="showRegistration()" class="btn-premium btn-success-modern" style="margin-top:12px; width:100%;">Create Account</button><button onclick="goBackToLanding()" class="btn-premium btn-outline" style="margin-top:12px; width:100%;">← Back</button></div>
-            <div id="registrationForm" style="display:none;"><h3 style="color:#333;">Create Account</h3><input type="text" id="regName" placeholder="Full Name"><input type="tel" id="regMobile" placeholder="Mobile"><input type="password" id="regPassword" placeholder="Password"><input type="text" id="regReferral" placeholder="Referral Code"><button class="btn-premium btn-success-modern" onclick="register()">Register</button><button onclick="showCustomerLoginForm()" class="btn-premium btn-outline" style="margin-top:12px; width:100%;">Back</button></div>
-        </div>
+        <!-- MODALS -->
+        <div id="productModal" class="modal"><div class="modal-content"><h2>Add Product</h2><input type="text" id="productCode" placeholder="Product Code" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productName" placeholder="Product Name" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productPrice" placeholder="Price" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productDiscount" placeholder="Discount %" value="0" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productStock" placeholder="Stock" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productImage" placeholder="Image URL" style="width:100%; margin:8px 0; padding:12px;"><img id="previewImg" src="" style="width:60px; display:none;"><label><input type="checkbox" id="productSuperDiscount"> 🔥 Super Discount</label><button onclick="saveProduct()" style="background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; margin-top:15px; width:100%;">Save</button><button onclick="closeModal('productModal')" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div></div>
+        <div id="customerModal" class="modal"><div class="modal-content"><h2>Add Customer</h2><input type="text" id="newCustName" placeholder="Name"><input type="tel" id="newCustMobile" placeholder="Mobile"><input type="password" id="newCustPassword" placeholder="Password"><input type="text" id="newCustRef" placeholder="Referral Code"><button onclick="saveCustomer()" style="background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; width:100%;">Save</button><button onclick="closeModal('customerModal')" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div></div>
+        <div id="walletControlModal" class="modal"><div class="modal-content"><h2>Wallet Control</h2><select id="walletCustomerSelect"><option>Select Customer</option></select><div id="currentBalance" style="padding:10px; background:#f5f5f5; border-radius:20px; margin:10px 0;">₹0</div><input type="number" id="walletAmount" placeholder="Amount"><input type="text" id="walletReason" placeholder="Reason"><div style="display:flex; gap:10px;"><button onclick="adminAddMoney()" style="background:#27ae60; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Add</button><button onclick="adminDeductMoney()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Deduct</button></div><button onclick="closeModal('walletControlModal')" style="margin-top:15px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Close</button></div></div>
 
-        <!-- ADMIN DASHBOARD - Organized Buttons -->
-        <div id="adminDashboard" class="dashboard">
-            <div class="dashboard-header">
-                <h1>🛍️ Admin Dashboard</h1>
-                <div class="header-buttons">
-                    <button class="btn-premium btn-primary-gold" onclick="showAddProductModal()">➕ Product</button>
-                    <button class="btn-premium btn-success-modern" onclick="showAddCustomerModal()">👤 Customer</button>
-                    <button class="btn-premium btn-warning-modern" onclick="showWalletControlModal()">💰 Wallet</button>
-                    <button class="btn-premium btn-primary-gold" onclick="showAdminJobPage()">💼 Jobs</button>
-                    <button class="btn-premium btn-danger-modern" onclick="logout()">🚪 Exit</button>
-                </div>
-            </div>
-            <div class="stat-grid"><div class="stat-card"><h3>Revenue</h3><div class="stat-value" id="totalSales">₹0</div></div><div class="stat-card"><h3>Customers</h3><div class="stat-value" id="totalCustomers">0</div></div><div class="stat-card"><h3>Commission</h3><div class="stat-value" id="totalCommission">₹0</div></div><div class="stat-card"><h3>Low Stock</h3><div class="stat-value" id="lowStock">0</div></div></div>
-            <div class="section"><h2>Products</h2><div style="overflow-x:auto;"><table class="premium-table"><thead><tr><th>Image</th><th>Code</th><th>Name</th><th>Price</th><th>Discount</th><th>Stock</th><th>Super</th><th>Actions</th></tr></thead><tbody id="productsList"></tbody></table></div></div>
-            <div class="section"><h2>Customers</h2><div style="overflow-x:auto;"><table class="premium-table"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th></tr></thead><tbody id="customersList"></tbody></table></div></div>
-            <div class="section"><h2>Billing System</h2><div class="scanner-section"><input type="text" id="barcodeInput" placeholder="📷 Scan barcode → Enter"></div><div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:15px;"><select id="billCustomer"><option>Select Customer</option></select><select id="billProduct"><option>Select Product</option></select><input type="number" id="billQuantity" placeholder="Quantity" value="1"><button class="btn-premium btn-primary-gold" onclick="addToCartManual()">➕ Add to Cart</button></div>
-                <h3>🛒 Cart</h3><div style="overflow-x:auto;"><table class="premium-table"><thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Discount</th><th>Cashback</th><th>Total</th><th></th></tr></thead><tbody id="cartList"></tbody></table></div>
-                <div class="cart-total-box"><span><strong>Total:</strong> ₹<span id="cartTotal">0</span></span><span><strong style="color:#27ae60;">Cashback:</strong> +₹<span id="cartCashback">0</span></span><div><button class="btn-premium btn-success-modern" onclick="createBill()">✅ Generate Bill</button><button class="btn-premium btn-primary-gold" onclick="printBill()">🖨️ Print Bill</button></div></div>
-            </div>
-        </div>
-
-        <!-- CUSTOMER DASHBOARD - No auto job form -->
-        <div id="customerDashboard" class="dashboard">
-            <div class="dashboard-header">
-                <h1>👤 My Portal</h1>
-                <div class="header-buttons">
-                    <button class="btn-premium btn-primary-gold" onclick="toggleJobApplicationForm()">💼 Apply for Job</button>
-                    <button class="btn-premium btn-danger-modern" onclick="logout()">🚪 Exit</button>
-                </div>
-            </div>
-            <div class="stat-grid"><div class="stat-card"><h3>Wallet</h3><div class="stat-value" id="custWallet">₹0</div></div><div class="stat-card"><h3>Spent</h3><div class="stat-value" id="custPurchases">₹0</div></div><div class="stat-card"><h3>Referrals</h3><div class="stat-value" id="custReferrals">0</div></div></div>
-            <div class="section"><h2>🔗 My Referral Code</h2><div style="background:#fef5e7; padding:20px; text-align:center; border-radius:20px;"><p style="font-size:28px; font-weight:700; color:#e67e22;" id="myReferralCode"></p><button class="btn-premium btn-primary-gold" onclick="copyReferralCode()">📋 Copy Code</button></div></div>
-            <div class="section"><h2>🔥 Super Discount Products</h2><div id="customerSuperProducts" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:15px;"></div></div>
-            <div class="section"><h2>📦 All Products</h2><div style="overflow-x:auto;"><table class="premium-table"><thead><tr><th>Image</th><th>Product</th><th>Price</th><th>Discount</th><th>Cashback</th><th>Stock</th></tr></thead><tbody id="customerProductsList"></tbody></table></div></div>
-            
-            <!-- Job Application Form (Hidden by default) -->
-            <div id="jobApplicationForm" class="job-apply-section" style="display:none;">
-                <h3 style="color:#e67e22; margin-bottom:15px;">📝 Apply for Job</h3>
-                <select id="applyJobSelect" style="width:100%; margin-bottom:15px; padding:12px; border-radius:28px; border:1px solid #ddd;"><option>Select Job Position</option></select>
-                <input type="text" id="applicantName" placeholder="Your Full Name" style="width:100%; margin-bottom:10px; padding:12px; border-radius:28px; border:1px solid #ddd;">
-                <input type="tel" id="applicantMobile" placeholder="Mobile Number" style="width:100%; margin-bottom:10px; padding:12px; border-radius:28px; border:1px solid #ddd;">
-                <input type="email" id="applicantEmail" placeholder="Email Address" style="width:100%; margin-bottom:10px; padding:12px; border-radius:28px; border:1px solid #ddd;">
-                <textarea id="applicantMessage" placeholder="Why should we hire you?" rows="3" style="width:100%; margin-bottom:10px; padding:12px; border-radius:20px; border:1px solid #ddd;"></textarea>
-                <button class="btn-premium btn-success-modern" onclick="submitJobApplication()">📤 Submit Application</button>
-                <button onclick="toggleJobApplicationForm()" class="btn-premium btn-outline" style="margin-top:10px; width:100%;">Cancel</button>
-            </div>
-            
-            <div class="section"><h2>💰 Wallet Transactions</h2><div style="overflow-x:auto;"><table class="premium-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransactions"></tbody></table></div></div>
-        </div>
-    </div>
-
-    <!-- MODALS -->
-    <div id="productModal" class="modal-premium"><div class="modal-content-premium"><h2>Add Product</h2><input type="text" id="productCode" placeholder="Product Code"><input type="text" id="productName" placeholder="Product Name"><input type="number" id="productPrice" placeholder="Price"><input type="number" id="productDiscount" placeholder="Discount %" value="0"><input type="number" id="productStock" placeholder="Stock">
-        <div style="margin:15px 0;"><label>Image URL</label><input type="text" id="productImage" placeholder="https://..."><img id="previewImg" src="" style="width:60px; margin-top:10px; border-radius:12px; display:none;"></div>
-        <div><label>🔥 Super Discount</label><input type="checkbox" id="productSuperDiscount"><span style="color:#e67e22;"> Mark as Super Discount</span></div>
-        <button class="btn-premium btn-success-modern" onclick="saveProduct()">Save</button><button onclick="closeModal('productModal')">Cancel</button></div></div>
-    <div id="customerModal" class="modal-premium"><div class="modal-content-premium"><h2>Add Customer</h2><input type="text" id="newCustName" placeholder="Name"><input type="tel" id="newCustMobile" placeholder="Mobile"><input type="password" id="newCustPassword" placeholder="Password"><input type="text" id="newCustRef" placeholder="Referral Code"><button onclick="saveCustomer()">Save</button><button onclick="closeModal('customerModal')">Cancel</button></div></div>
-    <div id="walletControlModal" class="modal-premium"><div class="modal-content-premium"><h2>Wallet Control</h2><select id="walletCustomerSelect"><option>Select Customer</option></select><div id="currentBalance" style="padding:10px; background:#f5f5f5; border-radius:20px; margin:15px 0;">₹0</div><input type="number" id="walletAmount" placeholder="Amount"><input type="text" id="walletReason" placeholder="Reason"><div style="display:flex; gap:10px;"><button class="btn-premium btn-success-modern" onclick="adminAddMoney()">Add Money</button><button class="btn-premium btn-danger-modern" onclick="adminDeductMoney()">Deduct Money</button></div><button onclick="closeModal('walletControlModal')" class="btn-premium btn-outline" style="margin-top:15px;">Close</button></div></div>
-
-    <div id="alert" class="alert-premium"></div>
+    <div id="alert" class="alert"></div>
 
     <script>
         const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
@@ -277,87 +203,85 @@
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
         let productImages = {}, superDiscountProducts = [], jobVacancies = [], jobApplications = [];
 
-        function toggleJobApplicationForm() { const form = document.getElementById('jobApplicationForm'); form.style.display = form.style.display === 'none' ? 'block' : 'none'; if(form.style.display === 'block') loadJobsForSelect(); }
-        function loadJobsForSelect() { const select = document.getElementById('applyJobSelect'); if(select && jobVacancies.length) { select.innerHTML = ''; jobVacancies.forEach(job => { select.innerHTML += `<option value="${job.title}">${job.title}</option>`; }); } }
+        // Navigation
+        function scrollToSection(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); showLandingSection(id); }
+        function showLandingSection(section) { document.getElementById('homeSection').style.display = section === 'home' ? 'block' : 'none'; document.getElementById('landingProductsSection').style.display = section === 'products' ? 'block' : 'none'; document.getElementById('landingSuperSection').style.display = section === 'super' ? 'block' : 'none'; document.getElementById('landingJobSection').style.display = section === 'careers' ? 'block' : 'none'; document.getElementById('contactSection').style.display = section === 'contact' ? 'block' : 'none'; }
+        function showLandingJobPage() { showLandingSection('careers'); loadLandingJobs(); }
+        function showLandingSuperPage() { showLandingSection('super'); loadLandingSuper(); }
+        function showCustomerSection(section) { document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section')); if(section === 'home') document.getElementById('customerHomeSection').classList.add('active-section'); if(section === 'products') { document.getElementById('customerProductsSection').classList.add('active-section'); loadCustomerProducts(); } if(section === 'careers') { document.getElementById('customerCareersSection').classList.add('active-section'); loadCustomerJobs(); } if(section === 'contact') document.getElementById('customerContactSection').classList.add('active-section'); if(section === 'super') { document.getElementById('customerSuperSection').classList.add('active-section'); loadCustomerSuper(); } }
         
-        function showLandingPage() { document.getElementById('landingPage').style.display = 'block'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'none'; document.getElementById('jobPage').style.display = 'none'; document.getElementById('adminJobPage').style.display = 'none'; loadJobListings(); }
-        function showJobPage() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('jobPage').style.display = 'block'; loadJobListings(); }
-        function closeJobPage() { showLandingPage(); }
+        function showAdminLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'none'; document.getElementById('adminTab').style.background = 'linear-gradient(135deg,#e67e22,#f39c12)'; document.getElementById('adminTab').style.color = 'white'; document.getElementById('customerTab').style.background = '#f0f0f0'; document.getElementById('customerTab').style.color = '#666'; }
+        function showCustomerLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('customerLoginForm').style.display = 'block'; document.getElementById('registrationForm').style.display = 'none'; document.getElementById('customerTab').style.background = 'linear-gradient(135deg,#e67e22,#f39c12)'; document.getElementById('customerTab').style.color = 'white'; document.getElementById('adminTab').style.background = '#f0f0f0'; document.getElementById('adminTab').style.color = '#666'; }
+        function showRegistration() { document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'block'; }
+        function goBackToLanding() { document.getElementById('landingPage').style.display = 'block'; document.getElementById('loginSection').style.display = 'none'; }
+        
         function showAdminJobPage() { document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('adminJobPage').style.display = 'block'; renderAdminJobs(); renderApplications(); }
         function closeAdminJobPage() { document.getElementById('adminJobPage').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; }
-        function showSuperDiscountPage() { document.getElementById('superDiscountPage').style.display = 'block'; document.getElementById('normalProductsView').style.display = 'none'; loadSuperDiscountFullPage(); }
-        function closeSuperDiscountPage() { document.getElementById('superDiscountPage').style.display = 'none'; document.getElementById('normalProductsView').style.display = 'block'; }
-        function showAdminLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'none'; }
-        function showCustomerLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('customerLoginForm').style.display = 'block'; document.getElementById('registrationForm').style.display = 'none'; }
-        function showRegistration() { document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'block'; }
-        function goBackToLanding() { showLandingPage(); }
-        function scrollToSection(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
-
-        function loadJobListings() { const container = document.getElementById('jobListingsCustomer'); if(container) { container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div style="background:white; border-radius:20px; padding:25px; box-shadow:0 5px 15px rgba(0,0,0,0.1);"><h3 style="color:#e67e22;">${job.title}</h3><p style="color:#666; margin:10px 0;">${job.description}</p><button class="btn-premium btn-primary-gold" onclick="showApplyFormFromCareer('${job.title}')">Apply Now →</button></div>`; }); } }
-        function showApplyFormFromCareer(jobTitle) { showCustomerLoginForm(); setTimeout(() => { document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; document.getElementById('applyJobSelect').disabled = true; toggleJobApplicationForm(); }, 500); }
-        function renderAdminJobs() { const container = document.getElementById('jobListAdmin'); if(container) { container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><div><strong>${job.title}</strong><br><small>${job.description}</small></div><button class="btn-icon btn-delete" onclick="deleteJob(${job.id})">Delete</button></div>`; }); } }
-        function renderApplications() { const container = document.getElementById('applicationsContainer'); const countSpan = document.getElementById('appCount'); if(container) { container.innerHTML = ''; jobApplications.forEach((app) => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px;"><strong>${app.jobTitle}</strong><br>Name: ${app.name}<br>Mobile: ${app.mobile}<br>Email: ${app.email}<br>Message: ${app.message}<br><small>Applied: ${app.date}</small></div>`; }); if(countSpan) countSpan.innerText = jobApplications.length; } }
-        function addJobVacancy() { const title = document.getElementById('jobTitle').value; const desc = document.getElementById('jobDesc').value; if(title && desc) { jobVacancies.push({ id: Date.now(), title, description: desc }); document.getElementById('jobTitle').value = ''; document.getElementById('jobDesc').value = ''; loadJobListings(); renderAdminJobs(); showAlert('Job added!','success'); } else { showAlert('Enter job details','error'); } }
-        function deleteJob(id) { jobVacancies = jobVacancies.filter(j => j.id !== id); loadJobListings(); renderAdminJobs(); showAlert('Job deleted','success'); }
-        function submitJobApplication() { const jobTitle = document.getElementById('applyJobSelect').value; const name = document.getElementById('applicantName').value; const mobile = document.getElementById('applicantMobile').value; const email = document.getElementById('applicantEmail').value; const message = document.getElementById('applicantMessage').value; if(!name||!mobile||!email) { showAlert('Fill all fields','error'); return; } jobApplications.push({ jobTitle, name, mobile, email, message, date: new Date().toLocaleString() }); showAlert('Application submitted!','success'); document.getElementById('applicantName').value = ''; document.getElementById('applicantMobile').value = ''; document.getElementById('applicantEmail').value = ''; document.getElementById('applicantMessage').value = ''; toggleJobApplicationForm(); renderApplications(); }
-        function showApplications() { const div = document.getElementById('applicationsList'); div.style.display = div.style.display === 'none' ? 'block' : 'none'; renderApplications(); }
-
+        function showAppList() { const div = document.getElementById('applicationsList'); div.style.display = div.style.display === 'none' ? 'block' : 'none'; renderApplications(); }
+        
+        async function loadLandingJobs() { const container = document.getElementById('landingJobList'); if(container) { container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showApplyFromLanding('${job.title}')">Apply Now</button></div>`; }); } }
+        function showApplyFromLanding(jobTitle) { showCustomerLoginForm(); setTimeout(() => { document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; document.getElementById('applyJobSelect').disabled = true; }, 500); }
+        async function loadLandingSuper() { const container = document.getElementById('landingSuperList'); if(container && allProducts.length) { const superProds = allProducts.filter(p => superDiscountProducts.includes(p.id)); container.innerHTML = ''; superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;"></i><h3>${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(0)}</div></div>`; }); } }
+        
+        async function loadCustomerProducts() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('customerAllProducts'); container.innerHTML = ''; products.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const imgUrl = productImages[p.id] || ''; container.innerHTML += `<div class="product-card"><div class="product-img"><img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF | +₹${cb.toFixed(0)} cashback</div></div>`; }); } catch(e) { showAlert('Error loading products','error'); } }
+        async function loadCustomerSuper() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('customerSuperList'); container.innerHTML = ''; const superProds = products.filter(p => superDiscountProducts.includes(p.id)); superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;"></i><h3>${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: +₹${cb.toFixed(0)}</div></div>`; }); } catch(e) { showAlert('Error','error'); } }
+        async function loadCustomerJobs() { const container = document.getElementById('customerJobsList'); container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showJobApplicationForm('${job.title}')">Apply Now</button></div>`; }); }
+        function showJobApplicationForm(jobTitle) { document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; document.getElementById('applyJobSelect').disabled = true; document.getElementById('customerJobForm').style.display = 'block'; }
+        function closeJobForm() { document.getElementById('customerJobForm').style.display = 'none'; }
+        async function submitCustomerJobApp() { const jobTitle = document.getElementById('applyJobSelect').value; const name = document.getElementById('applicantName').value; const mobile = document.getElementById('applicantMobile').value; const email = document.getElementById('applicantEmail').value; const msg = document.getElementById('applicantMsg').value; if(!name||!mobile||!email) { showAlert('Fill all fields','error'); return; } jobApplications.push({ jobTitle, name, mobile, email, message: msg, date: new Date().toLocaleString() }); showAlert('Application submitted!','success'); document.getElementById('applicantName').value = ''; document.getElementById('applicantMobile').value = ''; document.getElementById('applicantEmail').value = ''; document.getElementById('applicantMsg').value = ''; closeJobForm(); renderApplications(); }
+        
+        function renderAdminJobs() { const container = document.getElementById('adminJobsList'); container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;"><div><strong>${job.title}</strong><br><small>${job.description}</small></div><button onclick="deleteJob(${job.id})" style="background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:40px;">Delete</button></div>`; }); }
+        function renderApplications() { const container = document.getElementById('applicationsList'); const countSpan = document.getElementById('appCount'); container.innerHTML = ''; jobApplications.forEach(app => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px;"><strong>${app.jobTitle}</strong><br>Name: ${app.name}<br>Mobile: ${app.mobile}<br>Email: ${app.email}<br>Message: ${app.message}<br><small>Applied: ${app.date}</small></div>`; }); if(countSpan) countSpan.innerText = jobApplications.length; }
+        function addJobVacancy() { const title = document.getElementById('jobTitle').value; const desc = document.getElementById('jobDesc').value; if(title && desc) { jobVacancies.push({ id: Date.now(), title, description: desc }); document.getElementById('jobTitle').value = ''; document.getElementById('jobDesc').value = ''; renderAdminJobs(); loadCustomerJobs(); loadLandingJobs(); showAlert('Job added!','success'); } else { showAlert('Enter job details','error'); } }
+        function deleteJob(id) { jobVacancies = jobVacancies.filter(j => j.id !== id); renderAdminJobs(); loadCustomerJobs(); loadLandingJobs(); showAlert('Job deleted','success'); }
+        
         async function checkBackend() { try { const res = await fetch(`${BACKEND_URL}/`); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px;">✅ Connected</span>'; else document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Error</span>'; } catch(e) { document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Offline</span>'; } }
         async function apiCall(method, endpoint, data = null) { const options = { method, headers: { 'Content-Type': 'application/json' } }; if (authToken) options.headers['Authorization'] = `Bearer ${authToken}`; if (data) options.body = JSON.stringify(data); const res = await fetch(`${API_URL}${endpoint}`, options); if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'API failed'); } return res.json(); }
-        function showAlert(msg, type) { const a = document.getElementById('alert'); a.textContent = msg; a.className = `alert-premium alert-${type}`; a.style.display = 'block'; setTimeout(() => a.style.display = 'none', 3000); }
+        function showAlert(msg, type) { const a = document.getElementById('alert'); a.textContent = msg; a.className = `alert alert-${type}`; a.style.display = 'block'; setTimeout(() => a.style.display = 'none', 3000); }
         function showModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function showAddProductModal() { editingId = null; document.getElementById('productCode').value = ''; document.getElementById('productName').value = ''; document.getElementById('productPrice').value = ''; document.getElementById('productDiscount').value = '0'; document.getElementById('productStock').value = ''; document.getElementById('productImage').value = ''; document.getElementById('productSuperDiscount').checked = false; document.getElementById('previewImg').style.display = 'none'; showModal('productModal'); }
-        function updateImagePreview() { const url = document.getElementById('productImage').value; const img = document.getElementById('previewImg'); if(url) { img.src = url; img.style.display = 'block'; } else { img.style.display = 'none'; } }
-        document.getElementById('productImage').addEventListener('input', updateImagePreview);
-
+        function showAddProductModal() { editingId = null; showModal('productModal'); }
+        function showAddCustomerModal() { showModal('customerModal'); }
+        function showWalletControlModal() { showModal('walletControlModal'); loadWalletCustomers(); }
+        
         async function adminLogin() { const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value; if(!email||!password) return showAlert('Enter credentials','error'); try { const res = await fetch(`${API_URL}/auth/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'admin' }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!','success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Cannot connect','error'); } }
-        async function customerLogin() { const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value; if(!mobile||!password) return showAlert('Enter credentials','error'); try { const res = await fetch(`${API_URL}/auth/customer/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mobile,password}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; showLandingPage(); document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert(`Welcome ${data.customer.name}!`,'success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Server error','error'); } }
-        async function register() { const name = document.getElementById('regName').value, mobile = document.getElementById('regMobile').value, password = document.getElementById('regPassword').value, ref = document.getElementById('regReferral').value; if(!name||!mobile||!password) return showAlert('Fill all fields','error'); try { const res = await fetch(`${API_URL}/auth/customer/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,mobile,password,referralCode:ref}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; showLandingPage(); document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerData(); showAlert('Registered!','success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Registration failed','error'); } }
-
-        async function loadAdminData() { try { const products = await apiCall('GET','/products'), customers = await apiCall('GET','/customers'), reports = await apiCall('GET','/reports/dashboard'); allProducts = products; document.getElementById('totalSales').innerHTML = `₹${reports.total_sales}`; document.getElementById('totalCustomers').innerHTML = reports.total_customers; document.getElementById('totalCommission').innerHTML = `₹${reports.total_commission}`; document.getElementById('lowStock').innerHTML = reports.low_stock_alerts;
-            const pl = document.getElementById('productsList'); pl.innerHTML = ''; products.forEach(p => { const imgUrl = productImages[p.id] || ''; const isSuper = superDiscountProducts.includes(p.id); pl.innerHTML += `<tr><td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td><td>${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td><td>${p.discount_percent||0}%</td><td>${p.current_stock}</td><td>${isSuper ? '🔥' : '-'}</td><td><button class="btn-icon" onclick="editProduct(${p.id})">Edit</button><button class="btn-icon btn-delete" onclick="deleteProduct(${p.id})">Del</button></td>`; });
-            const cl = document.getElementById('customersList'); cl.innerHTML = ''; customers.forEach(c => { cl.innerHTML += `<tr><td>${c.name}</td><td>${c.mobile}</td><td>${c.referral_code}</td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button class="btn-icon btn-wallet" onclick="showWalletControlForCustomer(${c.id})">Wallet</button></td>`; });
+        async function customerLogin() { const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value; if(!mobile||!password) return showAlert('Enter credentials','error'); try { const res = await fetch(`${API_URL}/auth/customer/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mobile,password}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerDashboardData(); showAlert(`Welcome ${data.customer.name}!`,'success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Server error','error'); } }
+        async function register() { const name = document.getElementById('regName').value, mobile = document.getElementById('regMobile').value, password = document.getElementById('regPassword').value, ref = document.getElementById('regReferral').value; if(!name||!mobile||!password) return showAlert('Fill all fields','error'); try { const res = await fetch(`${API_URL}/auth/customer/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,mobile,password,referralCode:ref}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerDashboardData(); showAlert('Registered!','success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Registration failed','error'); } }
+        function customerLogout() { authToken = null; currentUser = null; cart = []; document.getElementById('customerDashboard').style.display = 'none'; document.getElementById('landingPage').style.display = 'block'; showAlert('Logged out','info'); }
+        function adminLogout() { authToken = null; currentUser = null; cart = []; document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('landingPage').style.display = 'block'; showAlert('Logged out','info'); }
+        
+        async function loadAdminData() { try { const products = await apiCall('GET','/products'), customers = await apiCall('GET','/customers'), reports = await apiCall('GET','/reports/dashboard'); allProducts = products; document.getElementById('adminTotalSales').innerHTML = `₹${reports.total_sales}`; document.getElementById('adminTotalCustomers').innerHTML = reports.total_customers; document.getElementById('adminTotalCommission').innerHTML = `₹${reports.total_commission}`; document.getElementById('adminLowStock').innerHTML = reports.low_stock_alerts;
+            const pl = document.getElementById('adminProductsList'); pl.innerHTML = ''; products.forEach(p => { const imgUrl = productImages[p.id] || ''; const isSuper = superDiscountProducts.includes(p.id); pl.innerHTML += `<tr><td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td><td>${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td><td>${p.discount_percent||0}%</td><td>${p.current_stock}</td><td>${isSuper ? '🔥' : '-'}</td><td><button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button> <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button></td></tr>`; });
+            const cl = document.getElementById('adminCustomersList'); cl.innerHTML = ''; customers.forEach(c => { cl.innerHTML += `<tr><td>${c.name}</td><td>${c.mobile}</td><td>${c.referral_code}</td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button onclick="showWalletControlForCustomer(${c.id})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:20px;">Wallet</button></td></tr>`; });
             const cs = document.getElementById('billCustomer'); cs.innerHTML = '<option>Select Customer</option>'; customers.forEach(c => { cs.innerHTML += `<option value="${c.id}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; });
             const ps = document.getElementById('billProduct'); ps.innerHTML = '<option>Select Product</option>'; products.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; ps.innerHTML += `<option value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cb}" data-stock="${p.current_stock}">${p.name} - ₹${p.selling_price}</option>`; });
-            loadPreviewProducts(); loadSuperDiscountDisplay(); loadJobListings(); } catch(e) { showAlert('Error','error'); } }
-
-        async function saveProduct() { const code = document.getElementById('productCode').value, name = document.getElementById('productName').value, price = parseFloat(document.getElementById('productPrice').value), discount = parseFloat(document.getElementById('productDiscount').value)||0, stock = parseInt(document.getElementById('productStock').value), imageUrl = document.getElementById('productImage').value, isSuper = document.getElementById('productSuperDiscount').checked; if(!code||!name||!price) return showAlert('Fill fields','error'); try { if(editingId) { await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,discount_percent:discount}); if(imageUrl) productImages[editingId] = imageUrl; if(isSuper && !superDiscountProducts.includes(editingId)) superDiscountProducts.push(editingId); else if(!isSuper) superDiscountProducts = superDiscountProducts.filter(pid => pid !== editingId); } else { const res = await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,discount_percent:discount}); const newId = res.id; if(imageUrl) productImages[newId] = imageUrl; if(isSuper) superDiscountProducts.push(newId); } showAlert('Product saved!','success'); closeModal('productModal'); await loadAdminData(); } catch(e) { showAlert('Error','error'); } }
+            loadLandingSuper(); loadCustomerProducts(); loadCustomerSuper(); loadCustomerJobs(); } catch(e) { showAlert('Error loading data','error'); } }
+        
+        async function loadCustomerDashboardData() { try { const profile = await apiCall('GET','/customers/profile'), trans = await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust = await apiCall('GET','/customers'); document.getElementById('custWalletAmt').innerHTML = `₹${profile.wallet_balance}`; document.getElementById('custWalletVal').innerHTML = `₹${profile.wallet_balance}`; document.getElementById('custTotalPurchases').innerHTML = `₹${profile.total_purchases}`; document.getElementById('myRefCode').innerHTML = profile.referral_code; document.getElementById('custReferralCount').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
+            const wt = document.getElementById('walletTransList'); wt.innerHTML = ''; trans.forEach(t=>{ wt.innerHTML += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td></tr>`; }); } catch(e){ showAlert('Error loading profile','error'); } }
+        
+        async function saveProduct() { const code = document.getElementById('productCode').value, name = document.getElementById('productName').value, price = parseFloat(document.getElementById('productPrice').value), discount = parseFloat(document.getElementById('productDiscount').value)||0, stock = parseInt(document.getElementById('productStock').value), imageUrl = document.getElementById('productImage').value, isSuper = document.getElementById('productSuperDiscount').checked; if(!code||!name||!price) return showAlert('Fill fields','error'); try { if(editingId) { await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,discount_percent:discount}); if(imageUrl) productImages[editingId] = imageUrl; if(isSuper && !superDiscountProducts.includes(editingId)) superDiscountProducts.push(editingId); else if(!isSuper) superDiscountProducts = superDiscountProducts.filter(pid => pid !== editingId); } else { const res = await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,discount_percent:discount}); const newId = res.id; if(imageUrl) productImages[newId] = imageUrl; if(isSuper) superDiscountProducts.push(newId); } showAlert('Product saved!','success'); closeModal('productModal'); await loadAdminData(); } catch(e) { showAlert('Error saving','error'); } }
         async function deleteProduct(id) { if(confirm('Delete?')){ try{ await apiCall('DELETE',`/products/${id}`); delete productImages[id]; superDiscountProducts = superDiscountProducts.filter(pid => pid !== id); showAlert('Deleted','success'); await loadAdminData(); } catch(e){ showAlert('Error','error'); } } }
         function editProduct(id){ const product = allProducts.find(p => p.id === id); editingId = id; document.getElementById('productCode').value = product.product_code; document.getElementById('productName').value = product.name; document.getElementById('productPrice').value = product.selling_price; document.getElementById('productDiscount').value = product.discount_percent||0; document.getElementById('productStock').value = product.current_stock; document.getElementById('productImage').value = productImages[id] || ''; document.getElementById('productSuperDiscount').checked = superDiscountProducts.includes(id); document.getElementById('previewImg').src = productImages[id] || ''; document.getElementById('previewImg').style.display = productImages[id] ? 'block' : 'none'; showModal('productModal'); }
         async function saveCustomer() { const name = document.getElementById('newCustName').value, mobile = document.getElementById('newCustMobile').value, password = document.getElementById('newCustPassword').value, ref = document.getElementById('newCustRef').value; if(!name||!mobile) return showAlert('Fill name & mobile','error'); const finalPassword = password || mobile; try { await apiCall('POST','/customers',{name,mobile,password:finalPassword,referred_by:ref||null}); showAlert(`Customer added! Login: ${mobile} / Password: ${finalPassword}`,'success'); closeModal('customerModal'); await loadAdminData(); } catch(e) { showAlert('Error','error'); } }
-
-        function addToCartManual() { const cust = document.getElementById('billCustomer').value, prod = document.getElementById('billProduct'), pid = prod.value, qty = parseInt(document.getElementById('billQuantity').value); if(!cust) return showAlert('Select customer','error'); if(!pid) return showAlert('Select product','error'); if(!qty||qty<1) return showAlert('Enter quantity','error'); const sel = prod.options[prod.selectedIndex], name = sel.text.split(' - ')[0], price = parseFloat(sel.dataset.price), disc = parseFloat(sel.dataset.discount), cashback = parseFloat(sel.dataset.cashback), stock = parseInt(sel.dataset.stock); if(stock<qty) return showAlert(`Only ${stock} left`,'error'); const ex = cart.find(i=>i.product_id===parseInt(pid)); if(ex) ex.quantity+=qty; else cart.push({product_id:parseInt(pid),name,originalPrice:price,discountPercent:disc,cashback,quantity:qty}); renderCart(); document.getElementById('billQuantity').value='1'; showAlert(`${name} added`,'success'); }
-        function renderCart() { const tbody = document.getElementById('cartList'); let total=0, cbTotal=0; tbody.innerHTML=''; cart.forEach((item,idx)=>{ const itemTotal=item.originalPrice*item.quantity; const itemCB=item.cashback*item.quantity; total+=itemTotal; cbTotal+=itemCB; tbody.innerHTML+=`<tr><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.originalPrice}</td><td>${item.discountPercent}%</td><td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td><td>₹${itemTotal.toFixed(2)}</td><td><button class="btn-icon btn-delete" onclick="removeFromCart(${idx})">Remove</button></td>`; }); document.getElementById('cartTotal').innerHTML=total; document.getElementById('cartCashback').innerHTML=cbTotal.toFixed(2); }
+        function copyRefCode() { navigator.clipboard.writeText(document.getElementById('myRefCode').innerText); showAlert('Copied!','success'); }
+        
+        function addToCart() { const cust = document.getElementById('billCustomer').value, prod = document.getElementById('billProduct'), pid = prod.value, qty = parseInt(document.getElementById('billQuantity').value); if(!cust) return showAlert('Select customer','error'); if(!pid) return showAlert('Select product','error'); if(!qty||qty<1) return showAlert('Enter quantity','error'); const sel = prod.options[prod.selectedIndex], name = sel.text.split(' - ')[0], price = parseFloat(sel.dataset.price), disc = parseFloat(sel.dataset.discount), cashback = parseFloat(sel.dataset.cashback), stock = parseInt(sel.dataset.stock); if(stock<qty) return showAlert(`Only ${stock} left`,'error'); const ex = cart.find(i=>i.product_id===parseInt(pid)); if(ex) ex.quantity+=qty; else cart.push({product_id:parseInt(pid),name,originalPrice:price,discountPercent:disc,cashback,quantity:qty}); renderCart(); document.getElementById('billQuantity').value='1'; showAlert(`${name} added`,'success'); }
+        function renderCart() { const tbody = document.getElementById('cartList'); let total=0, cbTotal=0; tbody.innerHTML=''; cart.forEach((item,idx)=>{ const itemTotal=item.originalPrice*item.quantity; const itemCB=item.cashback*item.quantity; total+=itemTotal; cbTotal+=itemCB; tbody.innerHTML+=`<tr><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.originalPrice}</td><td>${item.discountPercent}%</td><td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td><td>₹${itemTotal.toFixed(2)}</td><td><button onclick="removeFromCart(${idx})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Remove</button></td></tr>`; }); document.getElementById('cartTotal').innerHTML=total; document.getElementById('cartCashback').innerHTML=cbTotal.toFixed(2); }
         function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
         async function createBill() { if(cart.length===0) return showAlert('Cart empty','error'); const cust = document.getElementById('billCustomer').value; if(!cust) return showAlert('Select customer','error'); const items = cart.map(i=>({product_id:i.product_id,quantity:i.quantity})); try { const res = await apiCall('POST','/bills',{customer_id:parseInt(cust),items,payment_method:'cash'}); showAlert(`Bill created! Cashback: ₹${res.cashback.toFixed(2)} added!`,'success'); cart=[]; renderCart(); await loadAdminData(); } catch(e) { showAlert('Error','error'); } }
-        function printBill() { if(cart.length===0) return showAlert('Cart empty','error'); const cust = document.getElementById('billCustomer').value; if(!cust) return showAlert('Select customer','error'); const opt = document.getElementById('billCustomer').options[document.getElementById('billCustomer').selectedIndex]; const custName = opt.text.split(' (')[0]; let total=0, cbTotal=0, itemsHtml=''; cart.forEach(i=>{ const t=i.originalPrice*i.quantity; const cb=i.cashback*i.quantity; total+=t; cbTotal+=cb; itemsHtml+=`<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td>`; }); const win = window.open('','_blank'); win.document.write(`<html><head><title>Bill</title><style>body{font-family:'Courier New';margin:20px;}</style></head><body onload="window.print();window.close();"><div><h2>SASTA BAZAR</h2><p>Bill: SB${Date.now()}</p><p>Customer: ${custName}</p><table border="1" cellpadding="5"><tr><th>Product</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr>${itemsHtml}</tr><p><strong>Total: ₹${total}</strong></p><p style="color:#27ae60;">Cashback: +₹${cbTotal}</p><p>✨ Thank you! ✨</p></div></body></html>`); }
+        function printBill() { if(cart.length===0) return showAlert('Cart empty','error'); const cust = document.getElementById('billCustomer').value; if(!cust) return showAlert('Select customer','error'); const opt = document.getElementById('billCustomer').options[document.getElementById('billCustomer').selectedIndex]; const custName = opt.text.split(' (')[0]; let total=0, cbTotal=0, itemsHtml=''; cart.forEach(i=>{ const t=i.originalPrice*i.quantity; const cb=i.cashback*i.quantity; total+=t; cbTotal+=cb; itemsHtml+=`<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td>+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; }); const win = window.open('','_blank'); win.document.write(`<html><head><title>Bill</title><style>body{font-family:'Courier New';margin:20px;}</style></head><body onload="window.print();window.close();"><div><h2>SASTA BAZAR</h2><p>Bill: SB${Date.now()}</p><p>Customer: ${custName}</p><table border="1" cellpadding="5"><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th></tr>${itemsHtml}<tr><td colspan="5"><strong>Total: ₹${total}</strong></td></tr><tr><td colspan="5"><strong style="color:#27ae60;">Cashback: +₹${cbTotal}</strong></td></tr></table><p>✨ Thank you! ✨</p></div></body></html>`); win.document.close(); }
         function setupBarcodeScanner() { const input = document.getElementById('barcodeInput'); if(!input) return; input.addEventListener('keypress', async function(e) { if(e.key === 'Enter') { const barcode = this.value.trim(); if(barcode) await processBarcode(barcode); this.value = ''; } }); }
         async function processBarcode(barcode) { const cust = document.getElementById('billCustomer').value; if(!cust) { showAlert('Select customer first','error'); return; } try { const products = allProducts.length ? allProducts : await apiCall('GET','/products'); const p = products.find(p => p.product_code === barcode); if(!p) { showAlert('Product not found','error'); return; } if(p.current_stock<1) { showAlert('Out of stock','error'); return; } const cashback = (p.selling_price * (p.discount_percent||0))/100; const ex = cart.find(i=>i.product_id===p.id); if(ex) ex.quantity++; else cart.push({product_id:p.id,name:p.name,originalPrice:p.selling_price,discountPercent:p.discount_percent||0,cashback:cashback,quantity:1}); renderCart(); showAlert(`✅ ${p.name} added!`,'success'); } catch(e) { showAlert('Error','error'); } }
-
-        async function loadCustomerData() { try { const profile = await apiCall('GET','/customers/profile'), trans = await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust = await apiCall('GET','/customers'), products = await apiCall('GET','/products'); document.getElementById('custWallet').innerHTML = `₹${profile.wallet_balance}`; document.getElementById('custPurchases').innerHTML = `₹${profile.total_purchases}`; document.getElementById('myReferralCode').innerHTML = profile.referral_code; document.getElementById('custReferrals').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
-            const prodList = document.getElementById('customerProductsList'); if(prodList) { prodList.innerHTML = ''; products.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const imgUrl = productImages[p.id] || ''; prodList.innerHTML += `<tr><td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td><td>${p.name}</td><td>₹${p.selling_price}</td><td>${p.discount_percent||0}%</td><td style="color:#27ae60;">+₹${cb.toFixed(0)}</td><td>${p.current_stock}</td>`; }); }
-            const superDiv = document.getElementById('customerSuperProducts'); if(superDiv) { superDiv.innerHTML = ''; const superProds = products.filter(p => superDiscountProducts.includes(p.id)); superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; superDiv.innerHTML += `<div class="super-product-card"><i class="fas fa-fire" style="font-size:36px; color:#e67e22;"></i><h4>${p.name}</h4><div><span class="old-price">₹${p.selling_price}</span> <span style="color:#e67e22;">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: +₹${cb.toFixed(0)}</div></div>`; }); }
-            const wt = document.getElementById('walletTransactions'); if(wt) { wt.innerHTML = ''; trans.forEach(t=>{ wt.innerHTML += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td>`; }); }
-        } catch(e){ showAlert('Error','error'); } }
-
-        async function loadPreviewProducts() { try { const products = await apiCall('GET','/products'); const previewDiv = document.getElementById('previewProductsList'); if(previewDiv) { previewDiv.innerHTML = ''; products.slice(0,6).forEach(p => { const imgUrl = productImages[p.id] || ''; previewDiv.innerHTML += `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-mobile-alt\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">🔥 ${p.discount_percent||0}% OFF</div><div style="font-size:11px; color:#27ae60;">+₹${((p.selling_price*(p.discount_percent||0))/100).toFixed(0)} cashback</div></div>`; }); } } catch(e) { console.log('Preview error'); } }
-        async function loadSuperDiscountDisplay() { try { const products = await apiCall('GET','/products'); const superDiv = document.getElementById('superDiscountProducts'); if(superDiv) { superDiv.innerHTML = ''; const superProds = products.filter(p => superDiscountProducts.includes(p.id)).slice(0,4); if(superProds.length === 0) { superDiv.innerHTML = '<div style="text-align:center;">No super discount products yet</div>'; return; } superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; superDiv.innerHTML += `<div class="super-product-card"><i class="fas fa-fire" style="font-size:36px; color:#e67e22;"></i><h4>${p.name}</h4><div><span class="old-price">₹${p.selling_price}</span> <span>₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 UPTO ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div></div>`; }); } } catch(e) { console.log('Super discount error'); } }
-        async function loadSuperDiscountFullPage() { const container = document.getElementById('superDiscountProductsFull'); if(container && allProducts.length) { const superProds = allProducts.filter(p => superDiscountProducts.includes(p.id)); container.innerHTML = ''; superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; container.innerHTML += `<div class="super-product-card"><i class="fas fa-fire" style="font-size:48px; color:#e67e22;"></i><h3>${p.name}</h3><div class="price"><span class="old-price">₹${p.selling_price}</span> <span style="color:#e67e22;">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(0)}</div></div>`; }); } }
-
-        function copyReferralCode(){ navigator.clipboard.writeText(document.getElementById('myReferralCode').innerText); showAlert('Copied!','success'); }
-        function showWalletControlModal() { showModal('walletControlModal'); loadWalletCustomers(); }
-        function showWalletControlForCustomer(id) { showWalletControlModal(); setTimeout(() => { document.getElementById('walletCustomerSelect').value = id; updateWalletBalanceDisplay(); }, 100); }
-        async function loadWalletCustomers() { try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange = updateWalletBalanceDisplay; } catch(e){ showAlert('Error','error'); } }
-        function updateWalletBalanceDisplay() { const sel = document.getElementById('walletCustomerSelect'); const opt = sel.options[sel.selectedIndex]; document.getElementById('currentBalance').innerHTML = `₹${opt?.dataset.balance || 0}`; }
+        
+        async function loadWalletCustomers() { try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange = function(){ document.getElementById('currentBalance').innerHTML = `₹${this.options[this.selectedIndex]?.dataset.balance || 0}`; }; } catch(e){ showAlert('Error loading customers','error'); } }
+        function showWalletControlForCustomer(id) { showWalletControlModal(); setTimeout(() => { document.getElementById('walletCustomerSelect').value = id; document.getElementById('currentBalance').innerHTML = `₹${document.getElementById('walletCustomerSelect').options[document.getElementById('walletCustomerSelect').selectedIndex]?.dataset.balance || 0}`; }, 100); }
         async function adminAddMoney() { const cid = document.getElementById('walletCustomerSelect').value, amt = parseFloat(document.getElementById('walletAmount').value), reason = document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
         async function adminDeductMoney() { const cid = document.getElementById('walletCustomerSelect').value, amt = parseFloat(document.getElementById('walletAmount').value), reason = document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
 
-        function showAddCustomerModal(){ showModal('customerModal'); }
-        function logout() { authToken=null; currentUser=null; cart=[]; showLandingPage(); showAlert('Logged out','info'); }
-
         if(jobVacancies.length === 0) { jobVacancies.push({ id: 1, title: 'Software Developer', description: 'Full-stack developer with React and Node.js experience' }); jobVacancies.push({ id: 2, title: 'Marketing Manager', description: 'Lead our digital marketing campaigns' }); jobVacancies.push({ id: 3, title: 'Customer Support', description: '24/7 customer support for shop system' }); }
         checkBackend(); setInterval(checkBackend,30000);
+        loadLandingJobs(); loadLandingSuper();
     </script>
 </body>
 </html>
