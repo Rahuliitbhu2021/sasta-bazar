@@ -1,0 +1,88 @@
+{
+  "customers": [
+    {
+      "id": 1,
+      "customer_id": "ADMIN001",
+      "name": "Admin User",
+      "mobile": "0000000000",
+      "referral_code": "ADMIN123",
+      "referred_by": null,
+      "password_hash": "$2a$10$rQHjUzRZKXQZ5Z5Z5Z5ZuOZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5",
+      "wallet_balance": 0,
+      "total_purchases": 0,
+      "created_at": "2026-06-13T05:38:53.803654"
+    },
+    {
+      "id": 2,
+      "customer_id": "CUST001",
+      "name": "John Doe",
+      "mobile": "9876543210",
+      "referral_code": "REF123",
+      "referred_by": null,
+      "password_hash": "$2a$10$rQHjUzRZKXQZ5Z5Z5Z5ZuOZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5",
+      "wallet_balance": 500,
+      "total_purchases": 0,
+      "created_at": "2026-06-13T07:19:15.241988"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "product_code": "P001",
+      "name": "Smartphone",
+      "purchase_price": 15000,
+      "selling_price": 19999,
+      "current_stock": 25,
+      "min_stock_level": 5,
+      "discount_percent": 10,
+      "created_at": "2026-06-13T05:38:53.803654"
+    },
+    {
+      "id": 2,
+      "product_code": "P002",
+      "name": "Laptop",
+      "purchase_price": 45000,
+      "selling_price": 54999,
+      "current_stock": 10,
+      "min_stock_level": 5,
+      "discount_percent": 15,
+      "created_at": "2026-06-13T05:38:53.803654"
+    },
+    {
+      "id": 3,
+      "product_code": "P003",
+      "name": "Headphones",
+      "purchase_price": 800,
+      "selling_price": 1499,
+      "current_stock": 50,
+      "min_stock_level": 5,
+      "discount_percent": 5,
+      "created_at": "2026-06-13T05:38:53.803654"
+    },
+    {
+      "id": 4,
+      "product_code": "P004",
+      "name": "Charger",
+      "purchase_price": 300,
+      "selling_price": 599,
+      "current_stock": 100,
+      "min_stock_level": 5,
+      "discount_percent": 0,
+      "created_at": "2026-06-13T05:38:53.803654"
+    },
+    {
+      "id": 5,
+      "product_code": "P005",
+      "name": "Power Bank",
+      "purchase_price": 500,
+      "selling_price": 999,
+      "current_stock": 30,
+      "min_stock_level": 5,
+      "discount_percent": 0,
+      "created_at": "2026-06-13T05:38:53.803654"
+    }
+  ],
+  "bills": [],
+  "commissions": [],
+  "wallet_transactions": []
+}

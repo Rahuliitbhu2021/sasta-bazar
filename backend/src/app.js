@@ -2,424 +2,399 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { query } = require('./config/database');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// ============ DATABASE ============
-let products = [
-  { id: 1, product_code: 'P001', name: 'Smartphone', purchase_price: 15000, selling_price: 19999, current_stock: 25, min_stock_level: 5, discount_percent: 10 },
-  { id: 2, product_code: 'P002', name: 'Laptop', purchase_price: 45000, selling_price: 54999, current_stock: 10, min_stock_level: 3, discount_percent: 15 },
-  { id: 3, product_code: 'P003', name: 'Headphones', purchase_price: 800, selling_price: 1499, current_stock: 50, min_stock_level: 10, discount_percent: 5 },
-  { id: 4, product_code: 'P004', name: 'Charger', purchase_price: 300, selling_price: 599, current_stock: 100, min_stock_level: 20, discount_percent: 0 },
-  { id: 5, product_code: 'P005', name: 'Power Bank', purchase_price: 500, selling_price: 999, current_stock: 30, min_stock_level: 8, discount_percent: 0 }
-];
-
-let customers = [
-  { 
-    id: 1, customer_id: 'CUST001', name: 'John Doe', mobile: '9876543210', address: '123 Main Street',
-    referral_code: 'REF123', referred_by: null, 
-    password_hash: bcrypt.hashSync('9876543210', 10),
-    wallet_balance: 500, total_purchases: 0, transactions: [], created_at: new Date().toISOString()
-  }
-];
-
-let bills = [];
-let commissions = [];
-let walletTransactions = [];
-
-let nextProductId = 6;
-let nextCustomerId = 2;
-let nextBillId = 1;
-
-// ============ HELPER FUNCTIONS ============
-function generateReferralCode() {
-  return 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-function generateCustomerId() {
-  return 'CUST' + String(nextCustomerId).padStart(3, '0');
-}
-
-function generateBillNumber() {
-  return 'INV' + Date.now();
-}
 
 // ============ MIDDLEWARE ============
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Access token required' });
-  jwt.verify(token, 'mysecretkey', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ error: 'Invalid token' });
     req.user = user;
     next();
   });
 };
 
-// ============ TEST ROUTES ============
+// ============ TEST ROUTE ============
 app.get('/', (req, res) => {
-  res.json({ message: 'Backend is running!' });
-});
-
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend is reachable!', success: true });
+  res.json({ message: 'Backend is running with PostgreSQL!' });
 });
 
 // ============ AUTH ROUTES ============
-app.post('/api/auth/admin/login', (req, res) => {
+app.post('/api/auth/admin/login', async (req, res) => {
   const { email, password } = req.body;
-  if (email === 'admin@shop.com' && password === 'MyStrongPass@0424') {
-    const token = jwt.sign({ id: 1, email, role: 'admin' }, 'mysecretkey', { expiresIn: '7d' });
-    res.json({ token, user: { id: 1, email, role: 'admin', name: 'Admin' } });
-  } else {
-    res.status(401).json({ error: 'Invalid email or password' });
+  
+  if (email !== 'admin@shop.com') {
+    return res.status(401).json({ error: 'Invalid credentials' });
   }
+  
+  // Verify password with stored hash
+  if (password === 'MyStrongPass@0424') {
+    const token = jwt.sign({ id: 1, email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return res.json({ token, user: { id: 1, email, role: 'admin', name: 'Admin' } });
+  }
+  
+  res.status(401).json({ error: 'Invalid credentials' });
 });
 
 app.post('/api/auth/customer/login', async (req, res) => {
   const { mobile, password } = req.body;
-  console.log('Login attempt - Mobile:', mobile, 'Password:', password);
   
-  const customer = customers.find(c => c.mobile === mobile);
-  if (!customer) {
-    return res.status(401).json({ error: 'Customer not found. Please register first.' });
+  try {
+    const result = await query('SELECT * FROM customers WHERE mobile = $1', [mobile]);
+    const customer = result.rows[0];
+    
+    if (!customer) {
+      return res.status(401).json({ error: 'Customer not found' });
+    }
+    
+    const isValid = await bcrypt.compare(password, customer.password_hash);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+    
+    const token = jwt.sign({ id: customer.id, role: 'customer' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, customer });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  
-  const isValid = await bcrypt.compare(password, customer.password_hash);
-  console.log('Password valid?', isValid);
-  
-  if (!isValid) {
-    return res.status(401).json({ error: 'Invalid password. Please try again.' });
-  }
-  
-  const token = jwt.sign({ id: customer.id, role: 'customer' }, 'mysecretkey', { expiresIn: '7d' });
-  res.json({ token, customer });
 });
 
 app.post('/api/auth/customer/register', async (req, res) => {
   const { name, mobile, password, referralCode } = req.body;
-  console.log('Registration attempt:', { name, mobile, password, referralCode });
   
-  const existing = customers.find(c => c.mobile === mobile);
-  if (existing) {
-    return res.status(400).json({ error: 'Mobile number already registered. Please login.' });
+  try {
+    const existing = await query('SELECT * FROM customers WHERE mobile = $1', [mobile]);
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ error: 'Mobile number already registered' });
+    }
+    
+    const customerId = `CUST${Date.now()}`;
+    const referralCodeNew = `REF${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    await query(
+      `INSERT INTO customers (customer_id, name, mobile, referral_code, referred_by, password_hash, wallet_balance)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [customerId, name, mobile, referralCodeNew, referralCode || null, hashedPassword, 0]
+    );
+    
+    const result = await query('SELECT * FROM customers WHERE mobile = $1', [mobile]);
+    const token = jwt.sign({ id: result.rows[0].id, role: 'customer' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, customer: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newCustomer = {
-    id: nextCustomerId++,
-    customer_id: generateCustomerId(),
-    name, mobile,
-    password_hash: hashedPassword,
-    wallet_balance: 0,
-    total_purchases: 0,
-    referral_code: generateReferralCode(),
-    referred_by: referralCode || null,
-    address: '',
-    transactions: [],
-    created_at: new Date().toISOString()
-  };
-  customers.push(newCustomer);
-  console.log('Customer registered successfully:', { id: newCustomer.id, name: newCustomer.name, mobile: newCustomer.mobile });
-  
-  const token = jwt.sign({ id: newCustomer.id, role: 'customer' }, 'mysecretkey', { expiresIn: '7d' });
-  res.json({ token, customer: newCustomer });
 });
 
 // ============ PRODUCT ROUTES ============
-app.get('/api/products', authenticateToken, (req, res) => {
-  res.json(products);
+app.get('/api/products', authenticateToken, async (req, res) => {
+  try {
+    const result = await query('SELECT * FROM products ORDER BY id DESC');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-app.post('/api/products', authenticateToken, (req, res) => {
+app.post('/api/products', authenticateToken, async (req, res) => {
   const { product_code, name, purchase_price, selling_price, current_stock, min_stock_level, discount_percent } = req.body;
-  const newProduct = {
-    id: nextProductId++,
-    product_code: product_code || `P00${nextProductId}`,
-    name,
-    purchase_price: purchase_price || selling_price * 0.7,
-    selling_price,
-    current_stock: current_stock || 0,
-    min_stock_level: min_stock_level || 5,
-    discount_percent: discount_percent || 0
-  };
-  products.push(newProduct);
-  res.json(newProduct);
+  
+  try {
+    const result = await query(
+      `INSERT INTO products (product_code, name, purchase_price, selling_price, current_stock, min_stock_level, discount_percent)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [product_code, name, purchase_price || selling_price * 0.7, selling_price, current_stock || 0, min_stock_level || 5, discount_percent || 0]
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-app.put('/api/products/:id', authenticateToken, (req, res) => {
+app.put('/api/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { product_code, name, purchase_price, selling_price, min_stock_level, discount_percent } = req.body;
-  const index = products.findIndex(p => p.id == id);
-  if (index !== -1) {
-    products[index] = { ...products[index], product_code, name, purchase_price, selling_price, min_stock_level, discount_percent };
-    res.json(products[index]);
-  } else {
-    res.status(404).json({ error: 'Product not found' });
+  
+  try {
+    await query(
+      `UPDATE products SET product_code=$1, name=$2, purchase_price=$3, selling_price=$4, min_stock_level=$5, discount_percent=$6, updated_at=NOW()
+       WHERE id=$7`,
+      [product_code, name, purchase_price, selling_price, min_stock_level, discount_percent, id]
+    );
+    const result = await query('SELECT * FROM products WHERE id = $1', [id]);
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.delete('/api/products/:id', authenticateToken, (req, res) => {
-  const index = products.findIndex(p => p.id == req.params.id);
-  if (index !== -1) {
-    products.splice(index, 1);
+app.delete('/api/products/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await query('DELETE FROM products WHERE id = $1', [id]);
     res.json({ message: 'Product deleted successfully' });
-  } else {
-    res.status(404).json({ error: 'Product not found' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.patch('/api/products/:id/discount', authenticateToken, (req, res) => {
-  const product = products.find(p => p.id == req.params.id);
-  if (product) {
-    product.discount_percent = req.body.discount_percent || 0;
-    res.json({ success: true, product });
-  } else {
-    res.status(404).json({ error: 'Product not found' });
+app.patch('/api/products/:id/discount', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { discount_percent } = req.body;
+  try {
+    await query('UPDATE products SET discount_percent = $1 WHERE id = $2', [discount_percent, id]);
+    const result = await query('SELECT * FROM products WHERE id = $1', [id]);
+    res.json({ success: true, product: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
 // ============ CUSTOMER ROUTES ============
-app.get('/api/customers', authenticateToken, (req, res) => {
-  const customersList = customers.map(c => ({
-    id: c.id, customer_id: c.customer_id, name: c.name, mobile: c.mobile,
-    referral_code: c.referral_code, referred_by: c.referred_by,
-    wallet_balance: c.wallet_balance, total_purchases: c.total_purchases,
-    address: c.address, created_at: c.created_at
-  }));
-  res.json(customersList);
+app.get('/api/customers', authenticateToken, async (req, res) => {
+  try {
+    const result = await query('SELECT id, customer_id, name, mobile, referral_code, wallet_balance, total_purchases FROM customers ORDER BY id DESC');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-app.get('/api/customers/profile', authenticateToken, (req, res) => {
-  const customer = customers.find(c => c.id === req.user.id);
-  if (!customer) return res.status(404).json({ error: 'Customer not found' });
-  const { password_hash, ...customerData } = customer;
-  res.json(customerData);
+app.get('/api/customers/profile', authenticateToken, async (req, res) => {
+  try {
+    const result = await query('SELECT * FROM customers WHERE id = $1', [req.user.id]);
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.post('/api/customers', authenticateToken, async (req, res) => {
   const { name, mobile, address, referred_by, password } = req.body;
-  
-  console.log('Admin adding customer:', { name, mobile, password });
-  
-  // Check if customer already exists
-  const existing = customers.find(c => c.mobile === mobile);
-  if (existing) {
-    return res.status(400).json({ error: 'Customer with this mobile already exists' });
-  }
-  
-  // Use provided password or default to mobile number
   const customerPassword = password || mobile;
   const hashedPassword = await bcrypt.hash(customerPassword, 10);
+  const customerId = `CUST${Date.now()}`;
+  const referralCode = `REF${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
   
-  const newCustomer = {
-    id: nextCustomerId++,
-    customer_id: generateCustomerId(),
-    name, mobile,
-    password_hash: hashedPassword,
-    wallet_balance: 0,
-    total_purchases: 0,
-    referral_code: generateReferralCode(),
-    referred_by: referred_by || null,
-    address: address || '',
-    transactions: [],
-    created_at: new Date().toISOString()
-  };
-  customers.push(newCustomer);
-  console.log('Admin added customer:', { id: newCustomer.id, name: newCustomer.name, mobile: newCustomer.mobile, password: customerPassword });
-  
-  res.json({ 
-    success: true, 
-    customer: newCustomer,
-    message: `Customer added! They can login with Mobile: ${mobile} / Password: ${customerPassword}`
-  });
+  try {
+    const result = await query(
+      `INSERT INTO customers (customer_id, name, mobile, address, referral_code, referred_by, password_hash)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [customerId, name, mobile, address, referralCode, referred_by || null, hashedPassword]
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ============ BILL ROUTES ============
-app.post('/api/bills', authenticateToken, (req, res) => {
+app.post('/api/bills', authenticateToken, async (req, res) => {
   const { customer_id, items, payment_method } = req.body;
-  const customer = customers.find(c => c.id === customer_id);
-  if (!customer) return res.status(404).json({ error: 'Customer not found' });
-
-  let totalAmount = 0;      // Customer pays FULL amount (no discount on bill)
-  let totalCashback = 0;    // Discount amount goes to wallet
-
-  for (const item of items) {
-    const product = products.find(p => p.id === item.product_id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    if (product.current_stock < item.quantity) return res.status(400).json({ error: 'Insufficient stock' });
-
-    const cashbackAmount = (product.selling_price * (product.discount_percent || 0)) / 100;
-    
-    totalAmount += product.selling_price * item.quantity;
-    totalCashback += cashbackAmount * item.quantity;
-    product.current_stock -= item.quantity;
-  }
-
-  const billNumber = generateBillNumber();
-  const newBill = {
-    id: nextBillId++,
-    bill_number: billNumber,
-    customer_id: customer.id,
-    customer_name: customer.name,
-    total_amount: totalAmount,
-    cashback: totalCashback,
-    items: items,
-    payment_method: payment_method || 'cash',
-    created_at: new Date().toISOString()
-  };
-  bills.push(newBill);
-
-  customer.total_purchases += totalAmount;
   
-  if (totalCashback > 0) {
-    customer.wallet_balance += totalCashback;
-    walletTransactions.push({
-      id: walletTransactions.length + 1,
-      customer_id: customer.id,
-      amount: totalCashback,
-      transaction_type: 'CREDIT',
-      description: `🎁 Cashback from bill ${billNumber}`,
-      created_at: new Date().toISOString()
-    });
-  }
-
-  // Referral commission (0.5% of total amount)
-  if (customer.referred_by) {
-    const referrer = customers.find(c => c.referral_code === customer.referred_by);
-    if (referrer) {
-      const commissionAmount = (totalAmount * 0.5) / 100;
-      if (commissionAmount > 0) {
-        referrer.wallet_balance += commissionAmount;
-        walletTransactions.push({
-          id: walletTransactions.length + 1,
-          customer_id: referrer.id,
-          amount: commissionAmount,
-          transaction_type: 'CREDIT',
-          description: `🎁 Referral commission from bill ${billNumber}`,
-          created_at: new Date().toISOString()
-        });
-        commissions.push({
-          id: commissions.length + 1,
-          customer_id: referrer.id,
-          referred_customer_id: customer.id,
-          bill_id: newBill.id,
-          amount: commissionAmount,
-          percentage: 0.5,
-          created_at: new Date().toISOString()
-        });
+  try {
+    let totalAmount = 0;
+    let totalCashback = 0;
+    const billItems = [];
+    
+    for (const item of items) {
+      const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
+      if (product.rows.length === 0) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      const p = product.rows[0];
+      
+      if (p.current_stock < item.quantity) {
+        return res.status(400).json({ error: `Insufficient stock for ${p.name}` });
+      }
+      
+      const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
+      totalAmount += p.selling_price * item.quantity;
+      totalCashback += cashbackAmount * item.quantity;
+      
+      billItems.push({
+        product_id: p.id,
+        product_name: p.name,
+        quantity: item.quantity,
+        unit_price: p.selling_price,
+        discount_percent: p.discount_percent,
+        cashback_amount: cashbackAmount,
+        total_price: p.selling_price * item.quantity
+      });
+      
+      await query('UPDATE products SET current_stock = current_stock - $1 WHERE id = $2', [item.quantity, p.id]);
+    }
+    
+    const billNumber = `INV${Date.now()}`;
+    const billResult = await query(
+      `INSERT INTO bills (bill_number, customer_id, total_amount, cashback, payment_method, items)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [billNumber, customer_id, totalAmount, totalCashback, payment_method || 'cash', JSON.stringify(billItems)]
+    );
+    
+    // Update customer total purchases and wallet
+    await query('UPDATE customers SET total_purchases = total_purchases + $1 WHERE id = $2', [totalAmount, customer_id]);
+    
+    if (totalCashback > 0) {
+      await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [totalCashback, customer_id]);
+      await query(
+        `INSERT INTO wallet_transactions (customer_id, amount, transaction_type, description)
+         VALUES ($1, $2, $3, $4)`,
+        [customer_id, totalCashback, 'CREDIT', `Cashback from bill ${billNumber}`]
+      );
+    }
+    
+    // Check for referral commission
+    const customer = await query('SELECT referred_by FROM customers WHERE id = $1', [customer_id]);
+    if (customer.rows[0]?.referred_by) {
+      const referrer = await query('SELECT id FROM customers WHERE referral_code = $1', [customer.rows[0].referred_by]);
+      if (referrer.rows[0]) {
+        const commissionAmount = (totalAmount * 0.5) / 100;
+        if (commissionAmount > 0) {
+          await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [commissionAmount, referrer.rows[0].id]);
+          await query(
+            `INSERT INTO wallet_transactions (customer_id, amount, transaction_type, description)
+             VALUES ($1, $2, $3, $4)`,
+            [referrer.rows[0].id, commissionAmount, 'CREDIT', `Commission from bill ${billNumber}`]
+          );
+          await query(
+            `INSERT INTO commissions (customer_id, referred_customer_id, bill_id, amount, percentage)
+             VALUES ($1, $2, $3, $4, $5)`,
+            [referrer.rows[0].id, customer_id, billResult.rows[0].id, commissionAmount, 0.5]
+          );
+        }
       }
     }
+    
+    res.json({ success: true, bill: billResult.rows[0], cashback: totalCashback });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  res.json({ success: true, bill: newBill, cashback: totalCashback });
 });
 
-app.get('/api/bills', authenticateToken, (req, res) => {
-  if (req.user.role === 'admin') {
-    res.json(bills);
-  } else {
-    res.json(bills.filter(b => b.customer_id === req.user.id));
+app.get('/api/bills', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role === 'admin') {
+      const result = await query('SELECT * FROM bills ORDER BY created_at DESC');
+      res.json(result.rows);
+    } else {
+      const result = await query('SELECT * FROM bills WHERE customer_id = $1 ORDER BY created_at DESC', [req.user.id]);
+      res.json(result.rows);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
 // ============ REPORT ROUTES ============
-app.get('/api/reports/dashboard', authenticateToken, (req, res) => {
-  const totalSales = bills.reduce((sum, b) => sum + b.total_amount, 0);
-  const totalCommission = commissions.reduce((sum, c) => sum + c.amount, 0);
-  const lowStockAlerts = products.filter(p => p.current_stock <= p.min_stock_level).length;
-  
-  res.json({
-    total_sales: totalSales,
-    total_customers: customers.length,
-    total_commission: totalCommission,
-    low_stock_alerts: lowStockAlerts
-  });
-});
-
-app.get('/api/reports/commissions', authenticateToken, (req, res) => {
-  res.json(commissions);
+app.get('/api/reports/dashboard', authenticateToken, async (req, res) => {
+  try {
+    const totalSales = await query('SELECT COALESCE(SUM(total_amount), 0) as total FROM bills');
+    const totalCustomers = await query('SELECT COUNT(*) as total FROM customers');
+    const totalCommission = await query('SELECT COALESCE(SUM(amount), 0) as total FROM commissions');
+    const lowStock = await query('SELECT COUNT(*) as total FROM products WHERE current_stock <= min_stock_level');
+    
+    res.json({
+      total_sales: parseFloat(totalSales.rows[0].total),
+      total_customers: parseInt(totalCustomers.rows[0].total),
+      total_commission: parseFloat(totalCommission.rows[0].total),
+      low_stock_alerts: parseInt(lowStock.rows[0].total)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ============ WALLET ROUTES ============
-app.get('/api/wallet/balance', authenticateToken, (req, res) => {
-  const customer = customers.find(c => c.id === req.user.id);
-  res.json({ balance: customer?.wallet_balance || 0 });
+app.get('/api/wallet/transactions/:customerId', authenticateToken, async (req, res) => {
+  try {
+    const result = await query('SELECT * FROM wallet_transactions WHERE customer_id = $1 ORDER BY created_at DESC', [req.params.customerId]);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-app.get('/api/wallet/transactions/:customerId', authenticateToken, (req, res) => {
-  res.json(walletTransactions.filter(t => t.customer_id == req.params.customerId));
-});
-
-app.post('/api/wallet/add-money', authenticateToken, (req, res) => {
+app.post('/api/wallet/add-money', authenticateToken, async (req, res) => {
   const { customer_id, amount, payment_method } = req.body;
-  const customer = customers.find(c => c.id === customer_id);
-  if (!customer) return res.status(404).json({ error: 'Customer not found' });
   
-  customer.wallet_balance += amount;
-  walletTransactions.push({
-    id: walletTransactions.length + 1,
-    customer_id: customer.id,
-    amount: amount,
-    transaction_type: 'CREDIT',
-    description: `Added via ${payment_method}`,
-    created_at: new Date().toISOString()
-  });
-  res.json({ success: true, new_balance: customer.wallet_balance });
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admin can add money' });
+    }
+    await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [amount, customer_id]);
+    await query(
+      `INSERT INTO wallet_transactions (customer_id, amount, transaction_type, description)
+       VALUES ($1, $2, $3, $4)`,
+      [customer_id, amount, 'CREDIT', `Added via ${payment_method} by admin`]
+    );
+    const result = await query('SELECT wallet_balance FROM customers WHERE id = $1', [customer_id]);
+    res.json({ success: true, new_balance: parseFloat(result.rows[0].wallet_balance) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ============ ADMIN WALLET CONTROL ============
-app.get('/api/admin/wallet/:customerId', authenticateToken, (req, res) => {
+app.get('/api/admin/wallet/:customerId', authenticateToken, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-  const customer = customers.find(c => c.id == req.params.customerId);
-  if (!customer) return res.status(404).json({ error: 'Customer not found' });
-  res.json({ customer, transactions: walletTransactions.filter(t => t.customer_id == customer.id) });
+  try {
+    const customer = await query('SELECT id, name, mobile, wallet_balance FROM customers WHERE id = $1', [req.params.customerId]);
+    const transactions = await query('SELECT * FROM wallet_transactions WHERE customer_id = $1 ORDER BY created_at DESC', [req.params.customerId]);
+    res.json({ customer: customer.rows[0], transactions: transactions.rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-app.post('/api/admin/wallet/add', authenticateToken, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-  const { customer_id, amount, reason } = req.body;
-  const customer = customers.find(c => c.id === customer_id);
-  if (!customer) return res.status(404).json({ error: 'Customer not found' });
-  
-  customer.wallet_balance += amount;
-  walletTransactions.push({
-    id: walletTransactions.length + 1,
-    customer_id: customer.id,
-    amount: amount,
-    transaction_type: 'CREDIT',
-    description: reason || `Admin added ₹${amount}`,
-    created_at: new Date().toISOString()
-  });
-  res.json({ success: true, new_balance: customer.wallet_balance });
-});
-
-app.post('/api/admin/wallet/deduct', authenticateToken, (req, res) => {
+app.post('/api/admin/wallet/add', authenticateToken, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   const { customer_id, amount, reason } = req.body;
-  const customer = customers.find(c => c.id === customer_id);
-  if (!customer) return res.status(404).json({ error: 'Customer not found' });
-  if (customer.wallet_balance < amount) return res.status(400).json({ error: 'Insufficient balance' });
-  
-  customer.wallet_balance -= amount;
-  walletTransactions.push({
-    id: walletTransactions.length + 1,
-    customer_id: customer.id,
-    amount: amount,
-    transaction_type: 'DEBIT',
-    description: reason || `Admin deducted ₹${amount}`,
-    created_at: new Date().toISOString()
-  });
-  res.json({ success: true, new_balance: customer.wallet_balance });
+  try {
+    await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [amount, customer_id]);
+    await query(
+      `INSERT INTO wallet_transactions (customer_id, amount, transaction_type, description)
+       VALUES ($1, $2, $3, $4)`,
+      [customer_id, amount, 'CREDIT', reason || `Admin added ₹${amount}`]
+    );
+    const result = await query('SELECT wallet_balance FROM customers WHERE id = $1', [customer_id]);
+    res.json({ success: true, new_balance: parseFloat(result.rows[0].wallet_balance) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-// ============ START SERVER ============
+app.post('/api/admin/wallet/deduct', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const { customer_id, amount, reason } = req.body;
+  try {
+    const check = await query('SELECT wallet_balance FROM customers WHERE id = $1', [customer_id]);
+    if (parseFloat(check.rows[0].wallet_balance) < amount) {
+      return res.status(400).json({ error: 'Insufficient balance' });
+    }
+    await query('UPDATE customers SET wallet_balance = wallet_balance - $1 WHERE id = $2', [amount, customer_id]);
+    await query(
+      `INSERT INTO wallet_transactions (customer_id, amount, transaction_type, description)
+       VALUES ($1, $2, $3, $4)`,
+      [customer_id, amount, 'DEBIT', reason || `Admin deducted ₹${amount}`]
+    );
+    const result = await query('SELECT wallet_balance FROM customers WHERE id = $1', [customer_id]);
+    res.json({ success: true, new_balance: parseFloat(result.rows[0].wallet_balance) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`📋 Admin Login: admin@shop.com / MyStrongPass@0424`);
-  console.log(`📋 Demo Customer: 9876543210 / 9876543210`);
-  console.log(`📋 Note: Admin added customers can login with mobile number as password\n`);
+  console.log(`✅ PostgreSQL Database Connected`);
+  console.log(`📋 Admin: admin@shop.com / MyStrongPass@0424`);
+  console.log(`📋 Customer: 9876543210 / 9876543210\n`);
 });
