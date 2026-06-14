@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 
 // Connection pool with retry logic
 const pool = new Pool({
-  host: process.env.DB_HOST || 'db.zxunkltmnncmrwneudlq.supabase.co',
+  host: process.env.DB_HOST || 'aws-1-ap-southeast-1.pooler.supabase.com',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME || 'postgres',
