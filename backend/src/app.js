@@ -210,7 +210,7 @@ app.post('/api/customers', authenticateToken, async (req, res) => {
   }
 });
 
-// ============ BILL ROUTES ============
+// ============ BILL ROUTES - FIXED ✅ ============
 app.post('/api/bills', authenticateToken, async (req, res) => {
   const { customer_id, items, payment_method } = req.body;
   
@@ -237,11 +237,34 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
     }
     
     const billNumber = `INV${Date.now()}`;
+    
+    // ✅ FIXED: Added subtotal column
     const billResult = await query(
-      `INSERT INTO bills (bill_number, customer_id, total_amount, cashback, payment_method)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [billNumber, customer_id, totalAmount, totalCashback, payment_method || 'cash']
+      `INSERT INTO bills (bill_number, customer_id, subtotal, total_amount, cashback, payment_method)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [billNumber, customer_id, totalAmount, totalAmount, totalCashback, payment_method || 'cash']
     );
+    
+    // ✅ Save bill items for selling history
+    for (const item of items) {
+      const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
+      const p = product.rows[0];
+      const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
+      
+      await query(
+        `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, discount_percent, total_price, cashback_amount)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          billResult.rows[0].id,
+          item.product_id,
+          item.quantity,
+          p.selling_price,
+          p.discount_percent || 0,
+          p.selling_price * item.quantity,
+          cashbackAmount * item.quantity
+        ]
+      );
+    }
     
     await query('UPDATE customers SET total_purchases = total_purchases + $1 WHERE id = $2', [totalAmount, customer_id]);
     
@@ -281,12 +304,39 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
 app.get('/api/bills', authenticateToken, async (req, res) => {
   try {
     if (req.user.role === 'admin') {
-      const result = await query('SELECT * FROM bills ORDER BY created_at DESC');
+      const result = await query(`
+        SELECT b.*, c.name as customer_name 
+        FROM bills b 
+        JOIN customers c ON b.customer_id = c.id 
+        ORDER BY b.created_at DESC
+      `);
       res.json(result.rows);
     } else {
-      const result = await query('SELECT * FROM bills WHERE customer_id = $1 ORDER BY created_at DESC', [req.user.id]);
+      const result = await query(`
+        SELECT b.*, c.name as customer_name 
+        FROM bills b 
+        JOIN customers c ON b.customer_id = c.id 
+        WHERE b.customer_id = $1 
+        ORDER BY b.created_at DESC
+      `, [req.user.id]);
       res.json(result.rows);
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============ BILL ITEMS ROUTE ============
+app.get('/api/bills/:id/items', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await query(`
+      SELECT bi.*, p.name as product_name, p.product_code
+      FROM bill_items bi
+      JOIN products p ON bi.product_id = p.id
+      WHERE bi.bill_id = $1
+    `, [id]);
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -297,7 +347,7 @@ app.get('/api/reports/dashboard', authenticateToken, async (req, res) => {
   try {
     const totalSales = await query('SELECT COALESCE(SUM(total_amount), 0) as total FROM bills');
     const totalCustomers = await query('SELECT COUNT(*) as total FROM customers');
-    const totalCommission = await query('SELECT COALESCE(SUM(amount), 0) as total FROM commissions');
+    const totalCommission = await query('SELECT COALESCE(SUM(amount), 0) as total FROM wallet_transactions WHERE transaction_type = $1', ['CREDIT']);
     const lowStock = await query('SELECT COUNT(*) as total FROM products WHERE current_stock <= 5');
     
     res.json({
@@ -433,9 +483,24 @@ async function initTables() {
         id SERIAL PRIMARY KEY,
         bill_number VARCHAR(50) UNIQUE,
         customer_id INT,
+        subtotal DECIMAL DEFAULT 0,
         total_amount DECIMAL,
         cashback DECIMAL,
         payment_method VARCHAR(20),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS bill_items (
+        id SERIAL PRIMARY KEY,
+        bill_id INT REFERENCES bills(id) ON DELETE CASCADE,
+        product_id INT REFERENCES products(id),
+        quantity INT NOT NULL,
+        unit_price DECIMAL(10,2) NOT NULL,
+        discount_percent DECIMAL(5,2) DEFAULT 0,
+        total_price DECIMAL(10,2) NOT NULL,
+        cashback_amount DECIMAL(10,2) DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
