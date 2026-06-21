@@ -38,10 +38,6 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.95; transform: scale(1.02); }
         }
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
         @keyframes slideIn {
             from { transform: translateX(-100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -515,85 +511,496 @@
 
         <!-- MODALS -->
         <div id="productModal" class="modal"><div class="modal-content"><h2>Add Product</h2><input type="text" id="productCode" placeholder="Product Code" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productName" placeholder="Product Name" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productPrice" placeholder="Price" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productDiscount" placeholder="Discount %" value="0" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productStock" placeholder="Stock" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productImage" placeholder="Image URL" style="width:100%; margin:8px 0; padding:12px;"><img id="previewImg" src="" style="width:60px; display:none;"><label><input type="checkbox" id="productSuperDiscount"> 🔥 Super Discount</label><button onclick="saveProduct()" style="background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; margin-top:15px; width:100%;">Save</button><button onclick="closeModal('productModal')" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div></div>
-        <div id="customerModal" class="modal"><div class="modal-content"><h2>Add Customer</h2><input type="text" id="newCustName" placeholder="Name"><input type="tel" id="newCustMobile" placeholder="Mobile"><input type="password" id="newCustPassword" placeholder="Password"><input type="text" id="newCustRef" placeholder="Referral Code"><button onclick="saveCustomer()" style="background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; width:100%;">Save</button><button onclick="closeModal('customerModal')" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div></div>
+        <div id="customerModal" class="modal"><div class="modal-content"><h2>Add Customer</h2><input type="text" id="newCustName" placeholder="Name" style="width:100%;margin:8px 0;padding:12px;"><input type="tel" id="newCustMobile" placeholder="Mobile" style="width:100%;margin:8px 0;padding:12px;"><input type="password" id="newCustPassword" placeholder="Password" style="width:100%;margin:8px 0;padding:12px;"><input type="text" id="newCustRef" placeholder="Referral Code" style="width:100%;margin:8px 0;padding:12px;"><button onclick="saveCustomer()" style="background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; width:100%;">Save</button><button onclick="closeModal('customerModal')" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div></div>
         <div id="walletControlModal" class="modal"><div class="modal-content"><h2>Wallet Control</h2><select id="walletCustomerSelect"><option>Select Customer</option></select><div id="currentBalance" style="padding:10px; background:#f5f5f5; border-radius:20px; margin:10px 0;">₹0</div><input type="number" id="walletAmount" placeholder="Amount"><input type="text" id="walletReason" placeholder="Reason"><div style="display:flex; gap:10px;"><button onclick="adminAddMoney()" style="background:#27ae60; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Add</button><button onclick="adminDeductMoney()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Deduct</button></div><button onclick="closeModal('walletControlModal')" style="margin-top:15px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Close</button></div></div>
 
     <div id="alert" class="alert"></div>
 
     <script>
-        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
+        // =============================================
+        // BACKEND CONFIGURATION - Aapke Backend ke hisaab se
+        // =============================================
+        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com'; // Ya localhost:5000
         const API_URL = `${BACKEND_URL}/api`;
+        
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
         let productImages = {}, superDiscountProducts = [], jobVacancies = [], jobApplications = [];
         let customerPage=1, customerPerPage=10, productPage=1, productPerPage=10, historyPage=1, historyPerPage=10;
         let salesHistory = [];
         let billingMode = 'manual';
+        let customers = [];
 
-        // Landing Page Navigation
-        function showLandingHome() { document.getElementById('landingHomeSection').style.display = 'block'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('home'); }
-        function showLandingProducts() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'block'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('products'); loadLandingProducts(); }
-        function showLandingJobs() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'block'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('jobs'); loadLandingJobs(); }
-        function showLandingContact() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'block'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('contact'); }
-        function showLandingOffers() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'block'; updateNavActive('offers'); loadLandingSuper(); }
-        function updateNavActive(section) { document.querySelectorAll('#landingPage .nav-btn').forEach(btn => btn.classList.remove('active')); if(section === 'home') document.querySelector('#landingPage .nav-btn:nth-child(1)').classList.add('active'); if(section === 'products') document.querySelector('#landingPage .nav-btn:nth-child(2)').classList.add('active'); if(section === 'jobs') document.querySelector('#landingPage .nav-btn:nth-child(3)').classList.add('active'); if(section === 'contact') document.querySelector('#landingPage .nav-btn:nth-child(4)').classList.add('active'); if(section === 'offers') document.querySelector('#landingPage .nav-btn:nth-child(5)').classList.add('active'); }
-        
-        async function loadLandingProducts() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('landingProductsList'); if(container) { container.innerHTML = ''; products.slice(0,8).forEach(p => { const imgUrl = productImages[p.id] || ''; container.innerHTML += `<div class="product-card" onclick="showProductDetail(${p.id})"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF</div></div>`; }); } } catch(e) { console.log('Error'); } }
-        async function loadLandingJobs() { const container = document.getElementById('landingJobList'); if(container) { container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showApplyFromLanding('${job.title}')">Apply Now</button></div>`; }); } }
-        function showApplyFromLanding(jobTitle) { showCustomerLoginForm(); setTimeout(() => { document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; document.getElementById('applyJobSelect').disabled = true; }, 500); }
-        async function loadLandingSuper() { const container = document.getElementById('landingSuperList'); if(container && allProducts.length) { const superProds = allProducts.filter(p => superDiscountProducts.includes(p.id)); container.innerHTML = ''; superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(0)}</div></div>`; }); } }
-        
-        function showProductDetail(id) { const product = allProducts.find(p => p.id === id); if(product) { alert(`🛍️ ${product.name}\n💰 Price: ₹${product.selling_price}\n🎁 Discount: ${product.discount_percent||0}%\n💵 Cashback: ₹${((product.selling_price*(product.discount_percent||0))/100).toFixed(0)}`); } }
-        
-        function showCustomerSection(section) { document.querySelectorAll('#customerDashboard .content-section').forEach(s => s.classList.remove('active-section')); if(section === 'home') document.getElementById('customerHomeSection').classList.add('active-section'); if(section === 'products') { document.getElementById('customerProductsSection').classList.add('active-section'); loadCustomerProducts(); } if(section === 'careers') { document.getElementById('customerCareersSection').classList.add('active-section'); loadCustomerJobs(); } if(section === 'contact') document.getElementById('customerContactSection').classList.add('active-section'); if(section === 'super') { document.getElementById('customerSuperSection').classList.add('active-section'); loadCustomerSuper(); } }
-        
-        function showAdminLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'none'; }
-        function showCustomerLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('customerLoginForm').style.display = 'block'; document.getElementById('registrationForm').style.display = 'none'; }
-        function showRegistration() { document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'block'; }
-        function goBackToLanding() { document.getElementById('landingPage').style.display = 'block'; document.getElementById('loginSection').style.display = 'none'; }
-        
-        function showAdminJobPage() { document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('adminJobPage').style.display = 'block'; renderAdminJobs(); renderApplications(); }
-        function closeAdminJobPage() { document.getElementById('adminJobPage').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; }
-        function showAppList() { const div = document.getElementById('applicationsList'); div.style.display = div.style.display === 'none' ? 'block' : 'none'; renderApplications(); }
-        
-        async function loadCustomerProducts() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('customerAllProducts'); container.innerHTML = ''; products.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const imgUrl = productImages[p.id] || ''; container.innerHTML += `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF | +₹${cb.toFixed(0)} cashback</div><div class="discount-circle">${p.discount_percent||0}%</div></div>`; }); } catch(e) { showAlert('Error loading products','error'); } }
-        async function loadCustomerSuper() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('customerSuperList'); container.innerHTML = ''; const superProds = products.filter(p => superDiscountProducts.includes(p.id)); superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: +₹${cb.toFixed(0)}</div></div>`; }); } catch(e) { showAlert('Error','error'); } }
-        async function loadCustomerJobs() { const container = document.getElementById('customerJobsList'); container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showJobApplicationForm('${job.title}')">Apply Now</button></div>`; }); }
-        function showJobApplicationForm(jobTitle) { document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; document.getElementById('applyJobSelect').disabled = true; document.getElementById('customerJobForm').style.display = 'block'; }
-        function closeJobForm() { document.getElementById('customerJobForm').style.display = 'none'; }
-        async function submitCustomerJobApp() { const jobTitle = document.getElementById('applyJobSelect').value; const name = document.getElementById('applicantName').value; const mobile = document.getElementById('applicantMobile').value; const email = document.getElementById('applicantEmail').value; const msg = document.getElementById('applicantMsg').value; if(!name||!mobile||!email) { showAlert('Fill all fields','error'); return; } jobApplications.push({ jobTitle, name, mobile, email, message: msg, date: new Date().toLocaleString() }); showAlert('Application submitted!','success'); document.getElementById('applicantName').value = ''; document.getElementById('applicantMobile').value = ''; document.getElementById('applicantEmail').value = ''; document.getElementById('applicantMsg').value = ''; closeJobForm(); renderApplications(); }
-        
-        function renderAdminJobs() { const container = document.getElementById('adminJobsList'); container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;"><div><strong>${job.title}</strong><br><small>${job.description}</small></div><button onclick="deleteJob(${job.id})" style="background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:40px;">Delete</button></div>`; }); }
-        function renderApplications() { const container = document.getElementById('applicationsList'); const countSpan = document.getElementById('appCount'); container.innerHTML = ''; jobApplications.forEach(app => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px;"><strong>${app.jobTitle}</strong><br>Name: ${app.name}<br>Mobile: ${app.mobile}<br>Email: ${app.email}<br>Message: ${app.message}<br><small>Applied: ${app.date}</small></div>`; }); if(countSpan) countSpan.innerText = jobApplications.length; }
-        function addJobVacancy() { const title = document.getElementById('jobTitle').value; const desc = document.getElementById('jobDesc').value; if(title && desc) { jobVacancies.push({ id: Date.now(), title, description: desc }); document.getElementById('jobTitle').value = ''; document.getElementById('jobDesc').value = ''; renderAdminJobs(); loadCustomerJobs(); loadLandingJobs(); showAlert('Job added!','success'); } else { showAlert('Enter job details','error'); } }
-        function deleteJob(id) { jobVacancies = jobVacancies.filter(j => j.id !== id); renderAdminJobs(); loadCustomerJobs(); loadLandingJobs(); showAlert('Job deleted','success'); }
-        
-        async function checkBackend() { try { const res = await fetch(`${BACKEND_URL}/`); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px;">✅ Connected</span>'; else document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Error</span>'; } catch(e) { document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Offline</span>'; } }
-        async function apiCall(method, endpoint, data = null) { const options = { method, headers: { 'Content-Type': 'application/json' } }; if (authToken) options.headers['Authorization'] = `Bearer ${authToken}`; if (data) options.body = JSON.stringify(data); const res = await fetch(`${API_URL}${endpoint}`, options); if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'API failed'); } return res.json(); }
-        function showAlert(msg, type) { const a = document.getElementById('alert'); a.textContent = msg; a.className = `alert alert-${type}`; a.style.display = 'block'; setTimeout(() => a.style.display = 'none', 3000); }
+        // =============================================
+        // UTILITY FUNCTIONS
+        // =============================================
+        function showAlert(msg, type) { 
+            const a = document.getElementById('alert'); 
+            a.textContent = msg; 
+            a.className = `alert alert-${type}`; 
+            a.style.display = 'block'; 
+            setTimeout(() => a.style.display = 'none', 3000); 
+        }
         function showModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function showAddProductModal() { editingId = null; showModal('productModal'); }
-        function showAddCustomerModal() { showModal('customerModal'); }
-        function showWalletControlModal() { showModal('walletControlModal'); loadWalletCustomers(); }
         
-        async function adminLogin() { const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value; if(!email||!password) return showAlert('Enter credentials','error'); try { const res = await fetch(`${API_URL}/auth/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'admin' }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!','success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Cannot connect','error'); } }
-        async function customerLogin() { const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value; if(!mobile||!password) return showAlert('Enter credentials','error'); try { const res = await fetch(`${API_URL}/auth/customer/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mobile,password}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerDashboardData(); showAlert(`Welcome ${data.customer.name}!`,'success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Server error','error'); } }
-        async function register() { const name = document.getElementById('regName').value, mobile = document.getElementById('regMobile').value, password = document.getElementById('regPassword').value, ref = document.getElementById('regReferral').value; if(!name||!mobile||!password) return showAlert('Fill all fields','error'); try { const res = await fetch(`${API_URL}/auth/customer/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,mobile,password,referralCode:ref}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerDashboardData(); showAlert('Registered!','success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Registration failed','error'); } }
-        function customerLogout() { authToken = null; currentUser = null; cart = []; document.getElementById('customerDashboard').style.display = 'none'; document.getElementById('landingPage').style.display = 'block'; showAlert('Logged out','info'); }
-        function adminLogout() { authToken = null; currentUser = null; cart = []; document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('landingPage').style.display = 'block'; showAlert('Logged out','info'); }
+        async function apiCall(method, endpoint, data = null) { 
+            const options = { 
+                method, 
+                headers: { 'Content-Type': 'application/json' } 
+            }; 
+            if (authToken) options.headers['Authorization'] = `Bearer ${authToken}`; 
+            if (data) options.body = JSON.stringify(data); 
+            const res = await fetch(`${API_URL}${endpoint}`, options); 
+            if (!res.ok) { 
+                const err = await res.json(); 
+                throw new Error(err.error || 'API failed'); 
+            } 
+            return res.json(); 
+        }
+
+        // =============================================
+        // LANDING PAGE NAVIGATION
+        // =============================================
+        function showLandingHome() { 
+            document.getElementById('landingHomeSection').style.display = 'block'; 
+            document.getElementById('landingProductsPage').style.display = 'none'; 
+            document.getElementById('landingJobsPage').style.display = 'none'; 
+            document.getElementById('landingContactPage').style.display = 'none'; 
+            document.getElementById('landingOffersPage').style.display = 'none'; 
+            updateNavActive('home'); 
+        }
+        function showLandingProducts() { 
+            document.getElementById('landingHomeSection').style.display = 'none'; 
+            document.getElementById('landingProductsPage').style.display = 'block'; 
+            document.getElementById('landingJobsPage').style.display = 'none'; 
+            document.getElementById('landingContactPage').style.display = 'none'; 
+            document.getElementById('landingOffersPage').style.display = 'none'; 
+            updateNavActive('products'); 
+            loadLandingProducts(); 
+        }
+        function showLandingJobs() { 
+            document.getElementById('landingHomeSection').style.display = 'none'; 
+            document.getElementById('landingProductsPage').style.display = 'none'; 
+            document.getElementById('landingJobsPage').style.display = 'block'; 
+            document.getElementById('landingContactPage').style.display = 'none'; 
+            document.getElementById('landingOffersPage').style.display = 'none'; 
+            updateNavActive('jobs'); 
+            loadLandingJobs(); 
+        }
+        function showLandingContact() { 
+            document.getElementById('landingHomeSection').style.display = 'none'; 
+            document.getElementById('landingProductsPage').style.display = 'none'; 
+            document.getElementById('landingJobsPage').style.display = 'none'; 
+            document.getElementById('landingContactPage').style.display = 'block'; 
+            document.getElementById('landingOffersPage').style.display = 'none'; 
+            updateNavActive('contact'); 
+        }
+        function showLandingOffers() { 
+            document.getElementById('landingHomeSection').style.display = 'none'; 
+            document.getElementById('landingProductsPage').style.display = 'none'; 
+            document.getElementById('landingJobsPage').style.display = 'none'; 
+            document.getElementById('landingContactPage').style.display = 'none'; 
+            document.getElementById('landingOffersPage').style.display = 'block'; 
+            updateNavActive('offers'); 
+            loadLandingSuper(); 
+        }
+        function updateNavActive(section) { 
+            document.querySelectorAll('#landingPage .nav-btn').forEach(btn => btn.classList.remove('active')); 
+            if(section === 'home') document.querySelector('#landingPage .nav-btn:nth-child(1)').classList.add('active'); 
+            if(section === 'products') document.querySelector('#landingPage .nav-btn:nth-child(2)').classList.add('active'); 
+            if(section === 'jobs') document.querySelector('#landingPage .nav-btn:nth-child(3)').classList.add('active'); 
+            if(section === 'contact') document.querySelector('#landingPage .nav-btn:nth-child(4)').classList.add('active'); 
+            if(section === 'offers') document.querySelector('#landingPage .nav-btn:nth-child(5)').classList.add('active'); 
+        }
+
+        // =============================================
+        // LANDING PAGE LOADS
+        // =============================================
+        async function loadLandingProducts() { 
+            try { 
+                const products = await apiCall('GET','/products'); 
+                const container = document.getElementById('landingProductsList'); 
+                if(container) { 
+                    container.innerHTML = ''; 
+                    products.slice(0,8).forEach(p => { 
+                        const imgUrl = productImages[p.id] || ''; 
+                        container.innerHTML += `<div class="product-card" onclick="showProductDetail(${p.id})"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF</div></div>`; 
+                    }); 
+                } 
+            } catch(e) { console.log('Error loading products:', e); } 
+        }
         
-        async function loadAdminData() { try { const products = await apiCall('GET','/products'); const customers = await apiCall('GET','/customers'); const reports = await apiCall('GET','/reports/dashboard'); allProducts = products; document.getElementById('adminTotalSales').innerHTML = `₹${reports.total_sales}`; document.getElementById('adminTotalCustomers').innerHTML = reports.total_customers; document.getElementById('adminTotalCommission').innerHTML = `₹${reports.total_commission}`; document.getElementById('adminLowStock').innerHTML = reports.low_stock_alerts;
-            renderProductTable(); renderCustomerTable(); populateDropdowns(); loadLandingSuper(); loadCustomerProducts(); loadCustomerSuper(); loadCustomerJobs(); } catch(e) { showAlert('Error loading data','error'); } }
+        async function loadLandingJobs() { 
+            const container = document.getElementById('landingJobList'); 
+            if(container) { 
+                container.innerHTML = ''; 
+                jobVacancies.forEach(job => { 
+                    container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showApplyFromLanding('${job.title}')">Apply Now</button></div>`; 
+                }); 
+            } 
+        }
         
-        async function loadCustomerDashboardData() { try { const profile = await apiCall('GET','/customers/profile'), trans = await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust = await apiCall('GET','/customers'); document.getElementById('custWalletAmt').innerHTML = `₹${profile.wallet_balance}`; document.getElementById('custWalletVal').innerHTML = `₹${profile.wallet_balance}`; document.getElementById('custTotalPurchases').innerHTML = `₹${profile.total_purchases}`; document.getElementById('myRefCode').innerHTML = profile.referral_code; document.getElementById('custReferralCount').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
-            const wt = document.getElementById('walletTransList'); wt.innerHTML = ''; trans.forEach(t=>{ wt.innerHTML += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td></tr>`; }); } catch(e){ showAlert('Error loading profile','error'); } }
+        function showApplyFromLanding(jobTitle) { 
+            showCustomerLoginForm(); 
+            setTimeout(() => { 
+                document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; 
+                document.getElementById('applyJobSelect').disabled = true; 
+            }, 500); 
+        }
         
-        function populateDropdowns(){
+        async function loadLandingSuper() { 
+            const container = document.getElementById('landingSuperList'); 
+            if(container && allProducts.length) { 
+                const superProds = allProducts.filter(p => superDiscountProducts.includes(p.id)); 
+                container.innerHTML = ''; 
+                superProds.forEach(p => { 
+                    const cb = (p.selling_price * (p.discount_percent||0))/100; 
+                    const finalPrice = p.selling_price - cb; 
+                    container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(0)}</div></div>`; 
+                }); 
+            } 
+        }
+        
+        function showProductDetail(id) { 
+            const product = allProducts.find(p => p.id === id); 
+            if(product) { 
+                alert(`🛍️ ${product.name}\n💰 Price: ₹${product.selling_price}\n🎁 Discount: ${product.discount_percent||0}%\n💵 Cashback: ₹${((product.selling_price*(product.discount_percent||0))/100).toFixed(0)}`); 
+            } 
+        }
+
+        // =============================================
+        // CUSTOMER SECTION
+        // =============================================
+        function showCustomerSection(section) { 
+            document.querySelectorAll('#customerDashboard .content-section').forEach(s => s.classList.remove('active-section')); 
+            if(section === 'home') document.getElementById('customerHomeSection').classList.add('active-section'); 
+            if(section === 'products') { 
+                document.getElementById('customerProductsSection').classList.add('active-section'); 
+                loadCustomerProducts(); 
+            } 
+            if(section === 'careers') { 
+                document.getElementById('customerCareersSection').classList.add('active-section'); 
+                loadCustomerJobs(); 
+            } 
+            if(section === 'contact') document.getElementById('customerContactSection').classList.add('active-section'); 
+            if(section === 'super') { 
+                document.getElementById('customerSuperSection').classList.add('active-section'); 
+                loadCustomerSuper(); 
+            } 
+        }
+
+        async function loadCustomerProducts() { 
+            try { 
+                const products = await apiCall('GET','/products'); 
+                const container = document.getElementById('customerAllProducts'); 
+                container.innerHTML = ''; 
+                products.forEach(p => { 
+                    const cb = (p.selling_price * (p.discount_percent||0))/100; 
+                    const imgUrl = productImages[p.id] || ''; 
+                    container.innerHTML += `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF | +₹${cb.toFixed(0)} cashback</div><div class="discount-circle">${p.discount_percent||0}%</div></div>`; 
+                }); 
+            } catch(e) { showAlert('Error loading products','error'); } 
+        }
+        
+        async function loadCustomerSuper() { 
+            try { 
+                const products = await apiCall('GET','/products'); 
+                const container = document.getElementById('customerSuperList'); 
+                container.innerHTML = ''; 
+                const superProds = products.filter(p => superDiscountProducts.includes(p.id)); 
+                superProds.forEach(p => { 
+                    const cb = (p.selling_price * (p.discount_percent||0))/100; 
+                    const finalPrice = p.selling_price - cb; 
+                    container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: +₹${cb.toFixed(0)}</div></div>`; 
+                }); 
+            } catch(e) { showAlert('Error','error'); } 
+        }
+        
+        async function loadCustomerJobs() { 
+            const container = document.getElementById('customerJobsList'); 
+            container.innerHTML = ''; 
+            jobVacancies.forEach(job => { 
+                container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showJobApplicationForm('${job.title}')">Apply Now</button></div>`; 
+            }); 
+        }
+        
+        function showJobApplicationForm(jobTitle) { 
+            document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; 
+            document.getElementById('applyJobSelect').disabled = true; 
+            document.getElementById('customerJobForm').style.display = 'block'; 
+        }
+        
+        function closeJobForm() { 
+            document.getElementById('customerJobForm').style.display = 'none'; 
+        }
+        
+        async function submitCustomerJobApp() { 
+            const jobTitle = document.getElementById('applyJobSelect').value; 
+            const name = document.getElementById('applicantName').value; 
+            const mobile = document.getElementById('applicantMobile').value; 
+            const email = document.getElementById('applicantEmail').value; 
+            const msg = document.getElementById('applicantMsg').value; 
+            if(!name||!mobile||!email) { showAlert('Fill all fields','error'); return; } 
+            jobApplications.push({ jobTitle, name, mobile, email, message: msg, date: new Date().toLocaleString() }); 
+            showAlert('Application submitted!','success'); 
+            document.getElementById('applicantName').value = ''; 
+            document.getElementById('applicantMobile').value = ''; 
+            document.getElementById('applicantEmail').value = ''; 
+            document.getElementById('applicantMsg').value = ''; 
+            closeJobForm(); 
+            renderApplications(); 
+        }
+
+        // =============================================
+        // LOGIN / AUTH FUNCTIONS
+        // =============================================
+        function showAdminLoginForm() { 
+            document.getElementById('landingPage').style.display = 'none'; 
+            document.getElementById('loginSection').style.display = 'block'; 
+            document.getElementById('adminLoginForm').style.display = 'block'; 
+            document.getElementById('customerLoginForm').style.display = 'none'; 
+            document.getElementById('registrationForm').style.display = 'none'; 
+        }
+        
+        function showCustomerLoginForm() { 
+            document.getElementById('landingPage').style.display = 'none'; 
+            document.getElementById('loginSection').style.display = 'block'; 
+            document.getElementById('adminLoginForm').style.display = 'none'; 
+            document.getElementById('customerLoginForm').style.display = 'block'; 
+            document.getElementById('registrationForm').style.display = 'none'; 
+        }
+        
+        function showRegistration() { 
+            document.getElementById('customerLoginForm').style.display = 'none'; 
+            document.getElementById('registrationForm').style.display = 'block'; 
+        }
+        
+        function goBackToLanding() { 
+            document.getElementById('landingPage').style.display = 'block'; 
+            document.getElementById('loginSection').style.display = 'none'; 
+        }
+
+        async function adminLogin() { 
+            const email = document.getElementById('adminEmail').value; 
+            const password = document.getElementById('adminPassword').value; 
+            if(!email||!password) return showAlert('Enter credentials','error'); 
+            try { 
+                const res = await fetch(`${API_URL}/auth/admin/login`, { 
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({email,password}) 
+                }); 
+                if(res.ok) { 
+                    const data = await res.json(); 
+                    authToken = data.token; 
+                    currentUser = { type:'admin' }; 
+                    document.getElementById('landingPage').style.display = 'none'; 
+                    document.getElementById('loginSection').style.display = 'none'; 
+                    document.getElementById('adminDashboard').style.display = 'block'; 
+                    await loadAdminData(); 
+                    setupBarcodeScanner(); 
+                    showAlert('Welcome Admin!','success'); 
+                } else { 
+                    const err = await res.json(); 
+                    showAlert(err.error,'error'); 
+                } 
+            } catch(e) { showAlert('Cannot connect to server','error'); } 
+        }
+
+        async function customerLogin() { 
+            const mobile = document.getElementById('custMobileLogin').value; 
+            const password = document.getElementById('custPassword').value; 
+            if(!mobile||!password) return showAlert('Enter credentials','error'); 
+            try { 
+                const res = await fetch(`${API_URL}/auth/customer/login`, { 
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({mobile,password}) 
+                }); 
+                if(res.ok) { 
+                    const data = await res.json(); 
+                    authToken = data.token; 
+                    currentUser = { type:'customer', data:data.customer }; 
+                    document.getElementById('landingPage').style.display = 'none'; 
+                    document.getElementById('loginSection').style.display = 'none'; 
+                    document.getElementById('customerDashboard').style.display = 'block'; 
+                    await loadCustomerDashboardData(); 
+                    showAlert(`Welcome ${data.customer.name}!`,'success'); 
+                } else { 
+                    const err = await res.json(); 
+                    showAlert(err.error,'error'); 
+                } 
+            } catch(e) { showAlert('Server error','error'); } 
+        }
+
+        async function register() { 
+            const name = document.getElementById('regName').value; 
+            const mobile = document.getElementById('regMobile').value; 
+            const password = document.getElementById('regPassword').value; 
+            const ref = document.getElementById('regReferral').value; 
+            if(!name||!mobile||!password) return showAlert('Fill all fields','error'); 
+            try { 
+                const res = await fetch(`${API_URL}/auth/customer/register`, { 
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({name,mobile,password,referralCode:ref}) 
+                }); 
+                if(res.ok) { 
+                    const data = await res.json(); 
+                    authToken = data.token; 
+                    currentUser = { type:'customer', data:data.customer }; 
+                    document.getElementById('landingPage').style.display = 'none'; 
+                    document.getElementById('loginSection').style.display = 'none'; 
+                    document.getElementById('customerDashboard').style.display = 'block'; 
+                    await loadCustomerDashboardData(); 
+                    showAlert('Registered!','success'); 
+                } else { 
+                    const err = await res.json(); 
+                    showAlert(err.error,'error'); 
+                } 
+            } catch(e) { showAlert('Registration failed','error'); } 
+        }
+
+        function customerLogout() { 
+            authToken = null; 
+            currentUser = null; 
+            cart = []; 
+            document.getElementById('customerDashboard').style.display = 'none'; 
+            document.getElementById('landingPage').style.display = 'block'; 
+            showAlert('Logged out','info'); 
+        }
+        
+        function adminLogout() { 
+            authToken = null; 
+            currentUser = null; 
+            cart = []; 
+            document.getElementById('adminDashboard').style.display = 'none'; 
+            document.getElementById('landingPage').style.display = 'block'; 
+            showAlert('Logged out','info'); 
+        }
+
+        // =============================================
+        // ADMIN JOB FUNCTIONS
+        // =============================================
+        function showAdminJobPage() { 
+            document.getElementById('adminDashboard').style.display = 'none'; 
+            document.getElementById('adminJobPage').style.display = 'block'; 
+            renderAdminJobs(); 
+            renderApplications(); 
+        }
+        
+        function closeAdminJobPage() { 
+            document.getElementById('adminJobPage').style.display = 'none'; 
+            document.getElementById('adminDashboard').style.display = 'block'; 
+        }
+        
+        function showAppList() { 
+            const div = document.getElementById('applicationsList'); 
+            div.style.display = div.style.display === 'none' ? 'block' : 'none'; 
+            renderApplications(); 
+        }
+        
+        function renderAdminJobs() { 
+            const container = document.getElementById('adminJobsList'); 
+            container.innerHTML = ''; 
+            jobVacancies.forEach(job => { 
+                container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;"><div><strong>${job.title}</strong><br><small>${job.description}</small></div><button onclick="deleteJob(${job.id})" style="background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:40px;">Delete</button></div>`; 
+            }); 
+        }
+        
+        function renderApplications() { 
+            const container = document.getElementById('applicationsList'); 
+            const countSpan = document.getElementById('appCount'); 
+            container.innerHTML = ''; 
+            jobApplications.forEach(app => { 
+                container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px;"><strong>${app.jobTitle}</strong><br>Name: ${app.name}<br>Mobile: ${app.mobile}<br>Email: ${app.email}<br>Message: ${app.message}<br><small>Applied: ${app.date}</small></div>`; 
+            }); 
+            if(countSpan) countSpan.innerText = jobApplications.length; 
+        }
+        
+        function addJobVacancy() { 
+            const title = document.getElementById('jobTitle').value; 
+            const desc = document.getElementById('jobDesc').value; 
+            if(title && desc) { 
+                jobVacancies.push({ id: Date.now(), title, description: desc }); 
+                document.getElementById('jobTitle').value = ''; 
+                document.getElementById('jobDesc').value = ''; 
+                renderAdminJobs(); 
+                loadCustomerJobs(); 
+                loadLandingJobs(); 
+                showAlert('Job added!','success'); 
+            } else { 
+                showAlert('Enter job details','error'); 
+            } 
+        }
+        
+        function deleteJob(id) { 
+            jobVacancies = jobVacancies.filter(j => j.id !== id); 
+            renderAdminJobs(); 
+            loadCustomerJobs(); 
+            loadLandingJobs(); 
+            showAlert('Job deleted','success'); 
+        }
+
+        // =============================================
+        // LOAD ADMIN DATA
+        // =============================================
+        async function loadAdminData() { 
+            try { 
+                const products = await apiCall('GET','/products'); 
+                const custData = await apiCall('GET','/customers'); 
+                const reports = await apiCall('GET','/reports/dashboard'); 
+                allProducts = products; 
+                customers = custData;
+                
+                document.getElementById('adminTotalSales').innerHTML = `₹${reports.total_sales}`; 
+                document.getElementById('adminTotalCustomers').innerHTML = reports.total_customers; 
+                document.getElementById('adminTotalCommission').innerHTML = `₹${reports.total_commission}`; 
+                document.getElementById('adminLowStock').innerHTML = reports.low_stock_alerts;
+                
+                renderProductTable(); 
+                renderCustomerTable(); 
+                populateDropdowns(); 
+                loadLandingSuper(); 
+                loadCustomerProducts(); 
+                loadCustomerSuper(); 
+                loadCustomerJobs(); 
+            } catch(e) { 
+                showAlert('Error loading data: ' + e.message,'error'); 
+            } 
+        }
+
+        async function loadCustomerDashboardData() { 
+            try { 
+                const profile = await apiCall('GET','/customers/profile'); 
+                const trans = await apiCall('GET',`/wallet/transactions/${profile.id}`); 
+                const allCust = await apiCall('GET','/customers'); 
+                document.getElementById('custWalletAmt').innerHTML = `₹${profile.wallet_balance}`; 
+                document.getElementById('custWalletVal').innerHTML = `₹${profile.wallet_balance}`; 
+                document.getElementById('custTotalPurchases').innerHTML = `₹${profile.total_purchases}`; 
+                document.getElementById('myRefCode').innerHTML = profile.referral_code; 
+                document.getElementById('custReferralCount').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
+                
+                const wt = document.getElementById('walletTransList'); 
+                wt.innerHTML = ''; 
+                trans.forEach(t=>{ 
+                    wt.innerHTML += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td></tr>`; 
+                }); 
+            } catch(e){ 
+                showAlert('Error loading profile: ' + e.message,'error'); 
+            } 
+        }
+
+        // =============================================
+        // DROPDOWN FUNCTIONS
+        // =============================================
+        function populateDropdowns() {
             const custList = document.getElementById('customerDropdownList');
             custList.innerHTML = '<div class="item" data-value="" onclick="selectCustomer(\'\')">Select Customer</div>';
             customers.forEach(c => {
                 custList.innerHTML += `<div class="item" data-value="${c.id}" onclick="selectCustomer('${c.id}')">${c.name} (${c.mobile})</div>`;
             });
+            
             const prodList = document.getElementById('productDropdownList');
             prodList.innerHTML = '<div class="item" data-value="" onclick="selectProduct(\'\')">Select Product</div>';
             allProducts.forEach(p => {
@@ -602,8 +1009,7 @@
             });
         }
 
-        // Searchable Dropdown Functions
-        function filterCustomerDropdown(){
+        function filterCustomerDropdown() {
             const input = document.getElementById('customerSearchInput').value.toLowerCase();
             const items = document.querySelectorAll('#customerDropdownList .item');
             items.forEach(item => {
@@ -612,18 +1018,21 @@
             });
             document.getElementById('customerDropdownList').style.display = 'block';
         }
-        function selectCustomer(id){
+
+        function selectCustomer(id) {
             document.getElementById('selectedCustomerId').value = id;
             const items = document.querySelectorAll('#customerDropdownList .item');
             items.forEach(item => {
-                if(item.dataset.value == id){
+                if(item.dataset.value == id) {
                     document.getElementById('customerSearchInput').value = item.textContent;
                 }
             });
             document.getElementById('customerDropdownList').style.display = 'none';
+            // Also set the hidden billCustomer for compatibility
             document.getElementById('billCustomer').value = id;
         }
-        function filterProductDropdown(){
+
+        function filterProductDropdown() {
             const input = document.getElementById('productSearchInput').value.toLowerCase();
             const items = document.querySelectorAll('#productDropdownList .item');
             items.forEach(item => {
@@ -632,11 +1041,12 @@
             });
             document.getElementById('productDropdownList').style.display = 'block';
         }
-        function selectProduct(id){
+
+        function selectProduct(id) {
             document.getElementById('selectedProductId').value = id;
             const items = document.querySelectorAll('#productDropdownList .item');
             items.forEach(item => {
-                if(item.dataset.value == id){
+                if(item.dataset.value == id) {
                     document.getElementById('productSearchInput').value = item.textContent;
                     document.getElementById('selectedProductPrice').value = item.dataset.price || 0;
                     document.getElementById('selectedProductDiscount').value = item.dataset.discount || 0;
@@ -646,163 +1056,241 @@
             });
             document.getElementById('productDropdownList').style.display = 'none';
             const sel = document.getElementById('billProduct');
-            for(let i=0;i<sel.options.length;i++){
-                if(sel.options[i].value == id){
+            for(let i=0; i<sel.options.length; i++) {
+                if(sel.options[i].value == id) {
                     sel.selectedIndex = i;
                     break;
                 }
             }
         }
-        document.addEventListener('click', function(e){
-            if(!e.target.closest('.search-dropdown')){
+
+        // Click outside to close dropdowns
+        document.addEventListener('click', function(e) {
+            if(!e.target.closest('.search-dropdown')) {
                 document.querySelectorAll('.dropdown-list').forEach(d => d.style.display = 'none');
             }
         });
 
-        // ===== CUSTOMERS TABLE with Pagination =====
-        function renderCustomerTable(){ 
-            const search=document.getElementById('customerSearch').value.toLowerCase(); 
-            const perPage=parseInt(document.getElementById('customerPerPage').value)||10; 
-            customerPerPage=perPage; 
-            let filtered=customers.filter(c=>c.name.toLowerCase().includes(search)||c.mobile.includes(search)); 
-            const totalPages=Math.ceil(filtered.length/perPage); 
-            if(customerPage>totalPages) customerPage=1; 
-            const start=(customerPage-1)*perPage; 
-            const pageData=filtered.slice(start,start+perPage); 
-            const tbody=document.getElementById('adminCustomersList'); 
-            tbody.innerHTML=''; 
-            pageData.forEach(c=>{ 
-                tbody.innerHTML+=`<tr><td>${c.name}</td><td>${c.mobile}</td><td>${c.referral_code}</td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button onclick="showWalletControlForCustomer(${c.id})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:20px;">Wallet</button></td></tr>`; 
+        // =============================================
+        // CUSTOMERS TABLE with Pagination
+        // =============================================
+        function renderCustomerTable() { 
+            const search = document.getElementById('customerSearch').value.toLowerCase(); 
+            const perPage = parseInt(document.getElementById('customerPerPage').value) || 10; 
+            customerPerPage = perPage; 
+            let filtered = customers.filter(c => c.name.toLowerCase().includes(search) || c.mobile.includes(search)); 
+            const totalPages = Math.ceil(filtered.length / perPage); 
+            if(customerPage > totalPages) customerPage = 1; 
+            const start = (customerPage - 1) * perPage; 
+            const pageData = filtered.slice(start, start + perPage); 
+            const tbody = document.getElementById('adminCustomersList'); 
+            tbody.innerHTML = ''; 
+            pageData.forEach(c => { 
+                tbody.innerHTML += `<tr><td>${c.name}</td><td>${c.mobile}</td><td>${c.referral_code}</td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button onclick="showWalletControlForCustomer(${c.id})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:20px;">Wallet</button></td></tr>`; 
             }); 
-            const pag=document.getElementById('customerPagination'); 
-            pag.innerHTML=''; 
-            for(let i=1;i<=totalPages;i++){ 
-                const btn=document.createElement('button'); 
-                btn.textContent=i; 
-                if(i===customerPage) btn.classList.add('active-page'); 
-                btn.onclick=()=>{ customerPage=i; renderCustomerTable(); }; 
+            const pag = document.getElementById('customerPagination'); 
+            pag.innerHTML = ''; 
+            for(let i = 1; i <= totalPages; i++) { 
+                const btn = document.createElement('button'); 
+                btn.textContent = i; 
+                if(i === customerPage) btn.classList.add('active-page'); 
+                btn.onclick = () => { customerPage = i; renderCustomerTable(); }; 
                 pag.appendChild(btn); 
             } 
         }
 
-        // ===== PRODUCTS TABLE with Pagination =====
-        function renderProductTable(){ 
-            const search=document.getElementById('productSearch').value.toLowerCase(); 
-            const cat=document.getElementById('productCategoryFilter').value; 
-            const perPage=parseInt(document.getElementById('productPerPage').value)||10; 
-            productPerPage=perPage; 
-            let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(search)&&(cat===''||p.category===cat)); 
-            const totalPages=Math.ceil(filtered.length/perPage); 
-            if(productPage>totalPages) productPage=1; 
-            const start=(productPage-1)*perPage; 
-            const pageData=filtered.slice(start,start+perPage); 
-            const tbody=document.getElementById('adminProductsList'); 
-            tbody.innerHTML=''; 
-            pageData.forEach(p=>{ 
-                const imgUrl=productImages[p.id]||''; 
-                const isSuper=superDiscountProducts.includes(p.id); 
-                tbody.innerHTML+=`<tr><td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td><td>${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td><td>${p.discount_percent||0}%</td><td>${p.current_stock}</td><td>${isSuper ? '🔥' : '-'}</td><td><button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button> <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button></td></tr>`; 
+        // =============================================
+        // PRODUCTS TABLE with Pagination
+        // =============================================
+        function renderProductTable() { 
+            const search = document.getElementById('productSearch').value.toLowerCase(); 
+            const cat = document.getElementById('productCategoryFilter').value; 
+            const perPage = parseInt(document.getElementById('productPerPage').value) || 10; 
+            productPerPage = perPage; 
+            let filtered = allProducts.filter(p => p.name.toLowerCase().includes(search) && (cat === '' || p.category === cat)); 
+            const totalPages = Math.ceil(filtered.length / perPage); 
+            if(productPage > totalPages) productPage = 1; 
+            const start = (productPage - 1) * perPage; 
+            const pageData = filtered.slice(start, start + perPage); 
+            const tbody = document.getElementById('adminProductsList'); 
+            tbody.innerHTML = ''; 
+            pageData.forEach(p => { 
+                const imgUrl = productImages[p.id] || ''; 
+                const isSuper = superDiscountProducts.includes(p.id); 
+                tbody.innerHTML += `<tr><td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td><td>${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td><td>${p.discount_percent||0}%</td><td>${p.current_stock}</td><td>${isSuper ? '🔥' : '-'}</td><td><button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button> <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button></td></tr>`; 
             }); 
-            const pag=document.getElementById('productPagination'); 
-            pag.innerHTML=''; 
-            for(let i=1;i<=totalPages;i++){ 
-                const btn=document.createElement('button'); 
-                btn.textContent=i; 
-                if(i===productPage) btn.classList.add('active-page'); 
-                btn.onclick=()=>{ productPage=i; renderProductTable(); }; 
+            const pag = document.getElementById('productPagination'); 
+            pag.innerHTML = ''; 
+            for(let i = 1; i <= totalPages; i++) { 
+                const btn = document.createElement('button'); 
+                btn.textContent = i; 
+                if(i === productPage) btn.classList.add('active-page'); 
+                btn.onclick = () => { productPage = i; renderProductTable(); }; 
                 pag.appendChild(btn); 
             } 
         }
 
-        // ===== SALES HISTORY =====
-        function renderHistoryTable(){ 
-            const search=document.getElementById('historySearch').value.toLowerCase(); 
-            const perPage=parseInt(document.getElementById('historyPerPage').value)||10; 
-            historyPerPage=perPage; 
-            let filtered=salesHistory.filter(h=>h.bill_no.toLowerCase().includes(search)||h.customer.toLowerCase().includes(search)); 
-            const totalPages=Math.ceil(filtered.length/perPage); 
-            if(historyPage>totalPages) historyPage=1; 
-            const start=(historyPage-1)*perPage; 
-            const pageData=filtered.slice(start,start+perPage); 
-            const tbody=document.getElementById('historyList'); 
-            tbody.innerHTML=''; 
-            if(pageData.length===0){ 
-                tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;">No sales yet</td></tr>'; 
+        // =============================================
+        // SALES HISTORY
+        // =============================================
+        function renderHistoryTable() { 
+            const search = document.getElementById('historySearch').value.toLowerCase(); 
+            const perPage = parseInt(document.getElementById('historyPerPage').value) || 10; 
+            historyPerPage = perPage; 
+            let filtered = salesHistory.filter(h => h.bill_no.toLowerCase().includes(search) || h.customer.toLowerCase().includes(search)); 
+            const totalPages = Math.ceil(filtered.length / perPage); 
+            if(historyPage > totalPages) historyPage = 1; 
+            const start = (historyPage - 1) * perPage; 
+            const pageData = filtered.slice(start, start + perPage); 
+            const tbody = document.getElementById('historyList'); 
+            tbody.innerHTML = ''; 
+            if(pageData.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">No sales yet</td></tr>'; 
             } 
-            pageData.forEach(h=>{ 
-                tbody.innerHTML+=`<tr><td>${h.bill_no}</td><td>${h.date}</td><td>${h.customer}</td><td>${h.items}</td><td>₹${h.total}</td><td>₹${h.cashback}</td></tr>`; 
+            pageData.forEach(h => { 
+                tbody.innerHTML += `<tr><td>${h.bill_no}</td><td>${h.date}</td><td>${h.customer}</td><td>${h.items}</td><td>₹${h.total}</td><td>₹${h.cashback}</td></tr>`; 
             }); 
-            const pag=document.getElementById('historyPagination'); 
-            pag.innerHTML=''; 
-            for(let i=1;i<=totalPages;i++){ 
-                const btn=document.createElement('button'); 
-                btn.textContent=i; 
-                if(i===historyPage) btn.classList.add('active-page'); 
-                btn.onclick=()=>{ historyPage=i; renderHistoryTable(); }; 
+            const pag = document.getElementById('historyPagination'); 
+            pag.innerHTML = ''; 
+            for(let i = 1; i <= totalPages; i++) { 
+                const btn = document.createElement('button'); 
+                btn.textContent = i; 
+                if(i === historyPage) btn.classList.add('active-page'); 
+                btn.onclick = () => { historyPage = i; renderHistoryTable(); }; 
                 pag.appendChild(btn); 
             } 
         }
-        function addToHistory(billNo, customer, items, total, cashback){
-            salesHistory.unshift({ bill_no: billNo, date: new Date().toLocaleDateString(), customer: customer, items: items, total: total.toFixed(2), cashback: cashback.toFixed(2) });
+        
+        function addToHistory(billNo, customer, items, total, cashback) {
+            salesHistory.unshift({ 
+                bill_no: billNo, 
+                date: new Date().toLocaleDateString(), 
+                customer: customer, 
+                items: items, 
+                total: total.toFixed(2), 
+                cashback: cashback.toFixed(2) 
+            });
             renderHistoryTable();
         }
 
-        // ===== BILLING MODES =====
-        function setBillingMode(mode){ billingMode=mode; document.getElementById('modeManual').classList.toggle('active-mode',mode==='manual'); document.getElementById('modeScanner').classList.toggle('active-mode',mode==='scanner'); document.getElementById('barcodeInput').placeholder=mode==='scanner'?'📷 Scan barcode → Enter':'📷 Barcode (Manual)'; }
-        function setupBarcodeScanner(){ const input=document.getElementById('barcodeInput'); if(!input) return; input.addEventListener('keypress', async function(e) { if(e.key === 'Enter' && billingMode === 'scanner') { const barcode = this.value.trim(); if(barcode) await processBarcode(barcode); this.value = ''; } }); }
-        async function processBarcode(barcode) { const cust = document.getElementById('selectedCustomerId').value; if(!cust) { showAlert('Select customer first','error'); return; } try { const p = allProducts.find(p => p.product_code === barcode); if(!p) { showAlert('Product not found','error'); return; } if(p.current_stock<1) { showAlert('Out of stock','error'); return; } const cashback = (p.selling_price * (p.discount_percent||0))/100; const ex = cart.find(i=>i.product_id===p.id); if(ex) ex.quantity++; else cart.push({product_id:p.id,name:p.name,originalPrice:p.selling_price,discountPercent:p.discount_percent||0,cashback:cashback,quantity:1}); renderCart(); showAlert(`✅ ${p.name} added!`,'success'); } catch(e) { showAlert('Error','error'); } }
+        // =============================================
+        // BILLING MODES & BARCODE
+        // =============================================
+        function setBillingMode(mode) { 
+            billingMode = mode; 
+            document.getElementById('modeManual').classList.toggle('active-mode', mode === 'manual'); 
+            document.getElementById('modeScanner').classList.toggle('active-mode', mode === 'scanner'); 
+            document.getElementById('barcodeInput').placeholder = mode === 'scanner' ? '📷 Scan barcode → Enter' : '📷 Barcode (Manual)'; 
+        }
         
-        // ===== CART FUNCTIONS =====
+        function setupBarcodeScanner() { 
+            const input = document.getElementById('barcodeInput'); 
+            if(!input) return; 
+            input.addEventListener('keypress', async function(e) { 
+                if(e.key === 'Enter' && billingMode === 'scanner') { 
+                    const barcode = this.value.trim(); 
+                    if(barcode) await processBarcode(barcode); 
+                    this.value = ''; 
+                } 
+            }); 
+        }
+        
+        async function processBarcode(barcode) { 
+            const cust = document.getElementById('selectedCustomerId').value; 
+            if(!cust) { showAlert('Select customer first','error'); return; } 
+            try { 
+                const p = allProducts.find(p => p.product_code === barcode); 
+                if(!p) { showAlert('Product not found','error'); return; } 
+                if(p.current_stock < 1) { showAlert('Out of stock','error'); return; } 
+                const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
+                const ex = cart.find(i => i.product_id === p.id); 
+                if(ex) ex.quantity++; 
+                else cart.push({
+                    product_id: p.id, 
+                    name: p.name, 
+                    originalPrice: p.selling_price, 
+                    discountPercent: p.discount_percent||0, 
+                    cashback: cashback, 
+                    quantity: 1
+                }); 
+                renderCart(); 
+                showAlert(`✅ ${p.name} added!`,'success'); 
+            } catch(e) { showAlert('Error: ' + e.message,'error'); } 
+        }
+
+        // =============================================
+        // CART FUNCTIONS
+        // =============================================
         function addToCart() { 
-            if(billingMode==='scanner'){ showAlert('Scanner mode: use barcode input','error'); return; } 
+            if(billingMode === 'scanner') { 
+                showAlert('Scanner mode: use barcode input','error'); 
+                return; 
+            } 
             const cust = document.getElementById('selectedCustomerId').value; 
             const pid = document.getElementById('selectedProductId').value; 
             const qty = parseInt(document.getElementById('billQuantity').value) || 1; 
-            if(!cust) return showAlert('Select customer','error'); 
-            if(!pid) return showAlert('Select product','error'); 
-            if(!qty||qty<1) return showAlert('Enter quantity','error'); 
+            if(!cust) { showAlert('Select customer','error'); return; } 
+            if(!pid) { showAlert('Select product','error'); return; } 
+            if(!qty || qty < 1) { showAlert('Enter quantity','error'); return; } 
+            
             const price = parseFloat(document.getElementById('selectedProductPrice').value); 
             const disc = parseFloat(document.getElementById('selectedProductDiscount').value) || 0; 
             const cashback = parseFloat(document.getElementById('selectedProductCashback').value) || 0; 
             const stock = parseInt(document.getElementById('selectedProductStock').value) || 0; 
-            if(stock<qty) return showAlert(`Only ${stock} left`,'error'); 
+            
+            if(stock < qty) { showAlert(`Only ${stock} left`,'error'); return; } 
+            
             const p = allProducts.find(p => p.id == pid); 
-            const ex = cart.find(i=>i.product_id===parseInt(pid)); 
+            const ex = cart.find(i => i.product_id === parseInt(pid)); 
             if(ex) ex.quantity += qty; 
-            else cart.push({product_id:parseInt(pid), name: p ? p.name : 'Product', originalPrice: price, discountPercent: disc, cashback: cashback, quantity: qty}); 
+            else cart.push({
+                product_id: parseInt(pid), 
+                name: p ? p.name : 'Product', 
+                originalPrice: price, 
+                discountPercent: disc, 
+                cashback: cashback, 
+                quantity: qty
+            }); 
             renderCart(); 
-            document.getElementById('billQuantity').value='1'; 
+            document.getElementById('billQuantity').value = '1'; 
             showAlert(`${p ? p.name : 'Product'} added`,'success'); 
         }
+        
         function renderCart() { 
             const tbody = document.getElementById('cartList'); 
-            let total=0, cbTotal=0; 
-            tbody.innerHTML=''; 
-            cart.forEach((item,idx)=>{ 
-                const itemTotal=item.originalPrice*item.quantity; 
-                const itemCB=item.cashback*item.quantity; 
-                total+=itemTotal; 
-                cbTotal+=itemCB; 
-                tbody.innerHTML+=`<tr><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.originalPrice}</td><td>${item.discountPercent}%</td><td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td><td>₹${itemTotal.toFixed(2)}</td><td><button onclick="removeFromCart(${idx})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Remove</button></td></tr>`; 
+            let total = 0, cbTotal = 0; 
+            tbody.innerHTML = ''; 
+            cart.forEach((item, idx) => { 
+                const itemTotal = item.originalPrice * item.quantity; 
+                const itemCB = item.cashback * item.quantity; 
+                total += itemTotal; 
+                cbTotal += itemCB; 
+                tbody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.originalPrice}</td><td>${item.discountPercent}%</td><td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td><td>₹${itemTotal.toFixed(2)}</td><td><button onclick="removeFromCart(${idx})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Remove</button></td></tr>`; 
             }); 
-            document.getElementById('cartTotal').innerHTML=total; 
-            document.getElementById('cartCashback').innerHTML=cbTotal.toFixed(2); 
+            document.getElementById('cartTotal').innerHTML = total; 
+            document.getElementById('cartCashback').innerHTML = cbTotal.toFixed(2); 
         }
-        function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
         
-        // ===== GENERATE BILL PREVIEW (NO UPDATE) =====
-        function generateBillPreview(){ 
-            if(cart.length===0) return showAlert('Cart empty','error'); 
+        function removeFromCart(idx) { 
+            cart.splice(idx, 1); 
+            renderCart(); 
+        }
+
+        // =============================================
+        // GENERATE BILL PREVIEW (NO UPDATE)
+        // =============================================
+        function generateBillPreview() { 
+            if(cart.length === 0) { showAlert('Cart empty','error'); return; } 
             const cust = document.getElementById('selectedCustomerId').value; 
-            if(!cust) return showAlert('Select customer','error'); 
-            const custName = customers.find(c=>c.id==cust)?.name || 'Customer'; 
-            let total=0, cbTotal=0, itemsHtml=''; 
-            cart.forEach(i=>{ 
-                const t=i.originalPrice*i.quantity; 
-                const cb=i.cashback*i.quantity; 
-                total+=t; 
-                cbTotal+=cb; 
-                itemsHtml+=`<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; 
+            if(!cust) { showAlert('Select customer','error'); return; } 
+            const custName = customers.find(c => c.id == cust)?.name || 'Customer'; 
+            let total = 0, cbTotal = 0, itemsHtml = ''; 
+            cart.forEach(i => { 
+                const t = i.originalPrice * i.quantity; 
+                const cb = i.cashback * i.quantity; 
+                total += t; 
+                cbTotal += cb; 
+                itemsHtml += `<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; 
             }); 
             const content = document.getElementById('billPreviewContent'); 
             content.innerHTML = `
@@ -823,29 +1311,33 @@
             showModal('billPreviewModal');
         }
 
-        // ===== PRINT BILL AND UPDATE EVERYTHING =====
-        async function printBillAndUpdate(){ 
-            if(cart.length===0) return showAlert('Cart empty','error'); 
+        // =============================================
+        // PRINT BILL AND UPDATE EVERYTHING
+        // =============================================
+        async function printBillAndUpdate() { 
+            if(cart.length === 0) { showAlert('Cart empty','error'); return; } 
             const cust = document.getElementById('selectedCustomerId').value; 
-            if(!cust) return showAlert('Select customer','error'); 
-            const custName = customers.find(c=>c.id==cust)?.name || 'Customer'; 
-            let total=0, cbTotal=0, itemsHtml=''; 
-            cart.forEach(i=>{ 
-                const t=i.originalPrice*i.quantity; 
-                const cb=i.cashback*i.quantity; 
-                total+=t; 
-                cbTotal+=cb; 
-                itemsHtml+=`<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; 
+            if(!cust) { showAlert('Select customer','error'); return; } 
+            const custName = customers.find(c => c.id == cust)?.name || 'Customer'; 
+            let total = 0, cbTotal = 0, itemsHtml = ''; 
+            cart.forEach(i => { 
+                const t = i.originalPrice * i.quantity; 
+                const cb = i.cashback * i.quantity; 
+                total += t; 
+                cbTotal += cb; 
+                itemsHtml += `<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; 
             }); 
-            const billNo = 'SB'+Date.now(); 
-            const win = window.open('','_blank'); 
+            const billNo = 'SB' + Date.now(); 
+            
+            // Print bill in new window
+            const win = window.open('', '_blank'); 
             win.document.write(`<html><head><title>Bill - SASTA BAZAR</title><style>body{font-family:'Courier New',monospace;margin:20px;font-size:14px;max-width:300px;margin:auto;}table{width:100%;border-collapse:collapse;}td,th{padding:6px 4px;border-bottom:1px solid #ddd;text-align:left;}h2{color:#e67e22;}</style></head><body onload="window.print();window.close();"><h2>🛍️ SASTA BAZAR</h2><p>रामलक्ष्मण, रुद्रपुर रोड, देवरिया</p><p>📞 +91 6306088261</p><p>Bill: ${billNo}</p><p>Date: ${new Date().toLocaleDateString()}</p><p>Customer: ${custName}</p><hr><table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc</th><th>CB</th><th>Total</th></tr>${itemsHtml}</table><hr><p><strong>Total: ₹${total.toFixed(2)}</strong></p><p style="color:#27ae60;">Cashback: +₹${cbTotal.toFixed(2)}</p><p style="margin-top:15px;font-size:12px;">✨ Thank you for shopping! ✨</p><p style="font-size:10px;">Visit again! SASTA BAZAR</p></body></html>`); 
             win.document.close();
 
             // Update everything in backend
             try {
-                const items = cart.map(i=>({product_id:i.product_id, quantity:i.quantity}));
-                const res = await apiCall('POST','/bills',{
+                const items = cart.map(i => ({ product_id: i.product_id, quantity: i.quantity }));
+                const res = await apiCall('POST', '/bills', {
                     customer_id: parseInt(cust),
                     items: items,
                     payment_method: 'cash'
@@ -857,30 +1349,46 @@
                 await loadAdminData();
                 await loadCustomerDashboardData();
                 
-                showAlert(`✅ Bill created! Cashback: ₹${cbTotal.toFixed(2)} added to wallet!`,'success');
-            } catch(e){
+                showAlert(`✅ Bill created! Cashback: ₹${cbTotal.toFixed(2)} added to wallet!`, 'success');
+            } catch(e) {
                 console.error('Error details:', e);
                 showAlert('Error updating data: ' + e.message, 'error');
             }
         }
-        
+
+        // =============================================
+        // PRODUCT & CUSTOMER CRUD
+        // =============================================
         async function saveProduct() { 
             const code = document.getElementById('productCode').value; 
             const name = document.getElementById('productName').value; 
             const price = parseFloat(document.getElementById('productPrice').value); 
-            const discount = parseFloat(document.getElementById('productDiscount').value)||0; 
+            const discount = parseFloat(document.getElementById('productDiscount').value) || 0; 
             const stock = parseInt(document.getElementById('productStock').value); 
             const imageUrl = document.getElementById('productImage').value; 
             const isSuper = document.getElementById('productSuperDiscount').checked; 
-            if(!code||!name||!price) return showAlert('Fill fields','error'); 
+            if(!code || !name || !price) { showAlert('Fill all required fields','error'); return; } 
             try { 
                 if(editingId) { 
-                    await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,discount_percent:discount}); 
+                    await apiCall('PUT', `/products/${editingId}`, {
+                        product_code: code, 
+                        name, 
+                        purchase_price: price * 0.7, 
+                        selling_price: price, 
+                        discount_percent: discount
+                    }); 
                     if(imageUrl) productImages[editingId] = imageUrl; 
                     if(isSuper && !superDiscountProducts.includes(editingId)) superDiscountProducts.push(editingId); 
                     else if(!isSuper) superDiscountProducts = superDiscountProducts.filter(pid => pid !== editingId); 
                 } else { 
-                    const res = await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,discount_percent:discount}); 
+                    const res = await apiCall('POST', '/products', {
+                        product_code: code, 
+                        name, 
+                        purchase_price: price * 0.7, 
+                        selling_price: price, 
+                        current_stock: stock, 
+                        discount_percent: discount
+                    }); 
                     const newId = res.id; 
                     if(imageUrl) productImages[newId] = imageUrl; 
                     if(isSuper) superDiscountProducts.push(newId); 
@@ -888,48 +1396,181 @@
                 showAlert('Product saved!','success'); 
                 closeModal('productModal'); 
                 await loadAdminData(); 
-            } catch(e) { showAlert('Error saving','error'); } 
+            } catch(e) { showAlert('Error saving: ' + e.message,'error'); } 
         }
-        async function deleteProduct(id) { if(confirm('Delete?')){ try{ await apiCall('DELETE',`/products/${id}`); delete productImages[id]; superDiscountProducts = superDiscountProducts.filter(pid => pid !== id); showAlert('Deleted','success'); await loadAdminData(); } catch(e){ showAlert('Error','error'); } } }
-        function editProduct(id){ const product = allProducts.find(p => p.id === id); editingId = id; document.getElementById('productCode').value = product.product_code; document.getElementById('productName').value = product.name; document.getElementById('productPrice').value = product.selling_price; document.getElementById('productDiscount').value = product.discount_percent||0; document.getElementById('productStock').value = product.current_stock; document.getElementById('productImage').value = productImages[id] || ''; document.getElementById('productSuperDiscount').checked = superDiscountProducts.includes(id); document.getElementById('previewImg').src = productImages[id] || ''; document.getElementById('previewImg').style.display = productImages[id] ? 'block' : 'none'; showModal('productModal'); }
-        async function saveCustomer() { const name = document.getElementById('newCustName').value; const mobile = document.getElementById('newCustMobile').value; const password = document.getElementById('newCustPassword').value; const ref = document.getElementById('newCustRef').value; if(!name||!mobile) return showAlert('Fill name & mobile','error'); const finalPassword = password || mobile; try { await apiCall('POST','/customers',{name,mobile,password:finalPassword,referred_by:ref||null}); showAlert(`Customer added! Login: ${mobile} / Password: ${finalPassword}`,'success'); closeModal('customerModal'); await loadAdminData(); } catch(e) { showAlert('Error','error'); } }
-        function copyRefCode() { navigator.clipboard.writeText(document.getElementById('myRefCode').innerText); showAlert('Copied!','success'); }
         
-        async function loadWalletCustomers() { try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange = function(){ document.getElementById('currentBalance').innerHTML = `₹${this.options[this.selectedIndex]?.dataset.balance || 0}`; }; } catch(e){ showAlert('Error loading customers','error'); } }
-        function showWalletControlForCustomer(id) { showWalletControlModal(); setTimeout(() => { document.getElementById('walletCustomerSelect').value = id; document.getElementById('currentBalance').innerHTML = `₹${document.getElementById('walletCustomerSelect').options[document.getElementById('walletCustomerSelect').selectedIndex]?.dataset.balance || 0}`; }, 100); }
-        async function adminAddMoney() { const cid = document.getElementById('walletCustomerSelect').value; const amt = parseFloat(document.getElementById('walletAmount').value); const reason = document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
-        async function adminDeductMoney() { const cid = document.getElementById('walletCustomerSelect').value; const amt = parseFloat(document.getElementById('walletAmount').value); const reason = document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
+        async function deleteProduct(id) { 
+            if(confirm('Delete this product?')) { 
+                try { 
+                    await apiCall('DELETE', `/products/${id}`); 
+                    delete productImages[id]; 
+                    superDiscountProducts = superDiscountProducts.filter(pid => pid !== id); 
+                    showAlert('Deleted','success'); 
+                    await loadAdminData(); 
+                } catch(e){ showAlert('Error: ' + e.message,'error'); } 
+            } 
+        }
+        
+        function editProduct(id) { 
+            const product = allProducts.find(p => p.id === id); 
+            editingId = id; 
+            document.getElementById('productCode').value = product.product_code; 
+            document.getElementById('productName').value = product.name; 
+            document.getElementById('productPrice').value = product.selling_price; 
+            document.getElementById('productDiscount').value = product.discount_percent || 0; 
+            document.getElementById('productStock').value = product.current_stock; 
+            document.getElementById('productImage').value = productImages[id] || ''; 
+            document.getElementById('productSuperDiscount').checked = superDiscountProducts.includes(id); 
+            document.getElementById('previewImg').src = productImages[id] || ''; 
+            document.getElementById('previewImg').style.display = productImages[id] ? 'block' : 'none'; 
+            showModal('productModal'); 
+        }
+        
+        async function saveCustomer() { 
+            const name = document.getElementById('newCustName').value; 
+            const mobile = document.getElementById('newCustMobile').value; 
+            const password = document.getElementById('newCustPassword').value; 
+            const ref = document.getElementById('newCustRef').value; 
+            if(!name || !mobile) { showAlert('Fill name & mobile','error'); return; } 
+            const finalPassword = password || mobile; 
+            try { 
+                await apiCall('POST', '/customers', {
+                    name, 
+                    mobile, 
+                    password: finalPassword, 
+                    referred_by: ref || null
+                }); 
+                showAlert(`Customer added! Login: ${mobile} / Password: ${finalPassword}`,'success'); 
+                closeModal('customerModal'); 
+                await loadAdminData(); 
+            } catch(e) { showAlert('Error: ' + e.message,'error'); } 
+        }
+        
+        function copyRefCode() { 
+            navigator.clipboard.writeText(document.getElementById('myRefCode').innerText); 
+            showAlert('Copied!','success'); 
+        }
 
-        // ===== TABS =====
-        function switchAdminTab(tab){ 
-            document.getElementById('tabBilling').style.display='none'; 
-            document.getElementById('tabCustomers').style.display='none'; 
-            document.getElementById('tabProducts').style.display='none'; 
-            document.getElementById('tabHistory').style.display='none'; 
-            document.querySelectorAll('.tab-nav button').forEach(b=>b.classList.remove('active-tab')); 
-            if(tab==='billing'){ 
-                document.getElementById('tabBilling').style.display='block'; 
+        // =============================================
+        // WALLET FUNCTIONS
+        // =============================================
+        async function loadWalletCustomers() { 
+            try { 
+                const cust = await apiCall('GET', '/customers'); 
+                const sel = document.getElementById('walletCustomerSelect'); 
+                sel.innerHTML = '<option>Select Customer</option>'; 
+                cust.forEach(c => { 
+                    sel.innerHTML += `<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; 
+                }); 
+                sel.onchange = function() { 
+                    document.getElementById('currentBalance').innerHTML = `₹${this.options[this.selectedIndex]?.dataset.balance || 0}`; 
+                }; 
+            } catch(e){ showAlert('Error loading customers: ' + e.message,'error'); } 
+        }
+        
+        function showWalletControlForCustomer(id) { 
+            showWalletControlModal(); 
+            setTimeout(() => { 
+                document.getElementById('walletCustomerSelect').value = id; 
+                const bal = document.getElementById('walletCustomerSelect').options[document.getElementById('walletCustomerSelect').selectedIndex]?.dataset.balance || 0; 
+                document.getElementById('currentBalance').innerHTML = `₹${bal}`; 
+            }, 100); 
+        }
+        
+        async function adminAddMoney() { 
+            const cid = document.getElementById('walletCustomerSelect').value; 
+            const amt = parseFloat(document.getElementById('walletAmount').value); 
+            const reason = document.getElementById('walletReason').value; 
+            if(!cid || !amt) { showAlert('Select customer & amount','error'); return; } 
+            try { 
+                await apiCall('POST', '/admin/wallet/add', {
+                    customer_id: parseInt(cid), 
+                    amount: amt, 
+                    reason: reason || 'Admin added money'
+                }); 
+                showAlert(`₹${amt} added!`,'success'); 
+                await loadAdminData(); 
+                loadWalletCustomers(); 
+            } catch(e){ showAlert('Error: ' + e.message,'error'); } 
+        }
+        
+        async function adminDeductMoney() { 
+            const cid = document.getElementById('walletCustomerSelect').value; 
+            const amt = parseFloat(document.getElementById('walletAmount').value); 
+            const reason = document.getElementById('walletReason').value; 
+            if(!cid || !amt) { showAlert('Select customer & amount','error'); return; } 
+            try { 
+                await apiCall('POST', '/admin/wallet/deduct', {
+                    customer_id: parseInt(cid), 
+                    amount: amt, 
+                    reason: reason || 'Admin deducted money'
+                }); 
+                showAlert(`₹${amt} deducted!`,'success'); 
+                await loadAdminData(); 
+                loadWalletCustomers(); 
+            } catch(e){ showAlert('Error: ' + e.message,'error'); } 
+        }
+        
+        function showWalletControlModal() { 
+            showModal('walletControlModal'); 
+            loadWalletCustomers(); 
+        }
+
+        // =============================================
+        // TABS
+        // =============================================
+        function switchAdminTab(tab) { 
+            document.getElementById('tabBilling').style.display = 'none'; 
+            document.getElementById('tabCustomers').style.display = 'none'; 
+            document.getElementById('tabProducts').style.display = 'none'; 
+            document.getElementById('tabHistory').style.display = 'none'; 
+            document.querySelectorAll('.tab-nav button').forEach(b => b.classList.remove('active-tab')); 
+            
+            if(tab === 'billing') { 
+                document.getElementById('tabBilling').style.display = 'block'; 
                 document.querySelector('.tab-nav button:nth-child(1)').classList.add('active-tab'); 
             } 
-            if(tab==='customers'){ 
-                document.getElementById('tabCustomers').style.display='block'; 
+            if(tab === 'customers') { 
+                document.getElementById('tabCustomers').style.display = 'block'; 
                 document.querySelector('.tab-nav button:nth-child(2)').classList.add('active-tab'); 
                 renderCustomerTable(); 
             } 
-            if(tab==='products'){ 
-                document.getElementById('tabProducts').style.display='block'; 
+            if(tab === 'products') { 
+                document.getElementById('tabProducts').style.display = 'block'; 
                 document.querySelector('.tab-nav button:nth-child(3)').classList.add('active-tab'); 
                 renderProductTable(); 
             } 
-            if(tab==='history'){ 
-                document.getElementById('tabHistory').style.display='block'; 
+            if(tab === 'history') { 
+                document.getElementById('tabHistory').style.display = 'block'; 
                 document.querySelector('.tab-nav button:nth-child(4)').classList.add('active-tab'); 
                 renderHistoryTable(); 
             } 
         }
 
-        if(jobVacancies.length === 0) { jobVacancies.push({ id: 1, title: 'Software Developer', description: 'Full-stack developer with React and Node.js experience' }); jobVacancies.push({ id: 2, title: 'Marketing Manager', description: 'Lead our digital marketing campaigns' }); jobVacancies.push({ id: 3, title: 'Customer Support', description: '24/7 customer support' }); }
-        checkBackend(); setInterval(checkBackend,30000);
+        // =============================================
+        // CHECK BACKEND & INIT
+        // =============================================
+        async function checkBackend() { 
+            try { 
+                const res = await fetch(`${BACKEND_URL}/`); 
+                if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px;">✅ Connected</span>'; 
+                else document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Error</span>'; 
+            } catch(e) { 
+                document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Offline</span>'; 
+            } 
+        }
+
+        // =============================================
+        // INITIALIZE
+        // =============================================
+        if(jobVacancies.length === 0) { 
+            jobVacancies.push({ id: 1, title: 'Software Developer', description: 'Full-stack developer with React and Node.js experience' }); 
+            jobVacancies.push({ id: 2, title: 'Marketing Manager', description: 'Lead our digital marketing campaigns' }); 
+            jobVacancies.push({ id: 3, title: 'Customer Support', description: '24/7 customer support' }); 
+        }
+        
+        checkBackend(); 
+        setInterval(checkBackend, 30000);
         showLandingHome();
     </script>
 </body>
