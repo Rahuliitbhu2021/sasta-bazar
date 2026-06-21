@@ -129,6 +129,7 @@ app.post('/api/products', authenticateToken, async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (error) {
+    console.error('Add product error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -154,18 +155,6 @@ app.delete('/api/products/:id', authenticateToken, async (req, res) => {
   try {
     await query('DELETE FROM products WHERE id = $1', [id]);
     res.json({ message: 'Product deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.patch('/api/products/:id/discount', authenticateToken, async (req, res) => {
-  const { id } = req.params;
-  const { discount_percent } = req.body;
-  try {
-    await query('UPDATE products SET discount_percent = $1 WHERE id = $2', [discount_percent, id]);
-    const result = await query('SELECT * FROM products WHERE id = $1', [id]);
-    res.json({ success: true, product: result.rows[0] });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -210,14 +199,19 @@ app.post('/api/customers', authenticateToken, async (req, res) => {
   }
 });
 
-// ============ BILL ROUTES - FIXED ✅ ============
+// ============ BILL ROUTES - FULLY FIXED ============
 app.post('/api/bills', authenticateToken, async (req, res) => {
   const { customer_id, items, payment_method } = req.body;
+  
+  console.log('📝 Creating bill for customer:', customer_id);
+  console.log('📦 Items:', JSON.stringify(items, null, 2));
   
   try {
     let totalAmount = 0;
     let totalCashback = 0;
+    const billItems = [];
     
+    // Process each item
     for (const item of items) {
       const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
       if (product.rows.length === 0) {
@@ -230,23 +224,59 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       }
       
       const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
-      totalAmount += p.selling_price * item.quantity;
+      const itemTotal = p.selling_price * item.quantity;
+      
+      totalAmount += itemTotal;
       totalCashback += cashbackAmount * item.quantity;
       
+      // Update stock
       await query('UPDATE products SET current_stock = current_stock - $1 WHERE id = $2', [item.quantity, p.id]);
+      
+      billItems.push({
+        product_id: p.id,
+        quantity: item.quantity,
+        unit_price: p.selling_price,
+        discount_percent: p.discount_percent || 0,
+        total_price: itemTotal,
+        cashback_amount: cashbackAmount * item.quantity,
+        product_name: p.name
+      });
     }
     
     const billNumber = `INV${Date.now()}`;
     
-    // ✅ FIXED: Added subtotal column in INSERT
+    // ✅ Create bill with subtotal
     const billResult = await query(
       `INSERT INTO bills (bill_number, customer_id, subtotal, total_amount, cashback, payment_method)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [billNumber, customer_id, totalAmount, totalAmount, totalCashback, payment_method || 'cash']
     );
     
-    await query('UPDATE customers SET total_purchases = total_purchases + $1 WHERE id = $2', [totalAmount, customer_id]);
+    console.log('✅ Bill created:', billResult.rows[0]);
     
+    // ✅ Save bill items
+    for (const item of billItems) {
+      await query(
+        `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, discount_percent, total_price, cashback_amount)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          billResult.rows[0].id,
+          item.product_id,
+          item.quantity,
+          item.unit_price,
+          item.discount_percent,
+          item.total_price,
+          item.cashback_amount
+        ]
+      );
+    }
+    console.log('✅ Bill items saved');
+    
+    // ✅ Update customer total purchases
+    await query('UPDATE customers SET total_purchases = total_purchases + $1 WHERE id = $2', [totalAmount, customer_id]);
+    console.log('✅ Customer purchases updated');
+    
+    // ✅ Add cashback to wallet
     if (totalCashback > 0) {
       await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [totalCashback, customer_id]);
       await query(
@@ -254,9 +284,10 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
          VALUES ($1, $2, $3, $4)`,
         [customer_id, totalCashback, 'CREDIT', `Cashback from bill ${billNumber}`]
       );
+      console.log('✅ Cashback added to wallet:', totalCashback);
     }
     
-    // Referral commission
+    // ✅ Referral commission
     const customer = await query('SELECT referred_by FROM customers WHERE id = $1', [customer_id]);
     if (customer.rows[0]?.referred_by) {
       const referrer = await query('SELECT id FROM customers WHERE referral_code = $1', [customer.rows[0].referred_by]);
@@ -269,26 +300,48 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
              VALUES ($1, $2, $3, $4)`,
             [referrer.rows[0].id, commissionAmount, 'CREDIT', `Commission from bill ${billNumber}`]
           );
+          console.log('✅ Commission added:', commissionAmount);
         }
       }
     }
     
-    res.json({ success: true, bill: billResult.rows[0], cashback: totalCashback });
+    res.json({ 
+      success: true, 
+      bill: billResult.rows[0], 
+      cashback: totalCashback,
+      total: totalAmount
+    });
+    
   } catch (error) {
-    console.error('Bill creation error:', error);
+    console.error('❌ Bill creation error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
 app.get('/api/bills', authenticateToken, async (req, res) => {
   try {
-    if (req.user.role === 'admin') {
-      const result = await query('SELECT * FROM bills ORDER BY created_at DESC');
-      res.json(result.rows);
-    } else {
-      const result = await query('SELECT * FROM bills WHERE customer_id = $1 ORDER BY created_at DESC', [req.user.id]);
-      res.json(result.rows);
-    }
+    const result = await query(`
+      SELECT b.*, c.name as customer_name 
+      FROM bills b 
+      JOIN customers c ON b.customer_id = c.id 
+      ORDER BY b.created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/bills/:id/items', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await query(`
+      SELECT bi.*, p.name as product_name, p.product_code
+      FROM bill_items bi
+      JOIN products p ON bi.product_id = p.id
+      WHERE bi.bill_id = $1
+    `, [id]);
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -309,6 +362,7 @@ app.get('/api/reports/dashboard', authenticateToken, async (req, res) => {
       low_stock_alerts: parseInt(lowStock.rows[0].total)
     });
   } catch (error) {
+    console.error('Dashboard error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -323,36 +377,7 @@ app.get('/api/wallet/transactions/:customerId', authenticateToken, async (req, r
   }
 });
 
-app.post('/api/wallet/add-money', authenticateToken, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Only admin can add money' });
-  }
-  const { customer_id, amount, payment_method } = req.body;
-  try {
-    await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [amount, customer_id]);
-    await query(
-      `INSERT INTO wallet_transactions (customer_id, amount, transaction_type, description)
-       VALUES ($1, $2, $3, $4)`,
-      [customer_id, amount, 'CREDIT', `Added via ${payment_method} by admin`]
-    );
-    res.json({ success: true, message: 'Money added successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // ============ ADMIN WALLET CONTROL ============
-app.get('/api/admin/wallet/:customerId', authenticateToken, async (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-  try {
-    const customer = await query('SELECT id, name, mobile, wallet_balance FROM customers WHERE id = $1', [req.params.customerId]);
-    const transactions = await query('SELECT * FROM wallet_transactions WHERE customer_id = $1 ORDER BY created_at DESC', [req.params.customerId]);
-    res.json({ customer: customer.rows[0], transactions: transactions.rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 app.post('/api/admin/wallet/add', authenticateToken, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   const { customer_id, amount, reason } = req.body;
@@ -439,6 +464,20 @@ async function initTables() {
         total_amount DECIMAL,
         cashback DECIMAL,
         payment_method VARCHAR(20),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS bill_items (
+        id SERIAL PRIMARY KEY,
+        bill_id INT REFERENCES bills(id) ON DELETE CASCADE,
+        product_id INT REFERENCES products(id),
+        quantity INT NOT NULL,
+        unit_price DECIMAL(10,2) NOT NULL,
+        discount_percent DECIMAL(5,2) DEFAULT 0,
+        total_price DECIMAL(10,2) NOT NULL,
+        cashback_amount DECIMAL(10,2) DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);

@@ -192,7 +192,7 @@
 <body>
     <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
         
-        <!-- ========== LANDING PAGE (Front Page) ========== -->
+        <!-- ========== LANDING PAGE ========== -->
         <div id="landingPage">
             <div class="navbar">
                 <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
@@ -229,7 +229,6 @@
                     </div>
                 </div>
 
-                <!-- Features -->
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px; margin-bottom:50px;">
                     <div class="feature-card" style="background:rgba(255,255,255,0.95); border-radius:28px; padding:30px; text-align:center; transition:all 0.3s;"><div style="font-size:48px; margin-bottom:20px; display:inline-block; animation:bounce 2s infinite;"><i class="fas fa-bolt" style="color:#e67e22;"></i></div><h3 style="color:#333; font-size:20px;">Fast Billing</h3><p style="color:#666;">बारकोड स्कैनर से तुरंत बिलिंग</p></div>
                     <div class="feature-card" style="background:rgba(255,255,255,0.95); border-radius:28px; padding:30px; text-align:center; transition:all 0.3s;"><div style="font-size:48px; margin-bottom:20px; display:inline-block; animation:bounce 2s infinite 0.3s;"><i class="fas fa-wallet" style="color:#e67e22;"></i></div><h3 style="color:#333; font-size:20px;">Wallet System</h3><p style="color:#666;">कैशबैक सीधे वॉलेट में</p></div>
@@ -241,7 +240,6 @@
                     <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:15px;"><span class="offer-chip"><i class="fas fa-tag"></i> Up to 50% OFF</span><span class="offer-chip"><i class="fas fa-gift"></i> Free Delivery</span><span class="offer-chip"><i class="fas fa-wallet"></i> Up to ₹500 Cashback</span></div>
                 </div>
 
-                <!-- Footer Address -->
                 <div class="footer-address">
                     <p><strong>📍 SASTA BAZAR</strong></p>
                     <p>रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश - 274001</p>
@@ -250,23 +248,18 @@
                 </div>
             </div>
 
-            <!-- Products Page -->
             <div id="landingProductsPage" style="display:none;">
                 <div class="section-title">🔥 हमारे उत्पाद</div>
                 <div id="landingProductsList" class="products-grid"></div>
             </div>
 
-            <!-- Careers Page -->
             <div id="landingJobsPage" style="display:none;">
                 <div class="section-title">💼 करियर के अवसर</div>
                 <div id="landingJobList" class="jobs-grid"></div>
             </div>
 
-            <!-- Contact Page with Full Shop Details -->
             <div id="landingContactPage" style="display:none;">
                 <div class="section-title">📞 संपर्क करें</div>
-                
-                <!-- Shop Information Card -->
                 <div class="shop-info-card">
                     <h3><i class="fas fa-store"></i> दुकान की जानकारी</h3>
                     <div class="shop-detail-row"><i class="fas fa-map-marker-alt"></i><span><strong>पता:</strong> रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश </span></div>
@@ -280,8 +273,6 @@
                         <p>: सुबह 10:00 बजे - शाम 6:00 बजे</p>
                     </div>
                 </div>
-                
-                <!-- Social Media Section -->
                 <div style="background:white; border-radius:28px; padding:25px; text-align:center; margin-bottom:25px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
                     <h3 style="color:#e67e22; margin-bottom:15px;">हमें सोशल मीडिया पर फॉलो करें</h3>
                     <div style="display:flex; justify-content:center; gap:25px; flex-wrap:wrap;">
@@ -292,16 +283,12 @@
                         <a href="#" style="font-size:30px; color:#FF0000; transition:all 0.3s; display:inline-block;"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
-                
-                <!-- Contact Cards -->
                 <div class="contact-grid">
                     <div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>पता</h3><p>रामलक्ष्मण, रुद्रपुर रोड,<br>देवरिया, उ.प्र. </p></div>
                     <div class="contact-card"><i class="fas fa-phone"></i><h3>फोन</h3><p>📞 6306088261<br></p></div>
                     <div class="contact-card"><i class="fas fa-envelope"></i><h3>ईमेल</h3><p>rahulmaurya274202@gmail.com<br>support@sastabazar.com</p></div>
                     <div class="contact-card"><i class="fas fa-user-tie"></i><h3>दुकान प्रबंधक</h3><p>रोहित मौर्य<br>+91 6306088261</p></div>
                 </div>
-                
-                <!-- Map Section -->
                 <div style="background:white; border-radius:28px; padding:25px; margin-top:20px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
                     <h3 style="color:#e67e22; margin-bottom:15px;"><i class="fas fa-map"></i> हमारा स्थान</h3>
                     <div style="background:#f0f0f0; border-radius:20px; padding:40px; text-align:center;">
@@ -312,7 +299,6 @@
                 </div>
             </div>
 
-            <!-- Super Offers Page -->
             <div id="landingOffersPage" style="display:none;">
                 <div class="section-title">🔥 सुपर डिस्काउंट जोन</div>
                 <div id="landingSuperList" class="super-products-grid"></div>
@@ -347,33 +333,22 @@
             
             <div id="customerHomeSection" class="content-section active-section">
                 <div class="stats-row"><div class="stat-card"><h3>Wallet Balance</h3><div class="stat-value" id="custWalletVal">₹0</div></div><div class="stat-card"><h3>Total Purchases</h3><div class="stat-value" id="custTotalPurchases">₹0</div></div><div class="stat-card"><h3>Referrals</h3><div class="stat-value" id="custReferralCount">0</div></div></div>
-                
-                <!-- Referral Offer Banner -->
                 <div class="referral-card"><h2 style="color:white;">🎁 रेफरल ऑफर 🎁</h2><p style="color:rgba(255,255,255,0.9); margin:10px 0;">अपने दोस्तों को रेफर करें और <strong>Up to 0.5% Commission</strong> पाएं!</p><div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:10px;"><span class="offer-chip" style="background:rgba(255,255,255,0.2);">📱 शेयर करें</span><span class="offer-chip" style="background:rgba(255,255,255,0.2);">💸 कमाई करें</span></div></div>
-                
                 <div class="section-title">🔗 My Referral Code</div>
                 <div style="background:#fef5e7; padding:20px; text-align:center; border-radius:20px; margin-bottom:20px;"><p style="font-size:28px; font-weight:700; color:#e67e22;" id="myRefCode"></p><button onclick="copyRefCode()" class="apply-btn">📋 Copy Code</button></div>
-                
-                <!-- Special Offers Banner with Discount Pop-ups -->
                 <div class="offers-banner"><h2 style="font-size:24px;">🔥 विशेष ऑफर 🔥</h2><div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:15px;">
                     <div class="offer-chip pop"><i class="fas fa-tag"></i> <span>50% OFF</span><span class="discount-circle" style="position:relative; top:0; right:0; display:inline-block; margin-left:8px; width:25px; height:25px; font-size:10px;">-50%</span></div>
                     <div class="offer-chip pop" style="animation-delay:0.3s;"><i class="fas fa-gift"></i> <span>बंपर ऑफर</span><span class="discount-circle" style="position:relative; top:0; right:0; display:inline-block; margin-left:8px; width:25px; height:25px; font-size:10px;">🔥</span></div>
                     <div class="offer-chip pop" style="animation-delay:0.6s;"><i class="fas fa-wallet"></i> <span>₹500 कैशबैक</span><span class="discount-circle" style="position:relative; top:0; right:0; display:inline-block; margin-left:8px; width:25px; height:25px; font-size:10px;">+₹500</span></div>
                 </div></div>
-                
-                <!-- Advertisement Banner -->
                 <div class="ad-banner"><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-mobile-alt" style="font-size:48px; color:white; animation:bounce 1s infinite;"></i><div><h3 style="color:white;">📱 हमारा ऐप डाउनलोड करें</h3><p style="color:rgba(255,255,255,0.8);">एक्सक्लूसिव ऐप ऑफर पाएं!</p></div></div><button style="background:white; color:#667eea; border:none; padding:10px 25px; border-radius:40px; font-weight:600;">Download Now</button></div>
-                
                 <div class="ad-banner" style="background:linear-gradient(135deg, #27ae60, #2ecc71); animation:slideIn 0.7s ease;"><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-gift" style="font-size:48px; color:white; animation:pop 1.5s infinite;"></i><div><h3 style="color:white;">🎁 रेफर करें और कमाएं</h3><p style="color:rgba(255,255,255,0.8);">हर रेफरल पर कमीशन पाएं!</p></div></div><button class="offer-chip" style="background:white; color:#27ae60; border:none; padding:10px 25px; border-radius:40px;">शेयर करें</button></div>
-                
                 <div class="section-title">💰 Recent Transactions</div>
                 <div style="overflow-x:auto;"><table style="width:100%;"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransList"></tbody></table></div>
             </div>
             
             <div id="customerProductsSection" class="content-section"><div class="section-title">📦 All Products</div><div id="customerAllProducts" class="products-grid"></div></div>
-            <div id="customerCareersSection" class="content-section"><div class="section-title">💼 Job Openings</div><div id="customerJobsList" class="jobs-grid"></div>
-                <div id="customerJobForm" class="job-form"><h3>Apply for Job</h3><select id="applyJobSelect"><option>Select Position</option></select><input type="text" id="applicantName" placeholder="Full Name"><input type="tel" id="applicantMobile" placeholder="Mobile"><input type="email" id="applicantEmail" placeholder="Email"><textarea id="applicantMsg" rows="3" placeholder="Why should we hire you?"></textarea><button class="btn-submit" onclick="submitCustomerJobApp()">Submit Application</button><button onclick="closeJobForm()" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div>
-            </div>
+            <div id="customerCareersSection" class="content-section"><div class="section-title">💼 Job Openings</div><div id="customerJobsList" class="jobs-grid"></div></div>
             <div id="customerContactSection" class="content-section"><div class="section-title">📞 Contact Us</div><div class="contact-grid"><div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>Address</h3><p>Ramlakshan, Rudrapur Road,<br>Deoria, U.P.</p></div><div class="contact-card"><i class="fas fa-phone"></i><h3>Phone</h3><p>📞 6306088261</p></div><div class="contact-card"><i class="fas fa-envelope"></i><h3>Email</h3><p>rahulmaurya274202@gmail.com</p></div><div class="contact-card"><i class="fas fa-user-tie"></i><h3>Shop Admin</h3><p>Rohit Maurya</p></div></div></div>
             <div id="customerSuperSection" class="content-section"><div class="section-title">🔥 Super Discount Zone</div><div id="customerSuperList" class="super-products-grid"></div></div>
         </div>
@@ -383,7 +358,6 @@
             <div class="admin-header"><h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1><div class="admin-buttons"><button class="admin-btn admin-btn-primary" onclick="showAddProductModal()">➕ Product</button><button class="admin-btn admin-btn-success" onclick="showAddCustomerModal()">👤 Customer</button><button class="admin-btn admin-btn-warning" onclick="showWalletControlModal()">💰 Wallet</button><button class="admin-btn admin-btn-primary" onclick="showAdminJobPage()">💼 Jobs</button><button class="admin-btn admin-btn-danger" onclick="adminLogout()">🚪 Exit</button></div></div>
             <div class="stats-row"><div class="stat-card"><h3>Revenue</h3><div class="stat-value" id="adminTotalSales">₹0</div></div><div class="stat-card"><h3>Customers</h3><div class="stat-value" id="adminTotalCustomers">0</div></div><div class="stat-card"><h3>Commission</h3><div class="stat-value" id="adminTotalCommission">₹0</div></div><div class="stat-card"><h3>Low Stock</h3><div class="stat-value" id="adminLowStock">0</div></div></div>
             
-            <!-- Tab Navigation -->
             <div class="tab-nav">
                 <button class="active-tab" onclick="switchAdminTab('billing')">🧾 Billing</button>
                 <button onclick="switchAdminTab('customers')">👥 All Customers</button>
@@ -391,19 +365,14 @@
                 <button onclick="switchAdminTab('history')">📜 Sales History</button>
             </div>
 
-            <!-- Billing Tab -->
             <div id="tabBilling" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px;">
                 <h2 style="color:#e67e22;">🧾 Billing</h2>
-                
-                <!-- Mode Toggle -->
                 <div class="mode-toggle">
                     <button class="active-mode" id="modeManual" onclick="setBillingMode('manual')">✏️ Manual</button>
                     <button id="modeScanner" onclick="setBillingMode('scanner')">📷 Scanner</button>
                 </div>
-                
                 <input type="text" id="barcodeInput" placeholder="📷 Scan barcode → Enter" class="scanner-input">
                 
-                <!-- Searchable Customer Dropdown -->
                 <div class="search-dropdown">
                     <input type="text" id="customerSearchInput" placeholder="🔍 Search Customer..." oninput="filterCustomerDropdown()" onfocus="document.getElementById('customerDropdownList').style.display='block'">
                     <div class="dropdown-list" id="customerDropdownList">
@@ -412,7 +381,6 @@
                     <input type="hidden" id="selectedCustomerId" value="">
                 </div>
 
-                <!-- Searchable Product Dropdown -->
                 <div class="search-dropdown">
                     <input type="text" id="productSearchInput" placeholder="🔍 Search Product..." oninput="filterProductDropdown()" onfocus="document.getElementById('productDropdownList').style.display='block'">
                     <div class="dropdown-list" id="productDropdownList">
@@ -442,7 +410,6 @@
                 </div>
             </div>
 
-            <!-- All Customers Tab -->
             <div id="tabCustomers" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px; display:none;">
                 <h2 style="color:#e67e22;">👥 All Customers</h2>
                 <div class="filter-bar">
@@ -458,7 +425,6 @@
                 <div class="pagination" id="customerPagination"></div>
             </div>
 
-            <!-- All Products Tab -->
             <div id="tabProducts" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px; display:none;">
                 <h2 style="color:#e67e22;">📦 All Products</h2>
                 <div class="filter-bar">
@@ -480,7 +446,6 @@
                 <div class="pagination" id="productPagination"></div>
             </div>
 
-            <!-- Sales History Tab -->
             <div id="tabHistory" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px; display:none;">
                 <h2 style="color:#e67e22;">📜 Sales History</h2>
                 <div class="filter-bar">
@@ -518,9 +483,10 @@
 
     <script>
         // =============================================
-        // BACKEND CONFIGURATION - Aapke Backend ke hisaab se
+        // BACKEND CONFIGURATION
         // =============================================
-        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com'; // Ya localhost:5000
+        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com'; // Render URL
+        // Local testing ke liye: const BACKEND_URL = 'http://localhost:5000';
         const API_URL = `${BACKEND_URL}/api`;
         
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
@@ -538,7 +504,7 @@
             a.textContent = msg; 
             a.className = `alert alert-${type}`; 
             a.style.display = 'block'; 
-            setTimeout(() => a.style.display = 'none', 3000); 
+            setTimeout(() => a.style.display = 'none', 4000); 
         }
         function showModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -953,10 +919,10 @@
                 allProducts = products; 
                 customers = custData;
                 
-                document.getElementById('adminTotalSales').innerHTML = `₹${reports.total_sales}`; 
-                document.getElementById('adminTotalCustomers').innerHTML = reports.total_customers; 
-                document.getElementById('adminTotalCommission').innerHTML = `₹${reports.total_commission}`; 
-                document.getElementById('adminLowStock').innerHTML = reports.low_stock_alerts;
+                document.getElementById('adminTotalSales').innerHTML = `₹${reports.total_sales || 0}`; 
+                document.getElementById('adminTotalCustomers').innerHTML = reports.total_customers || 0; 
+                document.getElementById('adminTotalCommission').innerHTML = `₹${reports.total_commission || 0}`; 
+                document.getElementById('adminLowStock').innerHTML = reports.low_stock_alerts || 0;
                 
                 renderProductTable(); 
                 renderCustomerTable(); 
@@ -975,10 +941,10 @@
                 const profile = await apiCall('GET','/customers/profile'); 
                 const trans = await apiCall('GET',`/wallet/transactions/${profile.id}`); 
                 const allCust = await apiCall('GET','/customers'); 
-                document.getElementById('custWalletAmt').innerHTML = `₹${profile.wallet_balance}`; 
-                document.getElementById('custWalletVal').innerHTML = `₹${profile.wallet_balance}`; 
-                document.getElementById('custTotalPurchases').innerHTML = `₹${profile.total_purchases}`; 
-                document.getElementById('myRefCode').innerHTML = profile.referral_code; 
+                document.getElementById('custWalletAmt').innerHTML = `₹${profile.wallet_balance || 0}`; 
+                document.getElementById('custWalletVal').innerHTML = `₹${profile.wallet_balance || 0}`; 
+                document.getElementById('custTotalPurchases').innerHTML = `₹${profile.total_purchases || 0}`; 
+                document.getElementById('myRefCode').innerHTML = profile.referral_code || ''; 
                 document.getElementById('custReferralCount').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
                 
                 const wt = document.getElementById('walletTransList'); 
@@ -997,16 +963,20 @@
         function populateDropdowns() {
             const custList = document.getElementById('customerDropdownList');
             custList.innerHTML = '<div class="item" data-value="" onclick="selectCustomer(\'\')">Select Customer</div>';
-            customers.forEach(c => {
-                custList.innerHTML += `<div class="item" data-value="${c.id}" onclick="selectCustomer('${c.id}')">${c.name} (${c.mobile})</div>`;
-            });
+            if(customers && customers.length > 0) {
+                customers.forEach(c => {
+                    custList.innerHTML += `<div class="item" data-value="${c.id}" onclick="selectCustomer('${c.id}')">${c.name} (${c.mobile})</div>`;
+                });
+            }
             
             const prodList = document.getElementById('productDropdownList');
             prodList.innerHTML = '<div class="item" data-value="" onclick="selectProduct(\'\')">Select Product</div>';
-            allProducts.forEach(p => {
-                const cb = (p.selling_price*(p.discount_percent||0))/100;
-                prodList.innerHTML += `<div class="item" data-value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cb}" data-stock="${p.current_stock}" onclick="selectProduct('${p.id}')">${p.name} - ₹${p.selling_price}</div>`;
-            });
+            if(allProducts && allProducts.length > 0) {
+                allProducts.forEach(p => {
+                    const cb = (p.selling_price*(p.discount_percent||0))/100;
+                    prodList.innerHTML += `<div class="item" data-value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cb}" data-stock="${p.current_stock}" onclick="selectProduct('${p.id}')">${p.name} - ₹${p.selling_price}</div>`;
+                });
+            }
         }
 
         function filterCustomerDropdown() {
@@ -1028,8 +998,6 @@
                 }
             });
             document.getElementById('customerDropdownList').style.display = 'none';
-            // Also set the hidden billCustomer for compatibility
-            document.getElementById('billCustomer').value = id;
         }
 
         function filterProductDropdown() {
@@ -1055,16 +1023,8 @@
                 }
             });
             document.getElementById('productDropdownList').style.display = 'none';
-            const sel = document.getElementById('billProduct');
-            for(let i=0; i<sel.options.length; i++) {
-                if(sel.options[i].value == id) {
-                    sel.selectedIndex = i;
-                    break;
-                }
-            }
         }
 
-        // Click outside to close dropdowns
         document.addEventListener('click', function(e) {
             if(!e.target.closest('.search-dropdown')) {
                 document.querySelectorAll('.dropdown-list').forEach(d => d.style.display = 'none');
@@ -1329,12 +1289,12 @@
             }); 
             const billNo = 'SB' + Date.now(); 
             
-            // Print bill in new window
+            // Print bill
             const win = window.open('', '_blank'); 
             win.document.write(`<html><head><title>Bill - SASTA BAZAR</title><style>body{font-family:'Courier New',monospace;margin:20px;font-size:14px;max-width:300px;margin:auto;}table{width:100%;border-collapse:collapse;}td,th{padding:6px 4px;border-bottom:1px solid #ddd;text-align:left;}h2{color:#e67e22;}</style></head><body onload="window.print();window.close();"><h2>🛍️ SASTA BAZAR</h2><p>रामलक्ष्मण, रुद्रपुर रोड, देवरिया</p><p>📞 +91 6306088261</p><p>Bill: ${billNo}</p><p>Date: ${new Date().toLocaleDateString()}</p><p>Customer: ${custName}</p><hr><table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc</th><th>CB</th><th>Total</th></tr>${itemsHtml}</table><hr><p><strong>Total: ₹${total.toFixed(2)}</strong></p><p style="color:#27ae60;">Cashback: +₹${cbTotal.toFixed(2)}</p><p style="margin-top:15px;font-size:12px;">✨ Thank you for shopping! ✨</p><p style="font-size:10px;">Visit again! SASTA BAZAR</p></body></html>`); 
             win.document.close();
 
-            // Update everything in backend
+            // UPDATE EVERYTHING IN BACKEND
             try {
                 const items = cart.map(i => ({ product_id: i.product_id, quantity: i.quantity }));
                 const res = await apiCall('POST', '/bills', {
@@ -1352,22 +1312,37 @@
                 showAlert(`✅ Bill created! Cashback: ₹${cbTotal.toFixed(2)} added to wallet!`, 'success');
             } catch(e) {
                 console.error('Error details:', e);
-                showAlert('Error updating data: ' + e.message, 'error');
+                showAlert('Error: ' + e.message, 'error');
             }
         }
 
         // =============================================
-        // PRODUCT & CUSTOMER CRUD
+        // PRODUCT CRUD
         // =============================================
+        function showAddProductModal() {
+            editingId = null;
+            document.getElementById('productCode').value = '';
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productDiscount').value = '0';
+            document.getElementById('productStock').value = '';
+            document.getElementById('productImage').value = '';
+            document.getElementById('productSuperDiscount').checked = false;
+            document.getElementById('previewImg').style.display = 'none';
+            showModal('productModal');
+        }
+        
         async function saveProduct() { 
             const code = document.getElementById('productCode').value; 
             const name = document.getElementById('productName').value; 
             const price = parseFloat(document.getElementById('productPrice').value); 
             const discount = parseFloat(document.getElementById('productDiscount').value) || 0; 
-            const stock = parseInt(document.getElementById('productStock').value); 
+            const stock = parseInt(document.getElementById('productStock').value) || 0; 
             const imageUrl = document.getElementById('productImage').value; 
             const isSuper = document.getElementById('productSuperDiscount').checked; 
+            
             if(!code || !name || !price) { showAlert('Fill all required fields','error'); return; } 
+            
             try { 
                 if(editingId) { 
                     await apiCall('PUT', `/products/${editingId}`, {
@@ -1393,10 +1368,12 @@
                     if(imageUrl) productImages[newId] = imageUrl; 
                     if(isSuper) superDiscountProducts.push(newId); 
                 } 
-                showAlert('Product saved!','success'); 
+                showAlert('Product saved successfully!','success'); 
                 closeModal('productModal'); 
                 await loadAdminData(); 
-            } catch(e) { showAlert('Error saving: ' + e.message,'error'); } 
+            } catch(e) { 
+                showAlert('Error saving product: ' + e.message,'error'); 
+            } 
         }
         
         async function deleteProduct(id) { 
@@ -1405,25 +1382,37 @@
                     await apiCall('DELETE', `/products/${id}`); 
                     delete productImages[id]; 
                     superDiscountProducts = superDiscountProducts.filter(pid => pid !== id); 
-                    showAlert('Deleted','success'); 
+                    showAlert('Product deleted successfully','success'); 
                     await loadAdminData(); 
-                } catch(e){ showAlert('Error: ' + e.message,'error'); } 
+                } catch(e){ showAlert('Error deleting: ' + e.message,'error'); } 
             } 
         }
         
         function editProduct(id) { 
             const product = allProducts.find(p => p.id === id); 
+            if(!product) return;
             editingId = id; 
             document.getElementById('productCode').value = product.product_code; 
             document.getElementById('productName').value = product.name; 
             document.getElementById('productPrice').value = product.selling_price; 
             document.getElementById('productDiscount').value = product.discount_percent || 0; 
-            document.getElementById('productStock').value = product.current_stock; 
+            document.getElementById('productStock').value = product.current_stock || 0; 
             document.getElementById('productImage').value = productImages[id] || ''; 
             document.getElementById('productSuperDiscount').checked = superDiscountProducts.includes(id); 
             document.getElementById('previewImg').src = productImages[id] || ''; 
             document.getElementById('previewImg').style.display = productImages[id] ? 'block' : 'none'; 
             showModal('productModal'); 
+        }
+
+        // =============================================
+        // CUSTOMER CRUD
+        // =============================================
+        function showAddCustomerModal() {
+            document.getElementById('newCustName').value = '';
+            document.getElementById('newCustMobile').value = '';
+            document.getElementById('newCustPassword').value = '';
+            document.getElementById('newCustRef').value = '';
+            showModal('customerModal');
         }
         
         async function saveCustomer() { 
@@ -1431,8 +1420,10 @@
             const mobile = document.getElementById('newCustMobile').value; 
             const password = document.getElementById('newCustPassword').value; 
             const ref = document.getElementById('newCustRef').value; 
+            
             if(!name || !mobile) { showAlert('Fill name & mobile','error'); return; } 
             const finalPassword = password || mobile; 
+            
             try { 
                 await apiCall('POST', '/customers', {
                     name, 
@@ -1443,7 +1434,9 @@
                 showAlert(`Customer added! Login: ${mobile} / Password: ${finalPassword}`,'success'); 
                 closeModal('customerModal'); 
                 await loadAdminData(); 
-            } catch(e) { showAlert('Error: ' + e.message,'error'); } 
+            } catch(e) { 
+                showAlert('Error adding customer: ' + e.message,'error'); 
+            } 
         }
         
         function copyRefCode() { 
@@ -1488,7 +1481,7 @@
                     amount: amt, 
                     reason: reason || 'Admin added money'
                 }); 
-                showAlert(`₹${amt} added!`,'success'); 
+                showAlert(`₹${amt} added to wallet!`,'success'); 
                 await loadAdminData(); 
                 loadWalletCustomers(); 
             } catch(e){ showAlert('Error: ' + e.message,'error'); } 
@@ -1505,7 +1498,7 @@
                     amount: amt, 
                     reason: reason || 'Admin deducted money'
                 }); 
-                showAlert(`₹${amt} deducted!`,'success'); 
+                showAlert(`₹${amt} deducted from wallet!`,'success'); 
                 await loadAdminData(); 
                 loadWalletCustomers(); 
             } catch(e){ showAlert('Error: ' + e.message,'error'); } 
