@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>SASTA BAZAR | Premium Shop Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,22 +14,51 @@
             min-height: 100vh; 
             overflow-x: hidden; 
         }
-        @keyframes dance { 0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-8px) rotate(3deg)}75%{transform:translateY(8px) rotate(-3deg)} }
-        @keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
-        @keyframes pop { 0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)} }
-        @keyframes float { 0%,100%{transform:translateX(0)}50%{transform:translateX(15px)} }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.95;transform:scale(1.02)} }
-        @keyframes slideIn { from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1} }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
-        .dance{animation:dance 1.5s ease-in-out infinite;display:inline-block}
-        .bounce{animation:bounce 1s ease-in-out infinite;display:inline-block}
-        .pop{animation:pop 1s ease-in-out infinite;display:inline-block}
-        .float{animation:float 2s ease-in-out infinite;display:inline-block}
-        .pulse{animation:pulse 2s ease-in-out infinite}
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
+        
+        /* Animations */
+        @keyframes dance {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(3deg); }
+            75% { transform: translateY(8px) rotate(-3deg); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(15px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.95; transform: scale(1.02); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dance { animation: dance 1.5s ease-in-out infinite; display: inline-block; }
+        .bounce { animation: bounce 1s ease-in-out infinite; display: inline-block; }
+        .pop { animation: pop 1s ease-in-out infinite; display: inline-block; }
+        .float { animation: float 2s ease-in-out infinite; display: inline-block; }
+        .pulse { animation: pulse 2s ease-in-out infinite; }
+        
+        /* Common Styles */
         .dashboard-container { display: none; min-height: 100vh; }
-        .navbar { background: rgba(255,255,255,0.96); backdrop-filter: blur(10px); border-radius: 60px; padding: 12px 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .navbar { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 60px; padding: 12px 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         .logo-area { display: flex; align-items: center; gap: 10px; }
         .logo-icon { font-size: 28px; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .logo-text { font-size: 20px; font-weight: 700; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -39,53 +68,14 @@
         .nav-btn.active { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; }
         .nav-btn:hover { transform: translateY(-2px); background: #e67e22; color: white; }
         .logout-btn { background: #e74c3c; color: white; padding: 10px 20px; border-radius: 40px; border: none; cursor: pointer; font-weight: 600; }
-
-        .content-section { display: none; background: rgba(255,255,255,0.95); border-radius: 28px; padding: 25px; margin-top: 20px; animation: fadeInUp 0.4s ease; }
+        
+        /* Content Sections */
+        .content-section { display: none; background: rgba(255,255,255,0.95); border-radius: 28px; padding: 25px; margin-top: 20px; min-height: 400px; animation: fadeInUp 0.4s ease; }
         .content-section.active-section { display: block; }
-        .section-title { font-size: 22px; font-weight: 700; color: #e67e22; margin-bottom: 20px; border-left: 4px solid #e67e22; padding-left: 15px; }
-
-        .admin-container { display: none; }
-        .admin-header { background: rgba(255,255,255,0.95); border-radius: 28px; padding: 20px 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .admin-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .admin-btn { padding: 10px 18px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
-        .admin-btn-primary { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; }
-        .admin-btn-success { background: #27ae60; color: white; }
-        .admin-btn-warning { background: #f39c12; color: white; }
-        .admin-btn-danger { background: #e74c3c; color: white; }
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        .stat-card h3 { font-size: 13px; color: #666; margin-bottom: 8px; }
-        .stat-value { font-size: 28px; font-weight: 700; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
-
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f5f5f5; }
-
-        .scanner-input { width: 100%; padding: 14px; border-radius: 40px; border: 1px solid #e67e22; margin-bottom: 15px; font-size: 16px; }
-        .cart-total-box { background: #fef5e7; border-radius: 20px; padding: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-
-        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:1000; }
-        .modal-content { background:white; padding:30px; border-radius:32px; width:90%; max-width:500px; }
-        .alert { position: fixed; top:20px; right:20px; padding:12px 20px; border-radius:40px; display:none; z-index:2000; }
-        .alert-success { background:#27ae60; color:white; }
-        .alert-error { background:#e74c3c; color:white; }
-
-        .filter-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; align-items: center; }
-        .filter-bar input, .filter-bar select { padding: 10px 18px; border-radius: 40px; border: 1px solid #ddd; flex: 1 1 200px; }
-        .pagination { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
-        .pagination button { padding: 8px 16px; border-radius: 40px; border: 1px solid #ddd; background: white; cursor: pointer; }
-        .pagination button.active-page { background: #e67e22; color: white; border-color: #e67e22; }
-
-        .mode-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
-        .mode-toggle button { padding: 8px 20px; border-radius: 40px; border: 1px solid #e67e22; background: white; cursor: pointer; font-weight: 600; }
-        .mode-toggle button.active-mode { background: #e67e22; color: white; }
-
-        .tab-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-        .tab-nav button { padding: 10px 24px; border-radius: 40px; border: none; background: #f0f0f0; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .tab-nav button.active-tab { background: #e67e22; color: white; }
-
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+        .section-title { font-size: 24px; font-weight: 700; color: #e67e22; margin-bottom: 20px; border-left: 4px solid #e67e22; padding-left: 15px; }
+        
+        /* Products Grid */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
         .product-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: all 0.3s; cursor: pointer; position: relative; overflow: hidden; }
         .product-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .product-img { width: 80px; height: 80px; margin: 0 auto 15px; background: linear-gradient(135deg,#e67e22,#f39c12); border-radius: 20px; display: flex; align-items: center; justify-content: center; }
@@ -95,20 +85,23 @@
         .product-price { color: #e67e22; font-weight: 700; }
         .product-discount { font-size: 11px; color: #27ae60; }
         .discount-circle { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; animation: pop 1s infinite; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-
-        .super-products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        
+        /* Super Products */
+        .super-products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
         .super-card { background: linear-gradient(135deg, #e67e22, #d35400); border-radius: 20px; padding: 20px; text-align: center; color: white; transition: all 0.3s; animation: pulse 3s infinite; }
         .super-card:hover { transform: scale(1.03); }
         .super-card .old-price { text-decoration: line-through; font-size: 12px; opacity: 0.8; margin-right: 8px; }
         .super-card .price { font-size: 20px; font-weight: 700; }
         .offer-badge { background: #27ae60; display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; margin-top: 8px; animation: bounce 1s infinite; }
-
+        
+        /* Ads and Offers */
         .offers-banner { background: linear-gradient(135deg, #e67e22, #d35400, #e74c3c); border-radius: 28px; padding: 25px; margin-bottom: 25px; text-align: center; animation: pulse 2s infinite; }
         .offer-chip { background: rgba(255,255,255,0.2); border-radius: 60px; padding: 8px 20px; display: inline-flex; align-items: center; gap: 8px; margin: 5px; transition: all 0.3s; cursor: pointer; }
         .offer-chip:hover { transform: scale(1.1); background: white !important; color: #e67e22 !important; }
         .ad-banner { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 24px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; animation: slideIn 0.5s ease; }
         .referral-card { background: linear-gradient(135deg, #27ae60, #2ecc71); border-radius: 28px; padding: 25px; text-align: center; margin-bottom: 25px; animation: pulse 2s infinite; }
-
+        
+        /* Contact Section - Shop Details */
         .shop-info-card { background: white; border-radius: 28px; padding: 30px; margin-bottom: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
         .shop-info-card h3 { color: #e67e22; margin-bottom: 15px; font-size: 20px; border-left: 3px solid #e67e22; padding-left: 12px; }
         .shop-detail-row { display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid #eee; }
@@ -116,427 +109,828 @@
         .shop-detail-row span { color: #333; }
         .shop-timing { background: #fef5e7; border-radius: 20px; padding: 15px; margin-top: 15px; }
         .shop-timing p { margin: 5px 0; color: #555; }
-
-        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; text-align: center; margin-bottom: 30px; }
+        
+        /* Stats Cards */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .stat-card h3 { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .stat-value { font-size: 28px; font-weight: 700; background: linear-gradient(135deg,#e67e22,#f39c12); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        
+        /* Jobs Grid */
+        .jobs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .job-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .job-card h3 { color: #e67e22; margin-bottom: 10px; }
+        .apply-btn { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; margin-top: 15px; font-weight: 600; }
+        
+        /* Contact Grid */
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; text-align: center; margin-bottom: 30px; }
         .contact-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: all 0.3s; }
         .contact-card:hover { transform: translateY(-5px); }
         .contact-card i { font-size: 40px; color: #e67e22; margin-bottom: 15px; animation: bounce 2s infinite; }
         .contact-card h3 { color: #333; margin-bottom: 8px; }
         .contact-card p { color: #666; }
-
-        .jobs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .job-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        .job-card h3 { color: #e67e22; margin-bottom: 10px; }
-        .apply-btn { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; margin-top: 15px; font-weight: 600; }
-
-        /* Searchable dropdown */
-        .search-dropdown { position: relative; width: 100%; }
+        
+        /* Admin Dashboard */
+        .admin-container { display: none; }
+        .admin-header { background: rgba(255,255,255,0.95); border-radius: 28px; padding: 20px 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .admin-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .admin-btn { padding: 10px 18px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
+        .admin-btn-primary { background: linear-gradient(135deg,#e67e22,#f39c12); color: white; }
+        .admin-btn-success { background: #27ae60; color: white; }
+        .admin-btn-warning { background: #f39c12; color: white; }
+        .admin-btn-danger { background: #e74c3c; color: white; }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f5f5f5; }
+        .cart-total-box { background: #fef5e7; border-radius: 20px; padding: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .scanner-input { width: 100%; padding: 14px; border-radius: 40px; border: 1px solid #e67e22; margin-bottom: 15px; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 32px; width: 90%; max-width: 500px; }
+        .alert { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 40px; display: none; z-index: 2000; }
+        .alert-success { background: #27ae60; color: white; }
+        .alert-error { background: #e74c3c; color: white; }
+        
+        /* Searchable Dropdown */
+        .search-dropdown { position: relative; width: 100%; margin-bottom: 12px; }
         .search-dropdown input { width: 100%; padding: 12px 16px; border-radius: 40px; border: 1px solid #ddd; }
         .search-dropdown .dropdown-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; z-index: 50; display: none; }
         .search-dropdown .dropdown-list .item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
         .search-dropdown .dropdown-list .item:hover { background: #fef5e7; }
         .search-dropdown .dropdown-list .item.selected { background: #e67e22; color: white; }
 
-        /* address footer */
+        /* Pagination */
+        .pagination { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        .pagination button { padding: 8px 16px; border-radius: 40px; border: 1px solid #ddd; background: white; cursor: pointer; }
+        .pagination button.active-page { background: #e67e22; color: white; border-color: #e67e22; }
+
+        /* Filter Bar */
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; align-items: center; }
+        .filter-bar input, .filter-bar select { padding: 10px 18px; border-radius: 40px; border: 1px solid #ddd; flex: 1 1 200px; }
+
+        /* Mode Toggle */
+        .mode-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
+        .mode-toggle button { padding: 8px 20px; border-radius: 40px; border: 1px solid #e67e22; background: white; cursor: pointer; font-weight: 600; }
+        .mode-toggle button.active-mode { background: #e67e22; color: white; }
+
+        /* Tab Nav */
+        .tab-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .tab-nav button { padding: 10px 24px; border-radius: 40px; border: none; background: #f0f0f0; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .tab-nav button.active-tab { background: #e67e22; color: white; }
+
+        /* Bill Preview */
+        .bill-preview { background: white; padding: 20px; border-radius: 16px; max-width: 400px; margin: auto; font-family: 'Courier New', monospace; }
+        .bill-preview table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .bill-preview td, .bill-preview th { padding: 4px 6px; border-bottom: 1px dashed #ddd; }
+
+        /* Footer Address */
         .footer-address { background: rgba(255,255,255,0.9); border-radius: 28px; padding: 25px; margin-top: 40px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
         .footer-address p { color: #333; margin: 4px 0; }
         .footer-address strong { color: #e67e22; }
-
-        @media (max-width:768px){ .navbar{flex-direction:column;} .admin-header{flex-direction:column;text-align:center;} .filter-bar input,.filter-bar select{flex:1 1 100%;} }
+        
+        @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } .shop-detail-row { flex-wrap: wrap; } }
     </style>
 </head>
 <body>
-<div class="container" id="appContainer">
-    <!-- ===== LANDING PAGE ===== -->
-    <div id="landingPage">
-        <div class="navbar">
-            <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
-            <div class="nav-buttons">
-                <button class="nav-btn active" onclick="showLandingHome()">🏠 Home</button>
-                <button class="nav-btn" onclick="showLandingProducts()">🛍️ Products</button>
-                <button class="nav-btn" onclick="showLandingJobs()">💼 Careers</button>
-                <button class="nav-btn" onclick="showLandingContact()">📞 Contact</button>
-                <button class="nav-btn" onclick="showLandingOffers()">🔥 Super Offers</button>
-            </div>
-            <div><button class="login-btn login-admin" onclick="showAdminLoginForm()" style="background:transparent;border:1px solid #e67e22;color:#e67e22;padding:10px 20px;border-radius:40px;margin-right:10px;">👑 Admin</button><button class="login-btn login-customer" onclick="showCustomerLoginForm()" style="background:linear-gradient(135deg,#e67e22,#f39c12);color:white;border:none;padding:10px 20px;border-radius:40px;">👤 Customer</button></div>
-        </div>
-
-        <!-- Home Section -->
-        <div id="landingHomeSection">
-            <div style="display:flex;flex-wrap:wrap;gap:40px;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-radius:40px;padding:40px;margin-bottom:40px;">
-                <div style="flex:1;"><span class="hero-badge" style="background:#e67e22;padding:5px 15px;border-radius:40px;display:inline-block;color:white;animation:pulse 2s infinite;">✨ India's Most Trusted</span>
-                    <h1 style="font-size:52px;color:white;margin:20px 0;font-weight:800;">सस्ता बाजार<br><span style="color:#f39c12;animation:dance 2s infinite;display:inline-block;">Smart Shop Management</span></h1>
-                    <p style="color:rgba(255,255,255,0.9);font-size:16px;line-height:1.6;">देश का सबसे उन्नत दुकान प्रबंधन प्रणाली। आसान बिलिंग, स्मार्ट रेफरल कमीशन, और त्वरित कैशबैक।</p>
-                    <div style="display:flex;gap:30px;margin-top:30px;flex-wrap:wrap;"><div style="background:rgba(255,255,255,0.1);border-radius:20px;padding:15px 25px;text-align:center;animation:bounce 2s infinite;"><div style="font-size:32px;font-weight:700;color:#f39c12;">5000+</div><div style="color:white;">Happy Shops</div></div><div style="background:rgba(255,255,255,0.1);border-radius:20px;padding:15px 25px;text-align:center;animation:bounce 2s infinite 0.3s;"><div style="font-size:32px;font-weight:700;color:#f39c12;">1M+</div><div style="color:white;">Transactions</div></div><div style="background:rgba(255,255,255,0.1);border-radius:20px;padding:15px 25px;text-align:center;animation:bounce 2s infinite 0.6s;"><div style="font-size:32px;font-weight:700;color:#f39c12;">50k+</div><div style="color:white;">Active Users</div></div></div>
-                </div>
-                <div style="flex:1;position:relative;"><img src="https://placehold.co/500x400/ffffff/e67e22?text=SASTA+BAZAR" style="width:100%;border-radius:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2);">
-                    <div style="position:absolute;top:-20px;right:20px;background:rgba(255,255,255,0.95);border-radius:16px;padding:10px 15px;display:flex;align-items:center;gap:10px;animation:float 3s infinite;"><i class="fas fa-wallet" style="color:#e67e22;"></i><span>💰 Up to ₹500 Cashback</span></div>
-                    <div style="position:absolute;bottom:40px;left:-30px;background:rgba(255,255,255,0.95);border-radius:16px;padding:10px 15px;display:flex;align-items:center;gap:10px;animation:float 3s infinite 1s;"><i class="fas fa-gift" style="color:#27ae60;"></i><span>🎁 Up to 10% Cashback</span></div>
-                </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;margin-bottom:50px;">
-                <div class="feature-card" style="background:rgba(255,255,255,0.95);border-radius:28px;padding:30px;text-align:center;transition:all 0.3s;"><div style="font-size:48px;margin-bottom:20px;display:inline-block;animation:bounce 2s infinite;"><i class="fas fa-bolt" style="color:#e67e22;"></i></div><h3 style="color:#333;font-size:20px;">Fast Billing</h3><p style="color:#666;">बारकोड स्कैनर से तुरंत बिलिंग</p></div>
-                <div class="feature-card" style="background:rgba(255,255,255,0.95);border-radius:28px;padding:30px;text-align:center;transition:all 0.3s;"><div style="font-size:48px;margin-bottom:20px;display:inline-block;animation:bounce 2s infinite 0.3s;"><i class="fas fa-wallet" style="color:#e67e22;"></i></div><h3 style="color:#333;font-size:20px;">Wallet System</h3><p style="color:#666;">कैशबैक सीधे वॉलेट में</p></div>
-                <div class="feature-card" style="background:rgba(255,255,255,0.95);border-radius:28px;padding:30px;text-align:center;transition:all 0.3s;"><div style="font-size:48px;margin-bottom:20px;display:inline-block;animation:bounce 2s infinite 0.6s;"><i class="fas fa-users" style="color:#e67e22;"></i></div><h3 style="color:#333;font-size:20px;">Referral Rewards</h3><p style="color:#666;">रेफरल पर कमीशन</p></div>
-                <div class="feature-card" style="background:rgba(255,255,255,0.95);border-radius:28px;padding:30px;text-align:center;transition:all 0.3s;"><div style="font-size:48px;margin-bottom:20px;display:inline-block;animation:bounce 2s infinite 0.9s;"><i class="fas fa-chart-line" style="color:#e67e22;"></i></div><h3 style="color:#333;font-size:20px;">Analytics</h3><p style="color:#666;">रियल टाइम सेल्स रिपोर्ट</p></div>
-            </div>
-
-            <div class="offers-banner"><h2 style="font-size:28px;color:white;margin-bottom:10px;">🎉 स्पेशल ऑफर 🎉</h2><p style="color:rgba(255,255,255,0.9);">पहली खरीद पर <strong>Up to 10% Cashback</strong> मिल सकता है!</p><p>✨ रेफरल पर <strong>Up to 0.5% Commission</strong> पाएं ✨</p>
-                <div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin-top:15px;"><span class="offer-chip"><i class="fas fa-tag"></i> Up to 50% OFF</span><span class="offer-chip"><i class="fas fa-gift"></i> Free Delivery</span><span class="offer-chip"><i class="fas fa-wallet"></i> Up to ₹500 Cashback</span></div>
-            </div>
-            
-            <!-- Address Footer on Landing -->
-            <div class="footer-address">
-                <p><strong>📍 SASTA BAZAR</strong></p>
-                <p>रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश - 274001</p>
-                <p>📞 +91 6306088261 | ✉️ rahulmaurya274202@gmail.com</p>
-                <p style="font-size:13px;color:#888;margin-top:8px;">खुलने का समय: सुबह 10:00 बजे - शाम 6:00 बजे (सोम-रवि)</p>
-            </div>
-        </div>
-
-        <!-- Products Page -->
-        <div id="landingProductsPage" style="display:none;"><div class="section-title">🔥 हमारे उत्पाद</div><div id="landingProductsList" class="products-grid"></div></div>
-
-        <!-- Careers Page -->
-        <div id="landingJobsPage" style="display:none;"><div class="section-title">💼 करियर के अवसर</div><div id="landingJobList" class="jobs-grid"></div></div>
-
-        <!-- Contact Page with Full Shop Details -->
-        <div id="landingContactPage" style="display:none;">
-            <div class="section-title">📞 संपर्क करें</div>
-            <div class="shop-info-card">
-                <h3><i class="fas fa-store"></i> दुकान की जानकारी</h3>
-                <div class="shop-detail-row"><i class="fas fa-map-marker-alt"></i><span><strong>पता:</strong> रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश </span></div>
-                <div class="shop-detail-row"><i class="fas fa-phone-alt"></i><span><strong>फोन नंबर:</strong> +91 6306088261</span></div>
-                <div class="shop-detail-row"><i class="fas fa-envelope"></i><span><strong>ईमेल:</strong> rahulmaurya274202@gmail.com, support@sastabazar.com</span></div>
-                <div class="shop-detail-row"><i class="fas fa-user-tie"></i><span><strong>दुकान प्रबंधक:</strong> रोहित मौर्य</span></div>
-                <div class="shop-detail-row"><i class="fab fa-whatsapp"></i><span><strong>व्हाट्सएप:</strong> +91 6306088261</span></div>
-                <div class="shop-timing"><p><i class="far fa-clock"></i> <strong>खुलने का समय:</strong></p><p>सोमवार - रविवार </p><p>: सुबह 10:00 बजे - शाम 6:00 बजे</p></div>
-            </div>
-            <div style="background:white;border-radius:28px;padding:25px;text-align:center;margin-bottom:25px;box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-                <h3 style="color:#e67e22;margin-bottom:15px;">हमें सोशल मीडिया पर फॉलो करें</h3>
-                <div style="display:flex;justify-content:center;gap:25px;flex-wrap:wrap;">
-                    <a href="#" style="font-size:30px;color:#25D366;transition:all 0.3s;display:inline-block;"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" style="font-size:30px;color:#E4405F;transition:all 0.3s;display:inline-block;"><i class="fab fa-instagram"></i></a>
-                    <a href="#" style="font-size:30px;color:#1877F2;transition:all 0.3s;display:inline-block;"><i class="fab fa-facebook"></i></a>
-                    <a href="#" style="font-size:30px;color:#1DA1F2;transition:all 0.3s;display:inline-block;"><i class="fab fa-twitter"></i></a>
-                    <a href="#" style="font-size:30px;color:#FF0000;transition:all 0.3s;display:inline-block;"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
-            <div class="contact-grid">
-                <div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>पता</h3><p>रामलक्ष्मण, रुद्रपुर रोड,<br>देवरिया, उ.प्र. </p></div>
-                <div class="contact-card"><i class="fas fa-phone"></i><h3>फोन</h3><p>📞 6306088261</p></div>
-                <div class="contact-card"><i class="fas fa-envelope"></i><h3>ईमेल</h3><p>rahulmaurya274202@gmail.com<br>support@sastabazar.com</p></div>
-                <div class="contact-card"><i class="fas fa-user-tie"></i><h3>दुकान प्रबंधक</h3><p>रोहित मौर्य<br>+91 6306088261</p></div>
-            </div>
-            <div style="background:white;border-radius:28px;padding:25px;margin-top:20px;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-                <h3 style="color:#e67e22;margin-bottom:15px;"><i class="fas fa-map"></i> हमारा स्थान</h3>
-                <div style="background:#f0f0f0;border-radius:20px;padding:40px;text-align:center;"><i class="fas fa-map-marker-alt" style="font-size:50px;color:#e67e22;"></i><p style="margin-top:15px;">रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश - 274001</p></div>
-            </div>
-        </div>
-
-        <!-- Super Offers Page -->
-        <div id="landingOffersPage" style="display:none;"><div class="section-title">🔥 सुपर डिस्काउंट जोन</div><div id="landingSuperList" class="super-products-grid"></div><div class="offers-banner" style="margin-top:20px;"><h3>🎁 सीमित समय के ऑफर</h3><p>जल्दी करें! ऑफर सीमित समय के लिए हैं।</p></div></div>
-    </div>
-
-    <!-- ===== LOGIN ===== -->
-    <div id="loginSection" style="background:white;border-radius:48px;padding:40px;max-width:480px;margin:40px auto;display:none;"><h2 style="text-align:center;color:#e67e22;">🔐 Login</h2><div id="dbStatus" style="text-align:center;margin:15px 0;"></div><div style="display:flex;gap:12px;margin-bottom:25px;"><button id="adminTab" class="toggle-option" style="flex:1;padding:12px;background:#f0f0f0;border:none;border-radius:50px;cursor:pointer;" onclick="showAdminLoginForm()">Admin</button><button id="customerTab" class="toggle-option" style="flex:1;padding:12px;background:#f0f0f0;border:none;border-radius:50px;cursor:pointer;" onclick="showCustomerLoginForm()">Customer</button></div>
-        <div id="adminLoginForm"><input type="email" id="adminEmail" placeholder="admin@shop.com" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><input type="password" id="adminPassword" placeholder="Password" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><button onclick="adminLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#e67e22,#f39c12);color:white;border:none;border-radius:40px;cursor:pointer;">Login as Admin</button><button onclick="goBackToLanding()" style="margin-top:15px;width:100%;padding:12px;background:#f0f0f0;border:none;border-radius:28px;">← Back</button></div>
-        <div id="customerLoginForm" style="display:none;"><input type="tel" id="custMobileLogin" placeholder="9876543210" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><input type="password" id="custPassword" placeholder="Password" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><button onclick="customerLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#e67e22,#f39c12);color:white;border:none;border-radius:40px;">Login</button><button onclick="showRegistration()" style="margin-top:12px;width:100%;padding:12px;background:#27ae60;color:white;border:none;border-radius:28px;">Create Account</button><button onclick="goBackToLanding()" style="margin-top:12px;width:100%;padding:12px;background:#f0f0f0;border:none;border-radius:28px;">← Back</button></div>
-        <div id="registrationForm" style="display:none;"><h3>Create Account</h3><input type="text" id="regName" placeholder="Full Name" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><input type="tel" id="regMobile" placeholder="Mobile" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><input type="password" id="regPassword" placeholder="Password" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><input type="text" id="regReferral" placeholder="Referral Code" style="width:100%;padding:14px;margin:10px 0;border-radius:28px;border:1px solid #ddd;"><button onclick="register()" style="width:100%;padding:14px;background:#27ae60;color:white;border:none;border-radius:40px;">Register</button><button onclick="showCustomerLoginForm()" style="margin-top:12px;width:100%;padding:12px;background:#f0f0f0;border:none;border-radius:28px;">Back</button></div>
-    </div>
-
-    <!-- ===== CUSTOMER DASHBOARD ===== -->
-    <div id="customerDashboard" class="dashboard-container">
-        <div class="navbar">
-            <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
-            <div class="wallet-box"><i class="fas fa-wallet"></i><span id="custWalletAmt">₹0</span></div>
-            <div class="nav-buttons">
-                <button class="nav-btn active" onclick="showCustomerSection('home')">🏠 Home</button>
-                <button class="nav-btn" onclick="showCustomerSection('products')">🛍️ Products</button>
-                <button class="nav-btn" onclick="showCustomerSection('careers')">💼 Careers</button>
-                <button class="nav-btn" onclick="showCustomerSection('contact')">📞 Contact</button>
-                <button class="nav-btn" onclick="showCustomerSection('super')">🔥 Super Offers</button>
-            </div>
-            <button class="logout-btn" onclick="customerLogout()">🚪 Exit</button>
-        </div>
-
-        <div id="customerHomeSection" class="content-section active-section">
-            <div class="stats-row"><div class="stat-card"><h3>Wallet Balance</h3><div class="stat-value" id="custWalletVal">₹0</div></div><div class="stat-card"><h3>Total Purchases</h3><div class="stat-value" id="custTotalPurchases">₹0</div></div><div class="stat-card"><h3>Referrals</h3><div class="stat-value" id="custReferralCount">0</div></div></div>
-            
-            <div class="referral-card"><h2 style="color:white;">🎁 रेफरल ऑफर 🎁</h2><p style="color:rgba(255,255,255,0.9);margin:10px 0;">अपने दोस्तों को रेफर करें और <strong>Up to 0.5% Commission</strong> पाएं!</p><div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin-top:10px;"><span class="offer-chip" style="background:rgba(255,255,255,0.2);">📱 शेयर करें</span><span class="offer-chip" style="background:rgba(255,255,255,0.2);">💸 कमाई करें</span></div></div>
-            
-            <div class="section-title">🔗 My Referral Code</div>
-            <div style="background:#fef5e7;padding:20px;text-align:center;border-radius:20px;margin-bottom:20px;"><p style="font-size:28px;font-weight:700;color:#e67e22;" id="myRefCode"></p><button onclick="copyRefCode()" class="apply-btn">📋 Copy Code</button></div>
-            
-            <div class="offers-banner"><h2 style="font-size:24px;">🔥 विशेष ऑफर 🔥</h2><div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin-top:15px;">
-                <div class="offer-chip pop"><i class="fas fa-tag"></i> <span>50% OFF</span><span class="discount-circle" style="position:relative;top:0;right:0;display:inline-block;margin-left:8px;width:25px;height:25px;font-size:10px;">-50%</span></div>
-                <div class="offer-chip pop" style="animation-delay:0.3s;"><i class="fas fa-gift"></i> <span>बंपर ऑफर</span><span class="discount-circle" style="position:relative;top:0;right:0;display:inline-block;margin-left:8px;width:25px;height:25px;font-size:10px;">🔥</span></div>
-                <div class="offer-chip pop" style="animation-delay:0.6s;"><i class="fas fa-wallet"></i> <span>₹500 कैशबैक</span><span class="discount-circle" style="position:relative;top:0;right:0;display:inline-block;margin-left:8px;width:25px;height:25px;font-size:10px;">+₹500</span></div>
-            </div></div>
-            
-            <div class="ad-banner"><div style="display:flex;align-items:center;gap:15px;"><i class="fas fa-mobile-alt" style="font-size:48px;color:white;animation:bounce 1s infinite;"></i><div><h3 style="color:white;">📱 हमारा ऐप डाउनलोड करें</h3><p style="color:rgba(255,255,255,0.8);">एक्सक्लूसिव ऐप ऑफर पाएं!</p></div></div><button style="background:white;color:#667eea;border:none;padding:10px 25px;border-radius:40px;font-weight:600;">Download Now</button></div>
-            <div class="ad-banner" style="background:linear-gradient(135deg, #27ae60, #2ecc71);animation:slideIn 0.7s ease;"><div style="display:flex;align-items:center;gap:15px;"><i class="fas fa-gift" style="font-size:48px;color:white;animation:pop 1.5s infinite;"></i><div><h3 style="color:white;">🎁 रेफर करें और कमाएं</h3><p style="color:rgba(255,255,255,0.8);">हर रेफरल पर कमीशन पाएं!</p></div></div><button class="offer-chip" style="background:white;color:#27ae60;border:none;padding:10px 25px;border-radius:40px;">शेयर करें</button></div>
-            
-            <div class="section-title">💰 Recent Transactions</div>
-            <div style="overflow-x:auto;"><table><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransList"></tbody></table></div>
-        </div>
-
-        <div id="customerProductsSection" class="content-section"><div class="section-title">📦 All Products</div><div id="customerAllProducts" class="products-grid"></div></div>
-        <div id="customerCareersSection" class="content-section"><div class="section-title">💼 Job Openings</div><div id="customerJobsList" class="jobs-grid"></div></div>
-        <div id="customerContactSection" class="content-section"><div class="section-title">📞 Contact Us</div><div class="contact-grid"><div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>Address</h3><p>Ramlakshan, Rudrapur Road,<br>Deoria, U.P.</p></div><div class="contact-card"><i class="fas fa-phone"></i><h3>Phone</h3><p>📞 6306088261</p></div><div class="contact-card"><i class="fas fa-envelope"></i><h3>Email</h3><p>rahulmaurya274202@gmail.com</p></div><div class="contact-card"><i class="fas fa-user-tie"></i><h3>Shop Admin</h3><p>Rohit Maurya</p></div></div></div>
-        <div id="customerSuperSection" class="content-section"><div class="section-title">🔥 Super Discount Zone</div><div id="customerSuperList" class="super-products-grid"></div></div>
-    </div>
-
-    <!-- ===== ADMIN DASHBOARD ===== -->
-    <div id="adminDashboard" class="admin-container">
-        <div class="admin-header"><h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1><div class="admin-buttons"><button class="admin-btn admin-btn-primary" onclick="showAddProductModal()">➕ Product</button><button class="admin-btn admin-btn-success" onclick="showAddCustomerModal()">👤 Customer</button><button class="admin-btn admin-btn-warning" onclick="showWalletControlModal()">💰 Wallet</button><button class="admin-btn admin-btn-danger" onclick="adminLogout()">🚪 Exit</button></div></div>
-        <div class="stats-row"><div class="stat-card"><h3>Revenue</h3><div class="stat-value" id="adminTotalSales">₹0</div></div><div class="stat-card"><h3>Customers</h3><div class="stat-value" id="adminTotalCustomers">0</div></div><div class="stat-card"><h3>Low Stock</h3><div class="stat-value" id="adminLowStock">0</div></div></div>
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
         
-        <div class="tab-nav"><button class="active-tab" onclick="switchAdminTab('billing')">🧾 Billing</button><button onclick="switchAdminTab('customers')">👥 All Customers</button><button onclick="switchAdminTab('products')">📦 All Products</button><button onclick="switchAdminTab('history')">📜 Sales History</button></div>
+        <!-- ========== LANDING PAGE (Front Page) ========== -->
+        <div id="landingPage">
+            <div class="navbar">
+                <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
+                <div class="nav-buttons">
+                    <button class="nav-btn active" onclick="showLandingHome()">🏠 Home</button>
+                    <button class="nav-btn" onclick="showLandingProducts()">🛍️ Products</button>
+                    <button class="nav-btn" onclick="showLandingJobs()">💼 Careers</button>
+                    <button class="nav-btn" onclick="showLandingContact()">📞 Contact</button>
+                    <button class="nav-btn" onclick="showLandingOffers()">🔥 Super Offers</button>
+                </div>
+                <div>
+                    <button class="login-btn login-admin" onclick="showAdminLoginForm()" style="background:transparent; border:1px solid #e67e22; color:#e67e22; padding:10px 20px; border-radius:40px; margin-right:10px;">👑 Admin</button>
+                    <button class="login-btn login-customer" onclick="showCustomerLoginForm()" style="background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; padding:10px 20px; border-radius:40px;">👤 Customer</button>
+                </div>
+            </div>
 
-        <!-- Billing Tab with searchable dropdowns -->
-        <div id="tabBilling" class="admin-section" style="background:white;border-radius:24px;padding:20px;margin-bottom:20px;">
-            <h2 style="color:#e67e22;">🧾 Billing</h2>
-            <div class="mode-toggle"><button class="active-mode" id="modeManual" onclick="setBillingMode('manual')">✏️ Manual</button><button id="modeScanner" onclick="setBillingMode('scanner')">📷 Scanner</button></div>
-            <input type="text" id="barcodeInput" placeholder="📷 Scan barcode → Enter" class="scanner-input">
+            <!-- Home Section -->
+            <div id="landingHomeSection">
+                <div style="display:flex; flex-wrap:wrap; gap:40px; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-radius:40px; padding:40px; margin-bottom:40px;">
+                    <div style="flex:1;">
+                        <span class="hero-badge" style="background:#e67e22; padding:5px 15px; border-radius:40px; display:inline-block; color:white; animation:pulse 2s infinite;">✨ India's Most Trusted</span>
+                        <h1 style="font-size:52px; color:white; margin:20px 0; font-weight:800;">सस्ता बाजार<br><span style="color:#f39c12; animation:dance 2s infinite; display:inline-block;">Smart Shop Management</span></h1>
+                        <p style="color:rgba(255,255,255,0.9); font-size:16px; line-height:1.6;">देश का सबसे उन्नत दुकान प्रबंधन प्रणाली। आसान बिलिंग, स्मार्ट रेफरल कमीशन, और त्वरित कैशबैक।</p>
+                        <div style="display:flex; gap:30px; margin-top:30px; flex-wrap:wrap;">
+                            <div style="background:rgba(255,255,255,0.1); border-radius:20px; padding:15px 25px; text-align:center; animation:bounce 2s infinite;"><div style="font-size:32px; font-weight:700; color:#f39c12;">5000+</div><div style="color:white;">Happy Shops</div></div>
+                            <div style="background:rgba(255,255,255,0.1); border-radius:20px; padding:15px 25px; text-align:center; animation:bounce 2s infinite 0.3s;"><div style="font-size:32px; font-weight:700; color:#f39c12;">1M+</div><div style="color:white;">Transactions</div></div>
+                            <div style="background:rgba(255,255,255,0.1); border-radius:20px; padding:15px 25px; text-align:center; animation:bounce 2s infinite 0.6s;"><div style="font-size:32px; font-weight:700; color:#f39c12;">50k+</div><div style="color:white;">Active Users</div></div>
+                        </div>
+                    </div>
+                    <div style="flex:1; position:relative;">
+                        <img src="https://placehold.co/500x400/ffffff/e67e22?text=SASTA+BAZAR" style="width:100%; border-radius:30px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+                        <div style="position:absolute; top:-20px; right:20px; background:rgba(255,255,255,0.95); border-radius:16px; padding:10px 15px; display:flex; align-items:center; gap:10px; animation:float 3s infinite;"><i class="fas fa-wallet" style="color:#e67e22;"></i><span>💰 Up to ₹500 Cashback</span></div>
+                        <div style="position:absolute; bottom:40px; left:-30px; background:rgba(255,255,255,0.95); border-radius:16px; padding:10px 15px; display:flex; align-items:center; gap:10px; animation:float 3s infinite 1s;"><i class="fas fa-gift" style="color:#27ae60;"></i><span>🎁 Up to 10% Cashback</span></div>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px; margin-bottom:50px;">
+                    <div class="feature-card" style="background:rgba(255,255,255,0.95); border-radius:28px; padding:30px; text-align:center; transition:all 0.3s;"><div style="font-size:48px; margin-bottom:20px; display:inline-block; animation:bounce 2s infinite;"><i class="fas fa-bolt" style="color:#e67e22;"></i></div><h3 style="color:#333; font-size:20px;">Fast Billing</h3><p style="color:#666;">बारकोड स्कैनर से तुरंत बिलिंग</p></div>
+                    <div class="feature-card" style="background:rgba(255,255,255,0.95); border-radius:28px; padding:30px; text-align:center; transition:all 0.3s;"><div style="font-size:48px; margin-bottom:20px; display:inline-block; animation:bounce 2s infinite 0.3s;"><i class="fas fa-wallet" style="color:#e67e22;"></i></div><h3 style="color:#333; font-size:20px;">Wallet System</h3><p style="color:#666;">कैशबैक सीधे वॉलेट में</p></div>
+                    <div class="feature-card" style="background:rgba(255,255,255,0.95); border-radius:28px; padding:30px; text-align:center; transition:all 0.3s;"><div style="font-size:48px; margin-bottom:20px; display:inline-block; animation:bounce 2s infinite 0.6s;"><i class="fas fa-users" style="color:#e67e22;"></i></div><h3 style="color:#333; font-size:20px;">Referral Rewards</h3><p style="color:#666;">रेफरल पर कमीशन</p></div>
+                    <div class="feature-card" style="background:rgba(255,255,255,0.95); border-radius:28px; padding:30px; text-align:center; transition:all 0.3s;"><div style="font-size:48px; margin-bottom:20px; display:inline-block; animation:bounce 2s infinite 0.9s;"><i class="fas fa-chart-line" style="color:#e67e22;"></i></div><h3 style="color:#333; font-size:20px;">Analytics</h3><p style="color:#666;">रियल टाइम सेल्स रिपोर्ट</p></div>
+                </div>
+
+                <div class="offers-banner"><h2 style="font-size:28px; color:white; margin-bottom:10px;">🎉 स्पेशल ऑफर 🎉</h2><p style="color:rgba(255,255,255,0.9);">पहली खरीद पर <strong>Up to 10% Cashback</strong> मिल सकता है!</p><p>✨ रेफरल पर <strong>Up to 0.5% Commission</strong> पाएं ✨</p>
+                    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:15px;"><span class="offer-chip"><i class="fas fa-tag"></i> Up to 50% OFF</span><span class="offer-chip"><i class="fas fa-gift"></i> Free Delivery</span><span class="offer-chip"><i class="fas fa-wallet"></i> Up to ₹500 Cashback</span></div>
+                </div>
+
+                <!-- Footer Address -->
+                <div class="footer-address">
+                    <p><strong>📍 SASTA BAZAR</strong></p>
+                    <p>रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश - 274001</p>
+                    <p>📞 +91 6306088261 | ✉️ rahulmaurya274202@gmail.com</p>
+                    <p style="font-size:13px;color:#888;margin-top:8px;">खुलने का समय: सुबह 10:00 बजे - शाम 6:00 बजे (सोम-रवि)</p>
+                </div>
+            </div>
+
+            <!-- Products Page -->
+            <div id="landingProductsPage" style="display:none;">
+                <div class="section-title">🔥 हमारे उत्पाद</div>
+                <div id="landingProductsList" class="products-grid"></div>
+            </div>
+
+            <!-- Careers Page -->
+            <div id="landingJobsPage" style="display:none;">
+                <div class="section-title">💼 करियर के अवसर</div>
+                <div id="landingJobList" class="jobs-grid"></div>
+            </div>
+
+            <!-- Contact Page with Full Shop Details -->
+            <div id="landingContactPage" style="display:none;">
+                <div class="section-title">📞 संपर्क करें</div>
+                
+                <!-- Shop Information Card -->
+                <div class="shop-info-card">
+                    <h3><i class="fas fa-store"></i> दुकान की जानकारी</h3>
+                    <div class="shop-detail-row"><i class="fas fa-map-marker-alt"></i><span><strong>पता:</strong> रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश </span></div>
+                    <div class="shop-detail-row"><i class="fas fa-phone-alt"></i><span><strong>फोन नंबर:</strong> +91 6306088261</span></div>
+                    <div class="shop-detail-row"><i class="fas fa-envelope"></i><span><strong>ईमेल:</strong> rahulmaurya274202@gmail.com, support@sastabazar.com</span></div>
+                    <div class="shop-detail-row"><i class="fas fa-user-tie"></i><span><strong>दुकान प्रबंधक:</strong> रोहित मौर्य</span></div>
+                    <div class="shop-detail-row"><i class="fab fa-whatsapp"></i><span><strong>व्हाट्सएप:</strong> +91 6306088261</span></div>
+                    <div class="shop-timing">
+                        <p><i class="far fa-clock"></i> <strong>खुलने का समय:</strong></p>
+                        <p>सोमवार - रविवार </p>
+                        <p>: सुबह 10:00 बजे - शाम 6:00 बजे</p>
+                    </div>
+                </div>
+                
+                <!-- Social Media Section -->
+                <div style="background:white; border-radius:28px; padding:25px; text-align:center; margin-bottom:25px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+                    <h3 style="color:#e67e22; margin-bottom:15px;">हमें सोशल मीडिया पर फॉलो करें</h3>
+                    <div style="display:flex; justify-content:center; gap:25px; flex-wrap:wrap;">
+                        <a href="#" style="font-size:30px; color:#25D366; transition:all 0.3s; display:inline-block;"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" style="font-size:30px; color:#E4405F; transition:all 0.3s; display:inline-block;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="font-size:30px; color:#1877F2; transition:all 0.3s; display:inline-block;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="font-size:30px; color:#1DA1F2; transition:all 0.3s; display:inline-block;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="font-size:30px; color:#FF0000; transition:all 0.3s; display:inline-block;"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Contact Cards -->
+                <div class="contact-grid">
+                    <div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>पता</h3><p>रामलक्ष्मण, रुद्रपुर रोड,<br>देवरिया, उ.प्र. </p></div>
+                    <div class="contact-card"><i class="fas fa-phone"></i><h3>फोन</h3><p>📞 6306088261<br></p></div>
+                    <div class="contact-card"><i class="fas fa-envelope"></i><h3>ईमेल</h3><p>rahulmaurya274202@gmail.com<br>support@sastabazar.com</p></div>
+                    <div class="contact-card"><i class="fas fa-user-tie"></i><h3>दुकान प्रबंधक</h3><p>रोहित मौर्य<br>+91 6306088261</p></div>
+                </div>
+                
+                <!-- Map Section -->
+                <div style="background:white; border-radius:28px; padding:25px; margin-top:20px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+                    <h3 style="color:#e67e22; margin-bottom:15px;"><i class="fas fa-map"></i> हमारा स्थान</h3>
+                    <div style="background:#f0f0f0; border-radius:20px; padding:40px; text-align:center;">
+                        <i class="fas fa-map-marker-alt" style="font-size:50px; color:#e67e22;"></i>
+                        <p style="margin-top:15px;">रामलक्ष्मण, रुद्रपुर रोड, देवरिया, उत्तर प्रदेश - 274001</p>
+                        <p style="margin-top:10px; color:#666;">Google Maps पर देखने के लिए क्लिक करें</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Super Offers Page -->
+            <div id="landingOffersPage" style="display:none;">
+                <div class="section-title">🔥 सुपर डिस्काउंट जोन</div>
+                <div id="landingSuperList" class="super-products-grid"></div>
+                <div class="offers-banner" style="margin-top:20px;"><h3>🎁 सीमित समय के ऑफर</h3><p>जल्दी करें! ऑफर सीमित समय के लिए हैं।</p></div>
+            </div>
+        </div>
+
+        <!-- ========== LOGIN SECTION ========== -->
+        <div id="loginSection" style="background:white; border-radius:48px; padding:40px; max-width:480px; margin:40px auto; display:none;">
+            <h2 style="text-align:center; color:#e67e22;">🔐 Login</h2>
+            <div id="dbStatus" style="text-align:center; margin:15px 0;"></div>
+            <div style="display:flex; gap:12px; margin-bottom:25px;"><button id="adminTab" class="toggle-option" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:50px; cursor:pointer;" onclick="showAdminLoginForm()">Admin</button><button id="customerTab" class="toggle-option" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:50px; cursor:pointer;" onclick="showCustomerLoginForm()">Customer</button></div>
+            <div id="adminLoginForm"><input type="email" id="adminEmail" placeholder="admin@shop.com" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="password" id="adminPassword" placeholder="Password" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><button class="btn-premium" onclick="adminLogin()" style="width:100%; padding:14px; background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; border-radius:40px; cursor:pointer;">Login as Admin</button><button onclick="goBackToLanding()" style="margin-top:15px; width:100%; padding:12px; background:#f0f0f0; border:none; border-radius:28px;">← Back</button></div>
+            <div id="customerLoginForm" style="display:none;"><input type="tel" id="custMobileLogin" placeholder="9876543210" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="password" id="custPassword" placeholder="Password" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><button onclick="customerLogin()" style="width:100%; padding:14px; background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; border-radius:40px;">Login</button><button onclick="showRegistration()" style="margin-top:12px; width:100%; padding:12px; background:#27ae60; color:white; border:none; border-radius:28px;">Create Account</button><button onclick="goBackToLanding()" style="margin-top:12px; width:100%; padding:12px; background:#f0f0f0; border:none; border-radius:28px;">← Back</button></div>
+            <div id="registrationForm" style="display:none;"><h3 style="color:#333;">Create Account</h3><input type="text" id="regName" placeholder="Full Name" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="tel" id="regMobile" placeholder="Mobile" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="password" id="regPassword" placeholder="Password" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><input type="text" id="regReferral" placeholder="Referral Code" style="width:100%; padding:14px; margin:10px 0; border-radius:28px; border:1px solid #ddd;"><button onclick="register()" style="width:100%; padding:14px; background:#27ae60; color:white; border:none; border-radius:40px;">Register</button><button onclick="showCustomerLoginForm()" style="margin-top:12px; width:100%; padding:12px; background:#f0f0f0; border:none; border-radius:28px;">Back</button></div>
+        </div>
+
+        <!-- ========== CUSTOMER DASHBOARD ========== -->
+        <div id="customerDashboard" class="dashboard-container">
+            <div class="navbar">
+                <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text"> SASTA BAZAR</span></div>
+                <div class="wallet-box"><i class="fas fa-wallet"></i><span id="custWalletAmt">₹0</span></div>
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="showCustomerSection('home')">🏠 Home</button>
+                    <button class="nav-btn" onclick="showCustomerSection('products')">🛍️ Products</button>
+                    <button class="nav-btn" onclick="showCustomerSection('careers')">💼 Careers</button>
+                    <button class="nav-btn" onclick="showCustomerSection('contact')">📞 Contact</button>
+                    <button class="nav-btn" onclick="showCustomerSection('super')">🔥 Super Offers</button>
+                </div>
+                <button class="logout-btn" onclick="customerLogout()">🚪 Exit</button>
+            </div>
             
-            <!-- Searchable Customer Dropdown -->
-            <div class="search-dropdown" style="margin-bottom:12px;">
-                <input type="text" id="customerSearchInput" placeholder="🔍 Search Customer..." oninput="filterCustomerDropdown()" onfocus="document.getElementById('customerDropdownList').style.display='block'">
-                <div class="dropdown-list" id="customerDropdownList">
-                    <div class="item" data-value="" onclick="selectCustomer('')">Select Customer</div>
+            <div id="customerHomeSection" class="content-section active-section">
+                <div class="stats-row"><div class="stat-card"><h3>Wallet Balance</h3><div class="stat-value" id="custWalletVal">₹0</div></div><div class="stat-card"><h3>Total Purchases</h3><div class="stat-value" id="custTotalPurchases">₹0</div></div><div class="stat-card"><h3>Referrals</h3><div class="stat-value" id="custReferralCount">0</div></div></div>
+                
+                <!-- Referral Offer Banner -->
+                <div class="referral-card"><h2 style="color:white;">🎁 रेफरल ऑफर 🎁</h2><p style="color:rgba(255,255,255,0.9); margin:10px 0;">अपने दोस्तों को रेफर करें और <strong>Up to 0.5% Commission</strong> पाएं!</p><div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:10px;"><span class="offer-chip" style="background:rgba(255,255,255,0.2);">📱 शेयर करें</span><span class="offer-chip" style="background:rgba(255,255,255,0.2);">💸 कमाई करें</span></div></div>
+                
+                <div class="section-title">🔗 My Referral Code</div>
+                <div style="background:#fef5e7; padding:20px; text-align:center; border-radius:20px; margin-bottom:20px;"><p style="font-size:28px; font-weight:700; color:#e67e22;" id="myRefCode"></p><button onclick="copyRefCode()" class="apply-btn">📋 Copy Code</button></div>
+                
+                <!-- Special Offers Banner with Discount Pop-ups -->
+                <div class="offers-banner"><h2 style="font-size:24px;">🔥 विशेष ऑफर 🔥</h2><div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:15px;">
+                    <div class="offer-chip pop"><i class="fas fa-tag"></i> <span>50% OFF</span><span class="discount-circle" style="position:relative; top:0; right:0; display:inline-block; margin-left:8px; width:25px; height:25px; font-size:10px;">-50%</span></div>
+                    <div class="offer-chip pop" style="animation-delay:0.3s;"><i class="fas fa-gift"></i> <span>बंपर ऑफर</span><span class="discount-circle" style="position:relative; top:0; right:0; display:inline-block; margin-left:8px; width:25px; height:25px; font-size:10px;">🔥</span></div>
+                    <div class="offer-chip pop" style="animation-delay:0.6s;"><i class="fas fa-wallet"></i> <span>₹500 कैशबैक</span><span class="discount-circle" style="position:relative; top:0; right:0; display:inline-block; margin-left:8px; width:25px; height:25px; font-size:10px;">+₹500</span></div>
+                </div></div>
+                
+                <!-- Advertisement Banner -->
+                <div class="ad-banner"><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-mobile-alt" style="font-size:48px; color:white; animation:bounce 1s infinite;"></i><div><h3 style="color:white;">📱 हमारा ऐप डाउनलोड करें</h3><p style="color:rgba(255,255,255,0.8);">एक्सक्लूसिव ऐप ऑफर पाएं!</p></div></div><button style="background:white; color:#667eea; border:none; padding:10px 25px; border-radius:40px; font-weight:600;">Download Now</button></div>
+                
+                <div class="ad-banner" style="background:linear-gradient(135deg, #27ae60, #2ecc71); animation:slideIn 0.7s ease;"><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-gift" style="font-size:48px; color:white; animation:pop 1.5s infinite;"></i><div><h3 style="color:white;">🎁 रेफर करें और कमाएं</h3><p style="color:rgba(255,255,255,0.8);">हर रेफरल पर कमीशन पाएं!</p></div></div><button class="offer-chip" style="background:white; color:#27ae60; border:none; padding:10px 25px; border-radius:40px;">शेयर करें</button></div>
+                
+                <div class="section-title">💰 Recent Transactions</div>
+                <div style="overflow-x:auto;"><table style="width:100%;"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead><tbody id="walletTransList"></tbody></table></div>
+            </div>
+            
+            <div id="customerProductsSection" class="content-section"><div class="section-title">📦 All Products</div><div id="customerAllProducts" class="products-grid"></div></div>
+            <div id="customerCareersSection" class="content-section"><div class="section-title">💼 Job Openings</div><div id="customerJobsList" class="jobs-grid"></div>
+                <div id="customerJobForm" class="job-form"><h3>Apply for Job</h3><select id="applyJobSelect"><option>Select Position</option></select><input type="text" id="applicantName" placeholder="Full Name"><input type="tel" id="applicantMobile" placeholder="Mobile"><input type="email" id="applicantEmail" placeholder="Email"><textarea id="applicantMsg" rows="3" placeholder="Why should we hire you?"></textarea><button class="btn-submit" onclick="submitCustomerJobApp()">Submit Application</button><button onclick="closeJobForm()" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div>
+            </div>
+            <div id="customerContactSection" class="content-section"><div class="section-title">📞 Contact Us</div><div class="contact-grid"><div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>Address</h3><p>Ramlakshan, Rudrapur Road,<br>Deoria, U.P.</p></div><div class="contact-card"><i class="fas fa-phone"></i><h3>Phone</h3><p>📞 6306088261</p></div><div class="contact-card"><i class="fas fa-envelope"></i><h3>Email</h3><p>rahulmaurya274202@gmail.com</p></div><div class="contact-card"><i class="fas fa-user-tie"></i><h3>Shop Admin</h3><p>Rohit Maurya</p></div></div></div>
+            <div id="customerSuperSection" class="content-section"><div class="section-title">🔥 Super Discount Zone</div><div id="customerSuperList" class="super-products-grid"></div></div>
+        </div>
+
+        <!-- ========== ADMIN DASHBOARD ========== -->
+        <div id="adminDashboard" class="admin-container">
+            <div class="admin-header"><h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1><div class="admin-buttons"><button class="admin-btn admin-btn-primary" onclick="showAddProductModal()">➕ Product</button><button class="admin-btn admin-btn-success" onclick="showAddCustomerModal()">👤 Customer</button><button class="admin-btn admin-btn-warning" onclick="showWalletControlModal()">💰 Wallet</button><button class="admin-btn admin-btn-primary" onclick="showAdminJobPage()">💼 Jobs</button><button class="admin-btn admin-btn-danger" onclick="adminLogout()">🚪 Exit</button></div></div>
+            <div class="stats-row"><div class="stat-card"><h3>Revenue</h3><div class="stat-value" id="adminTotalSales">₹0</div></div><div class="stat-card"><h3>Customers</h3><div class="stat-value" id="adminTotalCustomers">0</div></div><div class="stat-card"><h3>Commission</h3><div class="stat-value" id="adminTotalCommission">₹0</div></div><div class="stat-card"><h3>Low Stock</h3><div class="stat-value" id="adminLowStock">0</div></div></div>
+            
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="active-tab" onclick="switchAdminTab('billing')">🧾 Billing</button>
+                <button onclick="switchAdminTab('customers')">👥 All Customers</button>
+                <button onclick="switchAdminTab('products')">📦 All Products</button>
+                <button onclick="switchAdminTab('history')">📜 Sales History</button>
+            </div>
+
+            <!-- Billing Tab -->
+            <div id="tabBilling" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px;">
+                <h2 style="color:#e67e22;">🧾 Billing</h2>
+                
+                <!-- Mode Toggle -->
+                <div class="mode-toggle">
+                    <button class="active-mode" id="modeManual" onclick="setBillingMode('manual')">✏️ Manual</button>
+                    <button id="modeScanner" onclick="setBillingMode('scanner')">📷 Scanner</button>
                 </div>
-                <input type="hidden" id="selectedCustomerId" value="">
-            </div>
-
-            <!-- Searchable Product Dropdown -->
-            <div class="search-dropdown" style="margin-bottom:12px;">
-                <input type="text" id="productSearchInput" placeholder="🔍 Search Product..." oninput="filterProductDropdown()" onfocus="document.getElementById('productDropdownList').style.display='block'">
-                <div class="dropdown-list" id="productDropdownList">
-                    <div class="item" data-value="" onclick="selectProduct('')">Select Product</div>
+                
+                <input type="text" id="barcodeInput" placeholder="📷 Scan barcode → Enter" class="scanner-input">
+                
+                <!-- Searchable Customer Dropdown -->
+                <div class="search-dropdown">
+                    <input type="text" id="customerSearchInput" placeholder="🔍 Search Customer..." oninput="filterCustomerDropdown()" onfocus="document.getElementById('customerDropdownList').style.display='block'">
+                    <div class="dropdown-list" id="customerDropdownList">
+                        <div class="item" data-value="" onclick="selectCustomer('')">Select Customer</div>
+                    </div>
+                    <input type="hidden" id="selectedCustomerId" value="">
                 </div>
-                <input type="hidden" id="selectedProductId" value="">
-                <input type="hidden" id="selectedProductPrice" value="0">
-                <input type="hidden" id="selectedProductDiscount" value="0">
-                <input type="hidden" id="selectedProductCashback" value="0">
-                <input type="hidden" id="selectedProductStock" value="0">
+
+                <!-- Searchable Product Dropdown -->
+                <div class="search-dropdown">
+                    <input type="text" id="productSearchInput" placeholder="🔍 Search Product..." oninput="filterProductDropdown()" onfocus="document.getElementById('productDropdownList').style.display='block'">
+                    <div class="dropdown-list" id="productDropdownList">
+                        <div class="item" data-value="" onclick="selectProduct('')">Select Product</div>
+                    </div>
+                    <input type="hidden" id="selectedProductId" value="">
+                    <input type="hidden" id="selectedProductPrice" value="0">
+                    <input type="hidden" id="selectedProductDiscount" value="0">
+                    <input type="hidden" id="selectedProductCashback" value="0">
+                    <input type="hidden" id="selectedProductStock" value="0">
+                </div>
+
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;">
+                    <input type="number" id="billQuantity" placeholder="Qty" value="1">
+                    <button onclick="addToCart()" style="background:linear-gradient(135deg,#e67e22,#f39c12); color:white; border:none; padding:12px; border-radius:40px;">Add to Cart</button>
+                </div>
+                
+                <h3 style="margin:15px 0;">🛒 Cart</h3>
+                <div class="table-responsive"><table style="width:100%;"><thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Discount</th><th>Cashback</th><th>Total</th><th></th><tr></thead><tbody id="cartList"></tbody></table></div>
+                <div class="cart-total-box">
+                    <span><strong>Total:</strong> ₹<span id="cartTotal">0</span></span>
+                    <span><strong style="color:#27ae60;">Cashback:</strong> +₹<span id="cartCashback">0</span></span>
+                    <div>
+                        <button onclick="generateBillPreview()" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:40px;">Generate Bill</button>
+                        <button onclick="printBillAndUpdate()" style="background:#3498db; color:white; border:none; padding:10px 20px; border-radius:40px; margin-left:10px;">Print Bill</button>
+                    </div>
+                </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
-                <input type="number" id="billQuantity" placeholder="Qty" value="1">
-                <button onclick="addToCart()" style="background:linear-gradient(135deg,#e67e22,#f39c12);color:white;border:none;padding:12px;border-radius:40px;">Add to Cart</button>
+            <!-- All Customers Tab -->
+            <div id="tabCustomers" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px; display:none;">
+                <h2 style="color:#e67e22;">👥 All Customers</h2>
+                <div class="filter-bar">
+                    <input type="text" id="customerSearch" placeholder="🔍 Search by name or mobile" oninput="renderCustomerTable()">
+                    <select id="customerPerPage" onchange="renderCustomerTable()">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div class="table-responsive"><table style="width:100%;"><thead><tr><th>Name</th><th>Mobile</th><th>Referral Code</th><th>Wallet</th><th>Purchases</th><th>Action</th></tr></thead><tbody id="adminCustomersList"></tbody></table></div>
+                <div class="pagination" id="customerPagination"></div>
             </div>
-            <h3 style="margin:15px 0;">🛒 Cart</h3>
-            <div class="table-responsive"><table><thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Cashback</th><th>Total</th><th></th></tr></thead><tbody id="cartList"></tbody></table></div>
-            <div class="cart-total-box"><span><strong>Total:</strong> ₹<span id="cartTotal">0</span></span><span><strong style="color:#27ae60;">Cashback:</strong> +₹<span id="cartCashback">0</span></span><div><button onclick="createBill()" style="background:#27ae60;color:white;border:none;padding:10px 20px;border-radius:40px;">Generate Bill</button><button onclick="printBill()" style="background:#3498db;color:white;border:none;padding:10px 20px;border-radius:40px;margin-left:10px;">Print Bill</button></div></div>
+
+            <!-- All Products Tab -->
+            <div id="tabProducts" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px; display:none;">
+                <h2 style="color:#e67e22;">📦 All Products</h2>
+                <div class="filter-bar">
+                    <input type="text" id="productSearch" placeholder="🔍 Search products" oninput="renderProductTable()">
+                    <select id="productCategoryFilter" onchange="renderProductTable()">
+                        <option value="">All Categories</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Grocery">Grocery</option>
+                    </select>
+                    <select id="productPerPage" onchange="renderProductTable()">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div class="table-responsive"><table style="width:100%;"><thead><tr><th>Image</th><th>Code</th><th>Name</th><th>Price</th><th>Discount</th><th>Stock</th><th>Super</th><th>Actions</th></tr></thead><tbody id="adminProductsList"></tbody></table></div>
+                <div class="pagination" id="productPagination"></div>
+            </div>
+
+            <!-- Sales History Tab -->
+            <div id="tabHistory" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px; display:none;">
+                <h2 style="color:#e67e22;">📜 Sales History</h2>
+                <div class="filter-bar">
+                    <input type="text" id="historySearch" placeholder="🔍 Search by bill no or customer" oninput="renderHistoryTable()">
+                    <select id="historyPerPage" onchange="renderHistoryTable()">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div class="table-responsive"><table style="width:100%;"><thead><tr><th>Bill No</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Cashback</th></tr></thead><tbody id="historyList"></tbody></table></div>
+                <div class="pagination" id="historyPagination"></div>
+            </div>
         </div>
 
-        <!-- All Customers Tab -->
-        <div id="tabCustomers" class="admin-section" style="background:white;border-radius:24px;padding:20px;margin-bottom:20px;display:none;">
-            <h2 style="color:#e67e22;">👥 All Customers</h2>
-            <div class="filter-bar"><input type="text" id="customerSearch" placeholder="🔍 Search by name or mobile" oninput="renderCustomerTable()"><select id="customerPerPage" onchange="renderCustomerTable()"><option value="5">5</option><option value="10" selected>10</option><option value="25">25</option><option value="50">50</option></select></div>
-            <div class="table-responsive"><table><thead><tr><th>Name</th><th>Mobile</th><th>Referral</th><th>Wallet</th><th>Purchases</th><th>Action</th></tr></thead><tbody id="adminCustomersList"></tbody></table></div>
-            <div class="pagination" id="customerPagination"></div>
+        <!-- ADMIN JOB PAGE -->
+        <div id="adminJobPage" class="admin-container"><div class="admin-header"><h1 style="color:#e67e22;">📋 Job Management</h1><button onclick="closeAdminJobPage()" class="admin-btn admin-btn-danger">✖ Close</button></div><div style="background:white; border-radius:24px; padding:20px;"><div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px;"><input type="text" id="jobTitle" placeholder="Job Title" style="flex:1; padding:12px; border-radius:28px; border:1px solid #ddd;"><input type="text" id="jobDesc" placeholder="Job Description" style="flex:2; padding:12px; border-radius:28px; border:1px solid #ddd;"><button onclick="addJobVacancy()" style="background:#27ae60; color:white; border:none; padding:12px 20px; border-radius:40px;">➕ Add</button></div><div id="adminJobsList"></div><button onclick="showAppList()" style="background:#e67e22; color:white; border:none; padding:12px 20px; border-radius:40px; margin-top:15px;">📋 View Applications (<span id="appCount">0</span>)</button><div id="applicationsList" style="margin-top:20px; display:none;"></div></div></div>
+
+        <!-- BILL PREVIEW MODAL -->
+        <div id="billPreviewModal" class="modal">
+            <div class="modal-content" style="max-width:450px;">
+                <h2 style="color:#e67e22;text-align:center;">🧾 Bill Preview</h2>
+                <div id="billPreviewContent" class="bill-preview"></div>
+                <button onclick="closeModal('billPreviewModal')" style="margin-top:15px;width:100%;padding:12px;background:#f0f0f0;border:none;border-radius:40px;">Close</button>
+            </div>
         </div>
 
-        <!-- All Products Tab -->
-        <div id="tabProducts" class="admin-section" style="background:white;border-radius:24px;padding:20px;margin-bottom:20px;display:none;">
-            <h2 style="color:#e67e22;">📦 All Products</h2>
-            <div class="filter-bar"><input type="text" id="productSearch" placeholder="🔍 Search products" oninput="renderProductTable()"><select id="productCategoryFilter" onchange="renderProductTable()"><option value="">All Categories</option><option value="Electronics">Electronics</option><option value="Clothing">Clothing</option><option value="Grocery">Grocery</option></select><select id="productPerPage" onchange="renderProductTable()"><option value="5">5</option><option value="10" selected>10</option><option value="25">25</option><option value="50">50</option></select></div>
-            <div class="table-responsive"><table><thead><tr><th>Image</th><th>Code</th><th>Name</th><th>Price</th><th>Disc%</th><th>Stock</th><th>Super</th><th>Actions</th></tr></thead><tbody id="adminProductsList"></tbody></table></div>
-            <div class="pagination" id="productPagination"></div>
-        </div>
-
-        <!-- Sales History Tab -->
-        <div id="tabHistory" class="admin-section" style="background:white;border-radius:24px;padding:20px;margin-bottom:20px;display:none;">
-            <h2 style="color:#e67e22;">📜 Sales History</h2>
-            <div class="filter-bar"><input type="text" id="historySearch" placeholder="🔍 Search by bill no or customer" oninput="renderHistoryTable()"><select id="historyPerPage" onchange="renderHistoryTable()"><option value="5">5</option><option value="10" selected>10</option><option value="25">25</option><option value="50">50</option></select></div>
-            <div class="table-responsive"><table><thead><tr><th>Bill No</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Cashback</th></tr></thead><tbody id="historyList"></tbody></table></div>
-            <div class="pagination" id="historyPagination"></div>
-        </div>
-    </div>
-
-    <!-- MODALS -->
-    <div id="productModal" class="modal"><div class="modal-content"><h2>Add/Edit Product</h2><input type="text" id="productCode" placeholder="Product Code" style="width:100%;margin:8px 0;padding:12px;"><input type="text" id="productName" placeholder="Product Name" style="width:100%;margin:8px 0;padding:12px;"><input type="number" id="productPrice" placeholder="Price" style="width:100%;margin:8px 0;padding:12px;"><input type="number" id="productDiscount" placeholder="Discount %" value="0" style="width:100%;margin:8px 0;padding:12px;"><input type="number" id="productStock" placeholder="Stock" style="width:100%;margin:8px 0;padding:12px;"><input type="text" id="productImage" placeholder="Image URL" style="width:100%;margin:8px 0;padding:12px;"><label><input type="checkbox" id="productSuperDiscount"> 🔥 Super Discount</label><button onclick="saveProduct()" style="background:#27ae60;color:white;border:none;padding:12px;border-radius:40px;margin-top:15px;width:100%;">Save</button><button onclick="closeModal('productModal')" style="margin-top:10px;width:100%;padding:10px;background:#f0f0f0;border:none;border-radius:40px;">Cancel</button></div></div>
-    <div id="customerModal" class="modal"><div class="modal-content"><h2>Add Customer</h2><input type="text" id="newCustName" placeholder="Name" style="width:100%;margin:8px 0;padding:12px;"><input type="tel" id="newCustMobile" placeholder="Mobile" style="width:100%;margin:8px 0;padding:12px;"><input type="password" id="newCustPassword" placeholder="Password" style="width:100%;margin:8px 0;padding:12px;"><input type="text" id="newCustRef" placeholder="Referral Code" style="width:100%;margin:8px 0;padding:12px;"><button onclick="saveCustomer()" style="background:#27ae60;color:white;border:none;padding:12px;border-radius:40px;width:100%;">Save</button><button onclick="closeModal('customerModal')" style="margin-top:10px;width:100%;padding:10px;background:#f0f0f0;border:none;border-radius:40px;">Cancel</button></div></div>
-    <div id="walletControlModal" class="modal"><div class="modal-content"><h2>Wallet Control</h2><select id="walletCustomerSelect" style="width:100%;padding:12px;margin:8px 0;"><option>Select Customer</option></select><div id="currentBalance" style="padding:10px;background:#f5f5f5;border-radius:20px;margin:10px 0;">₹0</div><input type="number" id="walletAmount" placeholder="Amount" style="width:100%;padding:12px;margin:8px 0;"><input type="text" id="walletReason" placeholder="Reason" style="width:100%;padding:12px;margin:8px 0;"><div style="display:flex;gap:10px;"><button onclick="adminAddMoney()" style="background:#27ae60;color:white;border:none;padding:10px;border-radius:40px;flex:1;">Add</button><button onclick="adminDeductMoney()" style="background:#e74c3c;color:white;border:none;padding:10px;border-radius:40px;flex:1;">Deduct</button></div><button onclick="closeModal('walletControlModal')" style="margin-top:15px;width:100%;padding:10px;background:#f0f0f0;border:none;border-radius:40px;">Close</button></div></div>
+        <!-- MODALS -->
+        <div id="productModal" class="modal"><div class="modal-content"><h2>Add Product</h2><input type="text" id="productCode" placeholder="Product Code" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productName" placeholder="Product Name" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productPrice" placeholder="Price" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productDiscount" placeholder="Discount %" value="0" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productStock" placeholder="Stock" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productImage" placeholder="Image URL" style="width:100%; margin:8px 0; padding:12px;"><img id="previewImg" src="" style="width:60px; display:none;"><label><input type="checkbox" id="productSuperDiscount"> 🔥 Super Discount</label><button onclick="saveProduct()" style="background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; margin-top:15px; width:100%;">Save</button><button onclick="closeModal('productModal')" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div></div>
+        <div id="customerModal" class="modal"><div class="modal-content"><h2>Add Customer</h2><input type="text" id="newCustName" placeholder="Name"><input type="tel" id="newCustMobile" placeholder="Mobile"><input type="password" id="newCustPassword" placeholder="Password"><input type="text" id="newCustRef" placeholder="Referral Code"><button onclick="saveCustomer()" style="background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; width:100%;">Save</button><button onclick="closeModal('customerModal')" style="margin-top:10px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Cancel</button></div></div>
+        <div id="walletControlModal" class="modal"><div class="modal-content"><h2>Wallet Control</h2><select id="walletCustomerSelect"><option>Select Customer</option></select><div id="currentBalance" style="padding:10px; background:#f5f5f5; border-radius:20px; margin:10px 0;">₹0</div><input type="number" id="walletAmount" placeholder="Amount"><input type="text" id="walletReason" placeholder="Reason"><div style="display:flex; gap:10px;"><button onclick="adminAddMoney()" style="background:#27ae60; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Add</button><button onclick="adminDeductMoney()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Deduct</button></div><button onclick="closeModal('walletControlModal')" style="margin-top:15px; width:100%; padding:10px; background:#f0f0f0; border:none; border-radius:40px;">Close</button></div></div>
 
     <div id="alert" class="alert"></div>
-</div>
 
-<script>
-    const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
-    const API_URL = `${BACKEND_URL}/api`;
-    let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
-    let productImages = {}, superDiscountProducts = [], customers = [];
-    let billingMode = 'manual';
-    let customerPage=1, customerPerPage=10;
-    let productPage=1, productPerPage=10;
-    let historyPage=1, historyPerPage=10;
-    let salesHistory = [];
+    <script>
+        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
+        const API_URL = `${BACKEND_URL}/api`;
+        let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
+        let productImages = {}, superDiscountProducts = [], jobVacancies = [], jobApplications = [];
+        let customerPage=1, customerPerPage=10, productPage=1, productPerPage=10, historyPage=1, historyPerPage=10;
+        let salesHistory = [];
+        let billingMode = 'manual';
 
-    // ===== UTILITIES =====
-    function showAlert(msg, type) { const a=document.getElementById('alert'); a.textContent=msg; a.className=`alert alert-${type}`; a.style.display='block'; setTimeout(()=>a.style.display='none',3000); }
-    function showModal(id) { document.getElementById(id).style.display='flex'; }
-    function closeModal(id) { document.getElementById(id).style.display='none'; }
-    async function apiCall(method,endpoint,data=null){ const options={method,headers:{'Content-Type':'application/json'}}; if(authToken) options.headers['Authorization']=`Bearer ${authToken}`; if(data) options.body=JSON.stringify(data); const res=await fetch(`${API_URL}${endpoint}`,options); if(!res.ok){const err=await res.json(); throw new Error(err.error||'API failed');} return res.json(); }
+        // Landing Page Navigation
+        function showLandingHome() { document.getElementById('landingHomeSection').style.display = 'block'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('home'); }
+        function showLandingProducts() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'block'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('products'); loadLandingProducts(); }
+        function showLandingJobs() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'block'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('jobs'); loadLandingJobs(); }
+        function showLandingContact() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'block'; document.getElementById('landingOffersPage').style.display = 'none'; updateNavActive('contact'); }
+        function showLandingOffers() { document.getElementById('landingHomeSection').style.display = 'none'; document.getElementById('landingProductsPage').style.display = 'none'; document.getElementById('landingJobsPage').style.display = 'none'; document.getElementById('landingContactPage').style.display = 'none'; document.getElementById('landingOffersPage').style.display = 'block'; updateNavActive('offers'); loadLandingSuper(); }
+        function updateNavActive(section) { document.querySelectorAll('#landingPage .nav-btn').forEach(btn => btn.classList.remove('active')); if(section === 'home') document.querySelector('#landingPage .nav-btn:nth-child(1)').classList.add('active'); if(section === 'products') document.querySelector('#landingPage .nav-btn:nth-child(2)').classList.add('active'); if(section === 'jobs') document.querySelector('#landingPage .nav-btn:nth-child(3)').classList.add('active'); if(section === 'contact') document.querySelector('#landingPage .nav-btn:nth-child(4)').classList.add('active'); if(section === 'offers') document.querySelector('#landingPage .nav-btn:nth-child(5)').classList.add('active'); }
+        
+        async function loadLandingProducts() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('landingProductsList'); if(container) { container.innerHTML = ''; products.slice(0,8).forEach(p => { const imgUrl = productImages[p.id] || ''; container.innerHTML += `<div class="product-card" onclick="showProductDetail(${p.id})"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF</div></div>`; }); } } catch(e) { console.log('Error'); } }
+        async function loadLandingJobs() { const container = document.getElementById('landingJobList'); if(container) { container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showApplyFromLanding('${job.title}')">Apply Now</button></div>`; }); } }
+        function showApplyFromLanding(jobTitle) { showCustomerLoginForm(); setTimeout(() => { document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; document.getElementById('applyJobSelect').disabled = true; }, 500); }
+        async function loadLandingSuper() { const container = document.getElementById('landingSuperList'); if(container && allProducts.length) { const superProds = allProducts.filter(p => superDiscountProducts.includes(p.id)); container.innerHTML = ''; superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(0)}</div></div>`; }); } }
+        
+        function showProductDetail(id) { const product = allProducts.find(p => p.id === id); if(product) { alert(`🛍️ ${product.name}\n💰 Price: ₹${product.selling_price}\n🎁 Discount: ${product.discount_percent||0}%\n💵 Cashback: ₹${((product.selling_price*(product.discount_percent||0))/100).toFixed(0)}`); } }
+        
+        function showCustomerSection(section) { document.querySelectorAll('#customerDashboard .content-section').forEach(s => s.classList.remove('active-section')); if(section === 'home') document.getElementById('customerHomeSection').classList.add('active-section'); if(section === 'products') { document.getElementById('customerProductsSection').classList.add('active-section'); loadCustomerProducts(); } if(section === 'careers') { document.getElementById('customerCareersSection').classList.add('active-section'); loadCustomerJobs(); } if(section === 'contact') document.getElementById('customerContactSection').classList.add('active-section'); if(section === 'super') { document.getElementById('customerSuperSection').classList.add('active-section'); loadCustomerSuper(); } }
+        
+        function showAdminLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'block'; document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'none'; }
+        function showCustomerLoginForm() { document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'block'; document.getElementById('adminLoginForm').style.display = 'none'; document.getElementById('customerLoginForm').style.display = 'block'; document.getElementById('registrationForm').style.display = 'none'; }
+        function showRegistration() { document.getElementById('customerLoginForm').style.display = 'none'; document.getElementById('registrationForm').style.display = 'block'; }
+        function goBackToLanding() { document.getElementById('landingPage').style.display = 'block'; document.getElementById('loginSection').style.display = 'none'; }
+        
+        function showAdminJobPage() { document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('adminJobPage').style.display = 'block'; renderAdminJobs(); renderApplications(); }
+        function closeAdminJobPage() { document.getElementById('adminJobPage').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; }
+        function showAppList() { const div = document.getElementById('applicationsList'); div.style.display = div.style.display === 'none' ? 'block' : 'none'; renderApplications(); }
+        
+        async function loadCustomerProducts() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('customerAllProducts'); container.innerHTML = ''; products.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const imgUrl = productImages[p.id] || ''; container.innerHTML += `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF | +₹${cb.toFixed(0)} cashback</div><div class="discount-circle">${p.discount_percent||0}%</div></div>`; }); } catch(e) { showAlert('Error loading products','error'); } }
+        async function loadCustomerSuper() { try { const products = await apiCall('GET','/products'); const container = document.getElementById('customerSuperList'); container.innerHTML = ''; const superProds = products.filter(p => superDiscountProducts.includes(p.id)); superProds.forEach(p => { const cb = (p.selling_price * (p.discount_percent||0))/100; const finalPrice = p.selling_price - cb; container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: +₹${cb.toFixed(0)}</div></div>`; }); } catch(e) { showAlert('Error','error'); } }
+        async function loadCustomerJobs() { const container = document.getElementById('customerJobsList'); container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div class="job-card"><h3>${job.title}</h3><p>${job.description}</p><button class="apply-btn" onclick="showJobApplicationForm('${job.title}')">Apply Now</button></div>`; }); }
+        function showJobApplicationForm(jobTitle) { document.getElementById('applyJobSelect').innerHTML = `<option>${jobTitle}</option>`; document.getElementById('applyJobSelect').disabled = true; document.getElementById('customerJobForm').style.display = 'block'; }
+        function closeJobForm() { document.getElementById('customerJobForm').style.display = 'none'; }
+        async function submitCustomerJobApp() { const jobTitle = document.getElementById('applyJobSelect').value; const name = document.getElementById('applicantName').value; const mobile = document.getElementById('applicantMobile').value; const email = document.getElementById('applicantEmail').value; const msg = document.getElementById('applicantMsg').value; if(!name||!mobile||!email) { showAlert('Fill all fields','error'); return; } jobApplications.push({ jobTitle, name, mobile, email, message: msg, date: new Date().toLocaleString() }); showAlert('Application submitted!','success'); document.getElementById('applicantName').value = ''; document.getElementById('applicantMobile').value = ''; document.getElementById('applicantEmail').value = ''; document.getElementById('applicantMsg').value = ''; closeJobForm(); renderApplications(); }
+        
+        function renderAdminJobs() { const container = document.getElementById('adminJobsList'); container.innerHTML = ''; jobVacancies.forEach(job => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;"><div><strong>${job.title}</strong><br><small>${job.description}</small></div><button onclick="deleteJob(${job.id})" style="background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:40px;">Delete</button></div>`; }); }
+        function renderApplications() { const container = document.getElementById('applicationsList'); const countSpan = document.getElementById('appCount'); container.innerHTML = ''; jobApplications.forEach(app => { container.innerHTML += `<div style="background:#f5f5f5; border-radius:16px; padding:15px; margin-bottom:10px;"><strong>${app.jobTitle}</strong><br>Name: ${app.name}<br>Mobile: ${app.mobile}<br>Email: ${app.email}<br>Message: ${app.message}<br><small>Applied: ${app.date}</small></div>`; }); if(countSpan) countSpan.innerText = jobApplications.length; }
+        function addJobVacancy() { const title = document.getElementById('jobTitle').value; const desc = document.getElementById('jobDesc').value; if(title && desc) { jobVacancies.push({ id: Date.now(), title, description: desc }); document.getElementById('jobTitle').value = ''; document.getElementById('jobDesc').value = ''; renderAdminJobs(); loadCustomerJobs(); loadLandingJobs(); showAlert('Job added!','success'); } else { showAlert('Enter job details','error'); } }
+        function deleteJob(id) { jobVacancies = jobVacancies.filter(j => j.id !== id); renderAdminJobs(); loadCustomerJobs(); loadLandingJobs(); showAlert('Job deleted','success'); }
+        
+        async function checkBackend() { try { const res = await fetch(`${BACKEND_URL}/`); if(res.ok) document.getElementById('dbStatus').innerHTML = '<span style="background:#27ae60; color:white; padding:5px 12px; border-radius:40px;">✅ Connected</span>'; else document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Error</span>'; } catch(e) { document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Offline</span>'; } }
+        async function apiCall(method, endpoint, data = null) { const options = { method, headers: { 'Content-Type': 'application/json' } }; if (authToken) options.headers['Authorization'] = `Bearer ${authToken}`; if (data) options.body = JSON.stringify(data); const res = await fetch(`${API_URL}${endpoint}`, options); if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'API failed'); } return res.json(); }
+        function showAlert(msg, type) { const a = document.getElementById('alert'); a.textContent = msg; a.className = `alert alert-${type}`; a.style.display = 'block'; setTimeout(() => a.style.display = 'none', 3000); }
+        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function showAddProductModal() { editingId = null; showModal('productModal'); }
+        function showAddCustomerModal() { showModal('customerModal'); }
+        function showWalletControlModal() { showModal('walletControlModal'); loadWalletCustomers(); }
+        
+        async function adminLogin() { const email = document.getElementById('adminEmail').value, password = document.getElementById('adminPassword').value; if(!email||!password) return showAlert('Enter credentials','error'); try { const res = await fetch(`${API_URL}/auth/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'admin' }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!','success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Cannot connect','error'); } }
+        async function customerLogin() { const mobile = document.getElementById('custMobileLogin').value, password = document.getElementById('custPassword').value; if(!mobile||!password) return showAlert('Enter credentials','error'); try { const res = await fetch(`${API_URL}/auth/customer/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mobile,password}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerDashboardData(); showAlert(`Welcome ${data.customer.name}!`,'success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Server error','error'); } }
+        async function register() { const name = document.getElementById('regName').value, mobile = document.getElementById('regMobile').value, password = document.getElementById('regPassword').value, ref = document.getElementById('regReferral').value; if(!name||!mobile||!password) return showAlert('Fill all fields','error'); try { const res = await fetch(`${API_URL}/auth/customer/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,mobile,password,referralCode:ref}) }); if(res.ok) { const data = await res.json(); authToken = data.token; currentUser = { type:'customer', data:data.customer }; document.getElementById('landingPage').style.display = 'none'; document.getElementById('loginSection').style.display = 'none'; document.getElementById('customerDashboard').style.display = 'block'; await loadCustomerDashboardData(); showAlert('Registered!','success'); } else { const err = await res.json(); showAlert(err.error,'error'); } } catch(e) { showAlert('Registration failed','error'); } }
+        function customerLogout() { authToken = null; currentUser = null; cart = []; document.getElementById('customerDashboard').style.display = 'none'; document.getElementById('landingPage').style.display = 'block'; showAlert('Logged out','info'); }
+        function adminLogout() { authToken = null; currentUser = null; cart = []; document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('landingPage').style.display = 'block'; showAlert('Logged out','info'); }
+        
+        async function loadAdminData() { try { const products = await apiCall('GET','/products'); const customers = await apiCall('GET','/customers'); const reports = await apiCall('GET','/reports/dashboard'); allProducts = products; document.getElementById('adminTotalSales').innerHTML = `₹${reports.total_sales}`; document.getElementById('adminTotalCustomers').innerHTML = reports.total_customers; document.getElementById('adminTotalCommission').innerHTML = `₹${reports.total_commission}`; document.getElementById('adminLowStock').innerHTML = reports.low_stock_alerts;
+            renderProductTable(); renderCustomerTable(); populateDropdowns(); loadLandingSuper(); loadCustomerProducts(); loadCustomerSuper(); loadCustomerJobs(); } catch(e) { showAlert('Error loading data','error'); } }
+        
+        async function loadCustomerDashboardData() { try { const profile = await apiCall('GET','/customers/profile'), trans = await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust = await apiCall('GET','/customers'); document.getElementById('custWalletAmt').innerHTML = `₹${profile.wallet_balance}`; document.getElementById('custWalletVal').innerHTML = `₹${profile.wallet_balance}`; document.getElementById('custTotalPurchases').innerHTML = `₹${profile.total_purchases}`; document.getElementById('myRefCode').innerHTML = profile.referral_code; document.getElementById('custReferralCount').innerHTML = allCust.filter(c=>c.referred_by===profile.referral_code).length;
+            const wt = document.getElementById('walletTransList'); wt.innerHTML = ''; trans.forEach(t=>{ wt.innerHTML += `<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td></tr>`; }); } catch(e){ showAlert('Error loading profile','error'); } }
+        
+        function populateDropdowns(){
+            const custList = document.getElementById('customerDropdownList');
+            custList.innerHTML = '<div class="item" data-value="" onclick="selectCustomer(\'\')">Select Customer</div>';
+            customers.forEach(c => {
+                custList.innerHTML += `<div class="item" data-value="${c.id}" onclick="selectCustomer('${c.id}')">${c.name} (${c.mobile})</div>`;
+            });
+            const prodList = document.getElementById('productDropdownList');
+            prodList.innerHTML = '<div class="item" data-value="" onclick="selectProduct(\'\')">Select Product</div>';
+            allProducts.forEach(p => {
+                const cb = (p.selling_price*(p.discount_percent||0))/100;
+                prodList.innerHTML += `<div class="item" data-value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cb}" data-stock="${p.current_stock}" onclick="selectProduct('${p.id}')">${p.name} - ₹${p.selling_price}</div>`;
+            });
+        }
 
-    // ===== NAVIGATION =====
-    function showLandingHome(){ document.getElementById('landingHomeSection').style.display='block';document.getElementById('landingProductsPage').style.display='none';document.getElementById('landingJobsPage').style.display='none';document.getElementById('landingContactPage').style.display='none';document.getElementById('landingOffersPage').style.display='none'; }
-    function showLandingProducts(){ document.getElementById('landingHomeSection').style.display='none';document.getElementById('landingProductsPage').style.display='block';document.getElementById('landingJobsPage').style.display='none';document.getElementById('landingContactPage').style.display='none';document.getElementById('landingOffersPage').style.display='none'; loadLandingProducts(); }
-    function showLandingJobs(){ document.getElementById('landingHomeSection').style.display='none';document.getElementById('landingProductsPage').style.display='none';document.getElementById('landingJobsPage').style.display='block';document.getElementById('landingContactPage').style.display='none';document.getElementById('landingOffersPage').style.display='none'; loadLandingJobs(); }
-    function showLandingContact(){ document.getElementById('landingHomeSection').style.display='none';document.getElementById('landingProductsPage').style.display='none';document.getElementById('landingJobsPage').style.display='none';document.getElementById('landingContactPage').style.display='block';document.getElementById('landingOffersPage').style.display='none'; }
-    function showLandingOffers(){ document.getElementById('landingHomeSection').style.display='none';document.getElementById('landingProductsPage').style.display='none';document.getElementById('landingJobsPage').style.display='none';document.getElementById('landingContactPage').style.display='none';document.getElementById('landingOffersPage').style.display='block'; loadLandingSuper(); }
-    function showAdminLoginForm(){ document.getElementById('landingPage').style.display='none';document.getElementById('loginSection').style.display='block';document.getElementById('adminLoginForm').style.display='block';document.getElementById('customerLoginForm').style.display='none';document.getElementById('registrationForm').style.display='none'; }
-    function showCustomerLoginForm(){ document.getElementById('landingPage').style.display='none';document.getElementById('loginSection').style.display='block';document.getElementById('adminLoginForm').style.display='none';document.getElementById('customerLoginForm').style.display='block';document.getElementById('registrationForm').style.display='none'; }
-    function showRegistration(){ document.getElementById('customerLoginForm').style.display='none';document.getElementById('registrationForm').style.display='block'; }
-    function goBackToLanding(){ document.getElementById('landingPage').style.display='block';document.getElementById('loginSection').style.display='none'; }
-    function showCustomerSection(section){ document.querySelectorAll('#customerDashboard .content-section').forEach(s=>s.classList.remove('active-section')); if(section==='home') document.getElementById('customerHomeSection').classList.add('active-section'); if(section==='products'){ document.getElementById('customerProductsSection').classList.add('active-section'); loadCustomerProducts(); } if(section==='careers'){ document.getElementById('customerCareersSection').classList.add('active-section'); loadCustomerJobs(); } if(section==='contact') document.getElementById('customerContactSection').classList.add('active-section'); if(section==='super'){ document.getElementById('customerSuperSection').classList.add('active-section'); loadCustomerSuper(); } }
-
-    // ===== LOGIN / AUTH =====
-    async function adminLogin(){ const email=document.getElementById('adminEmail').value,password=document.getElementById('adminPassword').value; if(!email||!password) return showAlert('Enter credentials','error'); try{ const res=await fetch(`${API_URL}/auth/admin/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})}); if(res.ok){ const data=await res.json(); authToken=data.token; currentUser={type:'admin'}; document.getElementById('landingPage').style.display='none';document.getElementById('loginSection').style.display='none';document.getElementById('adminDashboard').style.display='block'; await loadAdminData(); setupBarcodeScanner(); showAlert('Welcome Admin!','success'); } else { const err=await res.json(); showAlert(err.error,'error'); } } catch(e){ showAlert('Cannot connect','error'); } }
-    async function customerLogin(){ const mobile=document.getElementById('custMobileLogin').value,password=document.getElementById('custPassword').value; if(!mobile||!password) return showAlert('Enter credentials','error'); try{ const res=await fetch(`${API_URL}/auth/customer/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile,password})}); if(res.ok){ const data=await res.json(); authToken=data.token; currentUser={type:'customer',data:data.customer}; document.getElementById('landingPage').style.display='none';document.getElementById('loginSection').style.display='none';document.getElementById('customerDashboard').style.display='block'; await loadCustomerDashboardData(); showAlert(`Welcome ${data.customer.name}!`,'success'); } else { const err=await res.json(); showAlert(err.error,'error'); } } catch(e){ showAlert('Server error','error'); } }
-    async function register(){ const name=document.getElementById('regName').value,mobile=document.getElementById('regMobile').value,password=document.getElementById('regPassword').value,ref=document.getElementById('regReferral').value; if(!name||!mobile||!password) return showAlert('Fill all fields','error'); try{ const res=await fetch(`${API_URL}/auth/customer/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,mobile,password,referralCode:ref})}); if(res.ok){ const data=await res.json(); authToken=data.token; currentUser={type:'customer',data:data.customer}; document.getElementById('landingPage').style.display='none';document.getElementById('loginSection').style.display='none';document.getElementById('customerDashboard').style.display='block'; await loadCustomerDashboardData(); showAlert('Registered!','success'); } else { const err=await res.json(); showAlert(err.error,'error'); } } catch(e){ showAlert('Registration failed','error'); } }
-    function customerLogout(){ authToken=null;currentUser=null;cart=[];document.getElementById('customerDashboard').style.display='none';document.getElementById('landingPage').style.display='block';showAlert('Logged out','info'); }
-    function adminLogout(){ authToken=null;currentUser=null;cart=[];document.getElementById('adminDashboard').style.display='none';document.getElementById('landingPage').style.display='block';showAlert('Logged out','info'); }
-
-    // ===== LOAD DATA =====
-    async function loadAdminData(){ try { const products=await apiCall('GET','/products'), cust=await apiCall('GET','/customers'), reports=await apiCall('GET','/reports/dashboard'); allProducts=products; customers=cust; document.getElementById('adminTotalSales').innerHTML=`₹${reports.total_sales}`; document.getElementById('adminTotalCustomers').innerHTML=reports.total_customers; document.getElementById('adminLowStock').innerHTML=reports.low_stock_alerts; renderProductTable(); renderCustomerTable(); populateDropdowns(); loadLandingSuper(); loadCustomerProducts(); loadCustomerSuper(); loadCustomerJobs(); } catch(e){ showAlert('Error loading data','error'); } }
-    async function loadCustomerDashboardData(){ try { const profile=await apiCall('GET','/customers/profile'), trans=await apiCall('GET',`/wallet/transactions/${profile.id}`), allCust=await apiCall('GET','/customers'); document.getElementById('custWalletAmt').innerHTML=`₹${profile.wallet_balance}`; document.getElementById('custWalletVal').innerHTML=`₹${profile.wallet_balance}`; document.getElementById('custTotalPurchases').innerHTML=`₹${profile.total_purchases}`; document.getElementById('myRefCode').innerHTML=profile.referral_code; document.getElementById('custReferralCount').innerHTML=allCust.filter(c=>c.referred_by===profile.referral_code).length; const wt=document.getElementById('walletTransList'); wt.innerHTML=''; trans.forEach(t=>{ wt.innerHTML+=`<tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td style="color:${t.transaction_type==='CREDIT'?'#27ae60':'#e74c3c'}">${t.transaction_type}</td><td>₹${t.amount}</td><td>${t.description||'-'}</td></tr>`; }); } catch(e){ showAlert('Error loading profile','error'); } }
-
-    function populateDropdowns(){
-        // Customer dropdown
-        const custList = document.getElementById('customerDropdownList');
-        custList.innerHTML = '<div class="item" data-value="" onclick="selectCustomer(\'\')">Select Customer</div>';
-        customers.forEach(c => {
-            custList.innerHTML += `<div class="item" data-value="${c.id}" onclick="selectCustomer('${c.id}')">${c.name} (${c.mobile})</div>`;
-        });
-        // Product dropdown
-        const prodList = document.getElementById('productDropdownList');
-        prodList.innerHTML = '<div class="item" data-value="" onclick="selectProduct(\'\')">Select Product</div>';
-        allProducts.forEach(p => {
-            const cb = (p.selling_price*(p.discount_percent||0))/100;
-            prodList.innerHTML += `<div class="item" data-value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cb}" data-stock="${p.current_stock}" onclick="selectProduct('${p.id}')">${p.name} - ₹${p.selling_price}</div>`;
-        });
-    }
-
-    // ===== SEARCHABLE DROPDOWN =====
-    function filterCustomerDropdown(){
-        const input = document.getElementById('customerSearchInput').value.toLowerCase();
-        const items = document.querySelectorAll('#customerDropdownList .item');
-        items.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            item.style.display = text.includes(input) ? 'block' : 'none';
-        });
-        document.getElementById('customerDropdownList').style.display = 'block';
-    }
-    function selectCustomer(id){
-        document.getElementById('selectedCustomerId').value = id;
-        const items = document.querySelectorAll('#customerDropdownList .item');
-        items.forEach(item => {
-            if(item.dataset.value == id){
-                document.getElementById('customerSearchInput').value = item.textContent;
-            }
-        });
-        document.getElementById('customerDropdownList').style.display = 'none';
-        // Also set the old select for compatibility
-        document.getElementById('billCustomer').value = id;
-    }
-    function filterProductDropdown(){
-        const input = document.getElementById('productSearchInput').value.toLowerCase();
-        const items = document.querySelectorAll('#productDropdownList .item');
-        items.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            item.style.display = text.includes(input) ? 'block' : 'none';
-        });
-        document.getElementById('productDropdownList').style.display = 'block';
-    }
-    function selectProduct(id){
-        document.getElementById('selectedProductId').value = id;
-        const items = document.querySelectorAll('#productDropdownList .item');
-        items.forEach(item => {
-            if(item.dataset.value == id){
-                document.getElementById('productSearchInput').value = item.textContent;
-                document.getElementById('selectedProductPrice').value = item.dataset.price || 0;
-                document.getElementById('selectedProductDiscount').value = item.dataset.discount || 0;
-                document.getElementById('selectedProductCashback').value = item.dataset.cashback || 0;
-                document.getElementById('selectedProductStock').value = item.dataset.stock || 0;
-            }
-        });
-        document.getElementById('productDropdownList').style.display = 'none';
-        // Set the old select for compatibility
-        const sel = document.getElementById('billProduct');
-        for(let i=0;i<sel.options.length;i++){
-            if(sel.options[i].value == id){
-                sel.selectedIndex = i;
-                break;
+        // Searchable Dropdown Functions
+        function filterCustomerDropdown(){
+            const input = document.getElementById('customerSearchInput').value.toLowerCase();
+            const items = document.querySelectorAll('#customerDropdownList .item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(input) ? 'block' : 'none';
+            });
+            document.getElementById('customerDropdownList').style.display = 'block';
+        }
+        function selectCustomer(id){
+            document.getElementById('selectedCustomerId').value = id;
+            const items = document.querySelectorAll('#customerDropdownList .item');
+            items.forEach(item => {
+                if(item.dataset.value == id){
+                    document.getElementById('customerSearchInput').value = item.textContent;
+                }
+            });
+            document.getElementById('customerDropdownList').style.display = 'none';
+            document.getElementById('billCustomer').value = id;
+        }
+        function filterProductDropdown(){
+            const input = document.getElementById('productSearchInput').value.toLowerCase();
+            const items = document.querySelectorAll('#productDropdownList .item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(input) ? 'block' : 'none';
+            });
+            document.getElementById('productDropdownList').style.display = 'block';
+        }
+        function selectProduct(id){
+            document.getElementById('selectedProductId').value = id;
+            const items = document.querySelectorAll('#productDropdownList .item');
+            items.forEach(item => {
+                if(item.dataset.value == id){
+                    document.getElementById('productSearchInput').value = item.textContent;
+                    document.getElementById('selectedProductPrice').value = item.dataset.price || 0;
+                    document.getElementById('selectedProductDiscount').value = item.dataset.discount || 0;
+                    document.getElementById('selectedProductCashback').value = item.dataset.cashback || 0;
+                    document.getElementById('selectedProductStock').value = item.dataset.stock || 0;
+                }
+            });
+            document.getElementById('productDropdownList').style.display = 'none';
+            const sel = document.getElementById('billProduct');
+            for(let i=0;i<sel.options.length;i++){
+                if(sel.options[i].value == id){
+                    sel.selectedIndex = i;
+                    break;
+                }
             }
         }
-    }
-    // Click outside to close dropdowns
-    document.addEventListener('click', function(e){
-        if(!e.target.closest('.search-dropdown')){
-            document.querySelectorAll('.dropdown-list').forEach(d => d.style.display = 'none');
+        document.addEventListener('click', function(e){
+            if(!e.target.closest('.search-dropdown')){
+                document.querySelectorAll('.dropdown-list').forEach(d => d.style.display = 'none');
+            }
+        });
+
+        // ===== CUSTOMERS TABLE with Pagination =====
+        function renderCustomerTable(){ 
+            const search=document.getElementById('customerSearch').value.toLowerCase(); 
+            const perPage=parseInt(document.getElementById('customerPerPage').value)||10; 
+            customerPerPage=perPage; 
+            let filtered=customers.filter(c=>c.name.toLowerCase().includes(search)||c.mobile.includes(search)); 
+            const totalPages=Math.ceil(filtered.length/perPage); 
+            if(customerPage>totalPages) customerPage=1; 
+            const start=(customerPage-1)*perPage; 
+            const pageData=filtered.slice(start,start+perPage); 
+            const tbody=document.getElementById('adminCustomersList'); 
+            tbody.innerHTML=''; 
+            pageData.forEach(c=>{ 
+                tbody.innerHTML+=`<tr><td>${c.name}</td><td>${c.mobile}</td><td>${c.referral_code}</td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button onclick="showWalletControlForCustomer(${c.id})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:20px;">Wallet</button></td></tr>`; 
+            }); 
+            const pag=document.getElementById('customerPagination'); 
+            pag.innerHTML=''; 
+            for(let i=1;i<=totalPages;i++){ 
+                const btn=document.createElement('button'); 
+                btn.textContent=i; 
+                if(i===customerPage) btn.classList.add('active-page'); 
+                btn.onclick=()=>{ customerPage=i; renderCustomerTable(); }; 
+                pag.appendChild(btn); 
+            } 
         }
-    });
 
-    // ===== CUSTOMERS TABLE with Pagination =====
-    function renderCustomerTable(){ const search=document.getElementById('customerSearch').value.toLowerCase(); const perPage=parseInt(document.getElementById('customerPerPage').value)||10; customerPerPage=perPage; let filtered=customers.filter(c=>c.name.toLowerCase().includes(search)||c.mobile.includes(search)); const totalPages=Math.ceil(filtered.length/perPage); if(customerPage>totalPages) customerPage=1; const start=(customerPage-1)*perPage; const pageData=filtered.slice(start,start+perPage); const tbody=document.getElementById('adminCustomersList'); tbody.innerHTML=''; pageData.forEach(c=>{ tbody.innerHTML+=`<tr><td>${c.name}</td><td>${c.mobile}</td><td>${c.referral_code}</td><td>₹${c.wallet_balance}</td><td>₹${c.total_purchases}</td><td><button onclick="showWalletControlForCustomer(${c.id})" class="admin-btn admin-btn-warning" style="padding:4px 12px;">Wallet</button></td></tr>`; }); const pag=document.getElementById('customerPagination'); pag.innerHTML=''; for(let i=1;i<=totalPages;i++){ const btn=document.createElement('button'); btn.textContent=i; if(i===customerPage) btn.classList.add('active-page'); btn.onclick=()=>{ customerPage=i; renderCustomerTable(); }; pag.appendChild(btn); } }
+        // ===== PRODUCTS TABLE with Pagination =====
+        function renderProductTable(){ 
+            const search=document.getElementById('productSearch').value.toLowerCase(); 
+            const cat=document.getElementById('productCategoryFilter').value; 
+            const perPage=parseInt(document.getElementById('productPerPage').value)||10; 
+            productPerPage=perPage; 
+            let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(search)&&(cat===''||p.category===cat)); 
+            const totalPages=Math.ceil(filtered.length/perPage); 
+            if(productPage>totalPages) productPage=1; 
+            const start=(productPage-1)*perPage; 
+            const pageData=filtered.slice(start,start+perPage); 
+            const tbody=document.getElementById('adminProductsList'); 
+            tbody.innerHTML=''; 
+            pageData.forEach(p=>{ 
+                const imgUrl=productImages[p.id]||''; 
+                const isSuper=superDiscountProducts.includes(p.id); 
+                tbody.innerHTML+=`<tr><td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td><td>${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td><td>${p.discount_percent||0}%</td><td>${p.current_stock}</td><td>${isSuper ? '🔥' : '-'}</td><td><button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button> <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button></td></tr>`; 
+            }); 
+            const pag=document.getElementById('productPagination'); 
+            pag.innerHTML=''; 
+            for(let i=1;i<=totalPages;i++){ 
+                const btn=document.createElement('button'); 
+                btn.textContent=i; 
+                if(i===productPage) btn.classList.add('active-page'); 
+                btn.onclick=()=>{ productPage=i; renderProductTable(); }; 
+                pag.appendChild(btn); 
+            } 
+        }
 
-    // ===== PRODUCTS TABLE with Pagination =====
-    function renderProductTable(){ const search=document.getElementById('productSearch').value.toLowerCase(); const cat=document.getElementById('productCategoryFilter').value; const perPage=parseInt(document.getElementById('productPerPage').value)||10; productPerPage=perPage; let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(search)&&(cat===''||p.category===cat)); const totalPages=Math.ceil(filtered.length/perPage); if(productPage>totalPages) productPage=1; const start=(productPage-1)*perPage; const pageData=filtered.slice(start,start+perPage); const tbody=document.getElementById('adminProductsList'); tbody.innerHTML=''; pageData.forEach(p=>{ const imgUrl=productImages[p.id]||''; const isSuper=superDiscountProducts.includes(p.id); tbody.innerHTML+=`<tr><td><img src="${imgUrl}" style="width:40px;height:40px;border-radius:8px;" onerror="this.style.display='none'"></td><td>${p.product_code}</td><td>${p.name}</td><td>₹${p.selling_price}</td><td>${p.discount_percent||0}%</td><td>${p.current_stock}</td><td>${isSuper?'🔥':'-'}</td><td><button onclick="editProduct(${p.id})" class="admin-btn admin-btn-primary" style="padding:4px 12px;">Edit</button> <button onclick="deleteProduct(${p.id})" class="admin-btn admin-btn-danger" style="padding:4px 12px;">Del</button></td></tr>`; }); const pag=document.getElementById('productPagination'); pag.innerHTML=''; for(let i=1;i<=totalPages;i++){ const btn=document.createElement('button'); btn.textContent=i; if(i===productPage) btn.classList.add('active-page'); btn.onclick=()=>{ productPage=i; renderProductTable(); }; pag.appendChild(btn); } }
+        // ===== SALES HISTORY =====
+        function renderHistoryTable(){ 
+            const search=document.getElementById('historySearch').value.toLowerCase(); 
+            const perPage=parseInt(document.getElementById('historyPerPage').value)||10; 
+            historyPerPage=perPage; 
+            let filtered=salesHistory.filter(h=>h.bill_no.toLowerCase().includes(search)||h.customer.toLowerCase().includes(search)); 
+            const totalPages=Math.ceil(filtered.length/perPage); 
+            if(historyPage>totalPages) historyPage=1; 
+            const start=(historyPage-1)*perPage; 
+            const pageData=filtered.slice(start,start+perPage); 
+            const tbody=document.getElementById('historyList'); 
+            tbody.innerHTML=''; 
+            if(pageData.length===0){ 
+                tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;">No sales yet</td></tr>'; 
+            } 
+            pageData.forEach(h=>{ 
+                tbody.innerHTML+=`<tr><td>${h.bill_no}</td><td>${h.date}</td><td>${h.customer}</td><td>${h.items}</td><td>₹${h.total}</td><td>₹${h.cashback}</td></tr>`; 
+            }); 
+            const pag=document.getElementById('historyPagination'); 
+            pag.innerHTML=''; 
+            for(let i=1;i<=totalPages;i++){ 
+                const btn=document.createElement('button'); 
+                btn.textContent=i; 
+                if(i===historyPage) btn.classList.add('active-page'); 
+                btn.onclick=()=>{ historyPage=i; renderHistoryTable(); }; 
+                pag.appendChild(btn); 
+            } 
+        }
+        function addToHistory(billNo, customer, items, total, cashback){
+            salesHistory.unshift({ bill_no: billNo, date: new Date().toLocaleDateString(), customer: customer, items: items, total: total.toFixed(2), cashback: cashback.toFixed(2) });
+            renderHistoryTable();
+        }
 
-    // ===== SALES HISTORY =====
-    function renderHistoryTable(){ const search=document.getElementById('historySearch').value.toLowerCase(); const perPage=parseInt(document.getElementById('historyPerPage').value)||10; historyPerPage=perPage; let filtered=salesHistory.filter(h=>h.bill_no.toLowerCase().includes(search)||h.customer.toLowerCase().includes(search)); const totalPages=Math.ceil(filtered.length/perPage); if(historyPage>totalPages) historyPage=1; const start=(historyPage-1)*perPage; const pageData=filtered.slice(start,start+perPage); const tbody=document.getElementById('historyList'); tbody.innerHTML=''; if(pageData.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;">No sales yet</td></tr>'; } pageData.forEach(h=>{ tbody.innerHTML+=`<tr><td>${h.bill_no}</td><td>${h.date}</td><td>${h.customer}</td><td>${h.items}</td><td>₹${h.total}</td><td>₹${h.cashback}</td></tr>`; }); const pag=document.getElementById('historyPagination'); pag.innerHTML=''; for(let i=1;i<=totalPages;i++){ const btn=document.createElement('button'); btn.textContent=i; if(i===historyPage) btn.classList.add('active-page'); btn.onclick=()=>{ historyPage=i; renderHistoryTable(); }; pag.appendChild(btn); } }
-    function addToHistory(billNo, customer, items, total, cashback){
-        salesHistory.unshift({ bill_no: billNo, date: new Date().toLocaleDateString(), customer: customer, items: items, total: total.toFixed(2), cashback: cashback.toFixed(2) });
-        renderHistoryTable();
-    }
+        // ===== BILLING MODES =====
+        function setBillingMode(mode){ billingMode=mode; document.getElementById('modeManual').classList.toggle('active-mode',mode==='manual'); document.getElementById('modeScanner').classList.toggle('active-mode',mode==='scanner'); document.getElementById('barcodeInput').placeholder=mode==='scanner'?'📷 Scan barcode → Enter':'📷 Barcode (Manual)'; }
+        function setupBarcodeScanner(){ const input=document.getElementById('barcodeInput'); if(!input) return; input.addEventListener('keypress', async function(e) { if(e.key === 'Enter' && billingMode === 'scanner') { const barcode = this.value.trim(); if(barcode) await processBarcode(barcode); this.value = ''; } }); }
+        async function processBarcode(barcode) { const cust = document.getElementById('selectedCustomerId').value; if(!cust) { showAlert('Select customer first','error'); return; } try { const p = allProducts.find(p => p.product_code === barcode); if(!p) { showAlert('Product not found','error'); return; } if(p.current_stock<1) { showAlert('Out of stock','error'); return; } const cashback = (p.selling_price * (p.discount_percent||0))/100; const ex = cart.find(i=>i.product_id===p.id); if(ex) ex.quantity++; else cart.push({product_id:p.id,name:p.name,originalPrice:p.selling_price,discountPercent:p.discount_percent||0,cashback:cashback,quantity:1}); renderCart(); showAlert(`✅ ${p.name} added!`,'success'); } catch(e) { showAlert('Error','error'); } }
+        
+        // ===== CART FUNCTIONS =====
+        function addToCart() { 
+            if(billingMode==='scanner'){ showAlert('Scanner mode: use barcode input','error'); return; } 
+            const cust = document.getElementById('selectedCustomerId').value; 
+            const pid = document.getElementById('selectedProductId').value; 
+            const qty = parseInt(document.getElementById('billQuantity').value) || 1; 
+            if(!cust) return showAlert('Select customer','error'); 
+            if(!pid) return showAlert('Select product','error'); 
+            if(!qty||qty<1) return showAlert('Enter quantity','error'); 
+            const price = parseFloat(document.getElementById('selectedProductPrice').value); 
+            const disc = parseFloat(document.getElementById('selectedProductDiscount').value) || 0; 
+            const cashback = parseFloat(document.getElementById('selectedProductCashback').value) || 0; 
+            const stock = parseInt(document.getElementById('selectedProductStock').value) || 0; 
+            if(stock<qty) return showAlert(`Only ${stock} left`,'error'); 
+            const p = allProducts.find(p => p.id == pid); 
+            const ex = cart.find(i=>i.product_id===parseInt(pid)); 
+            if(ex) ex.quantity += qty; 
+            else cart.push({product_id:parseInt(pid), name: p ? p.name : 'Product', originalPrice: price, discountPercent: disc, cashback: cashback, quantity: qty}); 
+            renderCart(); 
+            document.getElementById('billQuantity').value='1'; 
+            showAlert(`${p ? p.name : 'Product'} added`,'success'); 
+        }
+        function renderCart() { 
+            const tbody = document.getElementById('cartList'); 
+            let total=0, cbTotal=0; 
+            tbody.innerHTML=''; 
+            cart.forEach((item,idx)=>{ 
+                const itemTotal=item.originalPrice*item.quantity; 
+                const itemCB=item.cashback*item.quantity; 
+                total+=itemTotal; 
+                cbTotal+=itemCB; 
+                tbody.innerHTML+=`<tr><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.originalPrice}</td><td>${item.discountPercent}%</td><td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td><td>₹${itemTotal.toFixed(2)}</td><td><button onclick="removeFromCart(${idx})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Remove</button></td></tr>`; 
+            }); 
+            document.getElementById('cartTotal').innerHTML=total; 
+            document.getElementById('cartCashback').innerHTML=cbTotal.toFixed(2); 
+        }
+        function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
+        
+        // ===== GENERATE BILL PREVIEW (NO UPDATE) =====
+        function generateBillPreview(){ 
+            if(cart.length===0) return showAlert('Cart empty','error'); 
+            const cust = document.getElementById('selectedCustomerId').value; 
+            if(!cust) return showAlert('Select customer','error'); 
+            const custName = customers.find(c=>c.id==cust)?.name || 'Customer'; 
+            let total=0, cbTotal=0, itemsHtml=''; 
+            cart.forEach(i=>{ 
+                const t=i.originalPrice*i.quantity; 
+                const cb=i.cashback*i.quantity; 
+                total+=t; 
+                cbTotal+=cb; 
+                itemsHtml+=`<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; 
+            }); 
+            const content = document.getElementById('billPreviewContent'); 
+            content.innerHTML = `
+                <h3 style="text-align:center;color:#e67e22;">🛍️ SASTA BAZAR</h3>
+                <p style="text-align:center;font-size:12px;">रामलक्ष्मण, रुद्रपुर रोड, देवरिया</p>
+                <p style="text-align:center;font-size:12px;">📞 +91 6306088261</p>
+                <hr>
+                <p><strong>Bill:</strong> SB${Date.now()}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                <p><strong>Customer:</strong> ${custName}</p>
+                <hr>
+                <table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc</th><th>CB</th><th>Total</th></tr>${itemsHtml}</table>
+                <hr>
+                <p><strong>Total: ₹${total.toFixed(2)}</strong></p>
+                <p style="color:#27ae60;"><strong>Cashback: +₹${cbTotal.toFixed(2)}</strong></p>
+                <p style="text-align:center;margin-top:15px;font-size:12px;">✨ Thank you for shopping! ✨</p>
+            `;
+            showModal('billPreviewModal');
+        }
 
-    // ===== BILLING MODES =====
-    function setBillingMode(mode){ billingMode=mode; document.getElementById('modeManual').classList.toggle('active-mode',mode==='manual'); document.getElementById('modeScanner').classList.toggle('active-mode',mode==='scanner'); document.getElementById('barcodeInput').placeholder=mode==='scanner'?'📷 Scan barcode → Enter':'📷 Barcode (Manual)'; }
-    function setupBarcodeScanner(){ const input=document.getElementById('barcodeInput'); input.addEventListener('keypress', async function(e){ if(e.key==='Enter' && billingMode==='scanner'){ const barcode=this.value.trim(); if(barcode) await processBarcode(barcode); this.value=''; } }); }
-    async function processBarcode(barcode){ const cust=document.getElementById('selectedCustomerId').value; if(!cust){ showAlert('Select customer first','error'); return; } try { const p=allProducts.find(p=>p.product_code===barcode); if(!p){ showAlert('Product not found','error'); return; } if(p.current_stock<1){ showAlert('Out of stock','error'); return; } const cashback=(p.selling_price*(p.discount_percent||0))/100; const ex=cart.find(i=>i.product_id===p.id); if(ex) ex.quantity++; else cart.push({product_id:p.id,name:p.name,originalPrice:p.selling_price,discountPercent:p.discount_percent||0,cashback,quantity:1}); renderCart(); showAlert(`✅ ${p.name} added!`,'success'); } catch(e){ showAlert('Error','error'); } }
+        // ===== PRINT BILL AND UPDATE EVERYTHING =====
+        async function printBillAndUpdate(){ 
+            if(cart.length===0) return showAlert('Cart empty','error'); 
+            const cust = document.getElementById('selectedCustomerId').value; 
+            if(!cust) return showAlert('Select customer','error'); 
+            const custName = customers.find(c=>c.id==cust)?.name || 'Customer'; 
+            let total=0, cbTotal=0, itemsHtml=''; 
+            cart.forEach(i=>{ 
+                const t=i.originalPrice*i.quantity; 
+                const cb=i.cashback*i.quantity; 
+                total+=t; 
+                cbTotal+=cb; 
+                itemsHtml+=`<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; 
+            }); 
+            const billNo = 'SB'+Date.now(); 
+            const win = window.open('','_blank'); 
+            win.document.write(`<html><head><title>Bill - SASTA BAZAR</title><style>body{font-family:'Courier New',monospace;margin:20px;font-size:14px;max-width:300px;margin:auto;}table{width:100%;border-collapse:collapse;}td,th{padding:6px 4px;border-bottom:1px solid #ddd;text-align:left;}h2{color:#e67e22;}</style></head><body onload="window.print();window.close();"><h2>🛍️ SASTA BAZAR</h2><p>रामलक्ष्मण, रुद्रपुर रोड, देवरिया</p><p>📞 +91 6306088261</p><p>Bill: ${billNo}</p><p>Date: ${new Date().toLocaleDateString()}</p><p>Customer: ${custName}</p><hr><table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc</th><th>CB</th><th>Total</th></tr>${itemsHtml}</table><hr><p><strong>Total: ₹${total.toFixed(2)}</strong></p><p style="color:#27ae60;">Cashback: +₹${cbTotal.toFixed(2)}</p><p style="margin-top:15px;font-size:12px;">✨ Thank you for shopping! ✨</p><p style="font-size:10px;">Visit again! SASTA BAZAR</p></body></html>`); 
+            win.document.close();
 
-    // ===== CART =====
-    function addToCart(){ if(billingMode==='scanner'){ showAlert('Scanner mode: use barcode input','error'); return; } const cust=document.getElementById('selectedCustomerId').value; const pid=document.getElementById('selectedProductId').value; const qty=parseInt(document.getElementById('billQuantity').value)||1; if(!cust){ showAlert('Select customer','error'); return; } if(!pid){ showAlert('Select product','error'); return; } const price=parseFloat(document.getElementById('selectedProductPrice').value); const disc=parseFloat(document.getElementById('selectedProductDiscount').value)||0; const cashback=parseFloat(document.getElementById('selectedProductCashback').value)||0; const stock=parseInt(document.getElementById('selectedProductStock').value)||0; if(stock<qty) return showAlert(`Only ${stock} left`,'error'); const p=allProducts.find(p=>p.id==pid); const ex=cart.find(i=>i.product_id===parseInt(pid)); if(ex) ex.quantity+=qty; else cart.push({product_id:parseInt(pid),name:p?p.name:'Product',originalPrice:price,discountPercent:disc,cashback,quantity:qty}); renderCart(); document.getElementById('billQuantity').value='1'; showAlert('Added to cart','success'); }
-    function renderCart(){ const tbody=document.getElementById('cartList'); let total=0, cbTotal=0; tbody.innerHTML=''; cart.forEach((item,idx)=>{ const itemTotal=item.originalPrice*item.quantity; const itemCB=item.cashback*item.quantity; total+=itemTotal; cbTotal+=itemCB; tbody.innerHTML+=`<tr><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.originalPrice}</td><td>${item.discountPercent}%</td><td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td><td>₹${itemTotal.toFixed(2)}</td><td><button onclick="removeFromCart(${idx})" class="admin-btn admin-btn-danger" style="padding:4px 12px;">Remove</button></td></tr>`; }); document.getElementById('cartTotal').innerHTML=total; document.getElementById('cartCashback').innerHTML=cbTotal.toFixed(2); }
-    function removeFromCart(idx){ cart.splice(idx,1); renderCart(); }
+            // Update everything in backend
+            try {
+                const items = cart.map(i=>({product_id:i.product_id, quantity:i.quantity}));
+                const res = await apiCall('POST','/bills',{
+                    customer_id: parseInt(cust),
+                    items: items,
+                    payment_method: 'cash'
+                });
+                
+                addToHistory(billNo, custName, cart.length, total, cbTotal);
+                cart = [];
+                renderCart();
+                await loadAdminData();
+                await loadCustomerDashboardData();
+                
+                showAlert(`✅ Bill created! Cashback: ₹${cbTotal.toFixed(2)} added to wallet!`,'success');
+            } catch(e){
+                console.error('Error details:', e);
+                showAlert('Error updating data: ' + e.message, 'error');
+            }
+        }
+        
+        async function saveProduct() { 
+            const code = document.getElementById('productCode').value; 
+            const name = document.getElementById('productName').value; 
+            const price = parseFloat(document.getElementById('productPrice').value); 
+            const discount = parseFloat(document.getElementById('productDiscount').value)||0; 
+            const stock = parseInt(document.getElementById('productStock').value); 
+            const imageUrl = document.getElementById('productImage').value; 
+            const isSuper = document.getElementById('productSuperDiscount').checked; 
+            if(!code||!name||!price) return showAlert('Fill fields','error'); 
+            try { 
+                if(editingId) { 
+                    await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,discount_percent:discount}); 
+                    if(imageUrl) productImages[editingId] = imageUrl; 
+                    if(isSuper && !superDiscountProducts.includes(editingId)) superDiscountProducts.push(editingId); 
+                    else if(!isSuper) superDiscountProducts = superDiscountProducts.filter(pid => pid !== editingId); 
+                } else { 
+                    const res = await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,discount_percent:discount}); 
+                    const newId = res.id; 
+                    if(imageUrl) productImages[newId] = imageUrl; 
+                    if(isSuper) superDiscountProducts.push(newId); 
+                } 
+                showAlert('Product saved!','success'); 
+                closeModal('productModal'); 
+                await loadAdminData(); 
+            } catch(e) { showAlert('Error saving','error'); } 
+        }
+        async function deleteProduct(id) { if(confirm('Delete?')){ try{ await apiCall('DELETE',`/products/${id}`); delete productImages[id]; superDiscountProducts = superDiscountProducts.filter(pid => pid !== id); showAlert('Deleted','success'); await loadAdminData(); } catch(e){ showAlert('Error','error'); } } }
+        function editProduct(id){ const product = allProducts.find(p => p.id === id); editingId = id; document.getElementById('productCode').value = product.product_code; document.getElementById('productName').value = product.name; document.getElementById('productPrice').value = product.selling_price; document.getElementById('productDiscount').value = product.discount_percent||0; document.getElementById('productStock').value = product.current_stock; document.getElementById('productImage').value = productImages[id] || ''; document.getElementById('productSuperDiscount').checked = superDiscountProducts.includes(id); document.getElementById('previewImg').src = productImages[id] || ''; document.getElementById('previewImg').style.display = productImages[id] ? 'block' : 'none'; showModal('productModal'); }
+        async function saveCustomer() { const name = document.getElementById('newCustName').value; const mobile = document.getElementById('newCustMobile').value; const password = document.getElementById('newCustPassword').value; const ref = document.getElementById('newCustRef').value; if(!name||!mobile) return showAlert('Fill name & mobile','error'); const finalPassword = password || mobile; try { await apiCall('POST','/customers',{name,mobile,password:finalPassword,referred_by:ref||null}); showAlert(`Customer added! Login: ${mobile} / Password: ${finalPassword}`,'success'); closeModal('customerModal'); await loadAdminData(); } catch(e) { showAlert('Error','error'); } }
+        function copyRefCode() { navigator.clipboard.writeText(document.getElementById('myRefCode').innerText); showAlert('Copied!','success'); }
+        
+        async function loadWalletCustomers() { try{ const cust = await apiCall('GET','/customers'); const sel = document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange = function(){ document.getElementById('currentBalance').innerHTML = `₹${this.options[this.selectedIndex]?.dataset.balance || 0}`; }; } catch(e){ showAlert('Error loading customers','error'); } }
+        function showWalletControlForCustomer(id) { showWalletControlModal(); setTimeout(() => { document.getElementById('walletCustomerSelect').value = id; document.getElementById('currentBalance').innerHTML = `₹${document.getElementById('walletCustomerSelect').options[document.getElementById('walletCustomerSelect').selectedIndex]?.dataset.balance || 0}`; }, 100); }
+        async function adminAddMoney() { const cid = document.getElementById('walletCustomerSelect').value; const amt = parseFloat(document.getElementById('walletAmount').value); const reason = document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
+        async function adminDeductMoney() { const cid = document.getElementById('walletCustomerSelect').value; const amt = parseFloat(document.getElementById('walletAmount').value); const reason = document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
 
-    // ===== BILL =====
-    async function createBill(){ if(cart.length===0) return showAlert('Cart empty','error'); const cust=document.getElementById('selectedCustomerId').value; if(!cust) return showAlert('Select customer','error'); const items=cart.map(i=>({product_id:i.product_id,quantity:i.quantity})); try { const res=await apiCall('POST','/bills',{customer_id:parseInt(cust),items,payment_method:'cash'}); const custName = customers.find(c=>c.id==cust)?.name || 'Customer'; addToHistory('SB'+Date.now(), custName, cart.length, res.total, res.cashback); showAlert(`Bill created! Cashback: ₹${res.cashback.toFixed(2)}`,'success'); cart=[]; renderCart(); await loadAdminData(); } catch(e){ showAlert('Error','error'); } }
-    function printBill(){ if(cart.length===0) return showAlert('Cart empty','error'); const cust=document.getElementById('selectedCustomerId').value; if(!cust) return showAlert('Select customer','error'); const custName = customers.find(c=>c.id==cust)?.name || 'Customer'; let total=0, cbTotal=0, itemsHtml=''; cart.forEach(i=>{ const t=i.originalPrice*i.quantity; const cb=i.cashback*i.quantity; total+=t; cbTotal+=cb; itemsHtml+=`<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; }); const win=window.open('','_blank'); win.document.write(`<html><head><title>Bill - SASTA BAZAR</title><style>body{font-family:'Courier New',monospace;margin:20px;font-size:14px;max-width:300px;margin:auto;}table{width:100%;border-collapse:collapse;}td,th{padding:6px 4px;border-bottom:1px solid #ddd;text-align:left;}h2{color:#e67e22;}</style></head><body onload="window.print();window.close();"><h2>🛍️ SASTA BAZAR</h2><p>रामलक्ष्मण, रुद्रपुर रोड, देवरिया</p><p>📞 +91 6306088261</p><p>Bill: SB${Date.now()}</p><p>Date: ${new Date().toLocaleDateString()}</p><p>Customer: ${custName}</p><hr><table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc</th><th>CB</th><th>Total</th></tr>${itemsHtml}</table><hr><p><strong>Total: ₹${total.toFixed(2)}</strong></p><p style="color:#27ae60;">Cashback: +₹${cbTotal.toFixed(2)}</p><p style="margin-top:15px;font-size:12px;">✨ Thank you for shopping! ✨</p><p style="font-size:10px;">Visit again! SASTA BAZAR</p></body></html>`); win.document.close(); }
+        // ===== TABS =====
+        function switchAdminTab(tab){ 
+            document.getElementById('tabBilling').style.display='none'; 
+            document.getElementById('tabCustomers').style.display='none'; 
+            document.getElementById('tabProducts').style.display='none'; 
+            document.getElementById('tabHistory').style.display='none'; 
+            document.querySelectorAll('.tab-nav button').forEach(b=>b.classList.remove('active-tab')); 
+            if(tab==='billing'){ 
+                document.getElementById('tabBilling').style.display='block'; 
+                document.querySelector('.tab-nav button:nth-child(1)').classList.add('active-tab'); 
+            } 
+            if(tab==='customers'){ 
+                document.getElementById('tabCustomers').style.display='block'; 
+                document.querySelector('.tab-nav button:nth-child(2)').classList.add('active-tab'); 
+                renderCustomerTable(); 
+            } 
+            if(tab==='products'){ 
+                document.getElementById('tabProducts').style.display='block'; 
+                document.querySelector('.tab-nav button:nth-child(3)').classList.add('active-tab'); 
+                renderProductTable(); 
+            } 
+            if(tab==='history'){ 
+                document.getElementById('tabHistory').style.display='block'; 
+                document.querySelector('.tab-nav button:nth-child(4)').classList.add('active-tab'); 
+                renderHistoryTable(); 
+            } 
+        }
 
-    // ===== PRODUCT / CUSTOMER CRUD =====
-    async function saveProduct(){ const code=document.getElementById('productCode').value,name=document.getElementById('productName').value,price=parseFloat(document.getElementById('productPrice').value),discount=parseFloat(document.getElementById('productDiscount').value)||0,stock=parseInt(document.getElementById('productStock').value),imageUrl=document.getElementById('productImage').value,isSuper=document.getElementById('productSuperDiscount').checked; if(!code||!name||!price) return showAlert('Fill fields','error'); try { if(editingId){ await apiCall('PUT',`/products/${editingId}`,{product_code:code,name,purchase_price:price*0.7,selling_price:price,discount_percent:discount,current_stock:stock}); if(imageUrl) productImages[editingId]=imageUrl; if(isSuper && !superDiscountProducts.includes(editingId)) superDiscountProducts.push(editingId); else if(!isSuper) superDiscountProducts=superDiscountProducts.filter(pid=>pid!==editingId); } else { const res=await apiCall('POST','/products',{product_code:code,name,purchase_price:price*0.7,selling_price:price,current_stock:stock,discount_percent:discount}); const newId=res.id; if(imageUrl) productImages[newId]=imageUrl; if(isSuper) superDiscountProducts.push(newId); } showAlert('Product saved!','success'); closeModal('productModal'); await loadAdminData(); } catch(e){ showAlert('Error saving','error'); } }
-    async function deleteProduct(id){ if(confirm('Delete?')){ try{ await apiCall('DELETE',`/products/${id}`); delete productImages[id]; superDiscountProducts=superDiscountProducts.filter(pid=>pid!==id); showAlert('Deleted','success'); await loadAdminData(); } catch(e){ showAlert('Error','error'); } } }
-    function editProduct(id){ const p=allProducts.find(p=>p.id===id); editingId=id; document.getElementById('productCode').value=p.product_code; document.getElementById('productName').value=p.name; document.getElementById('productPrice').value=p.selling_price; document.getElementById('productDiscount').value=p.discount_percent||0; document.getElementById('productStock').value=p.current_stock; document.getElementById('productImage').value=productImages[id]||''; document.getElementById('productSuperDiscount').checked=superDiscountProducts.includes(id); showModal('productModal'); }
-    async function saveCustomer(){ const name=document.getElementById('newCustName').value,mobile=document.getElementById('newCustMobile').value,password=document.getElementById('newCustPassword').value||mobile,ref=document.getElementById('newCustRef').value; if(!name||!mobile) return showAlert('Fill name & mobile','error'); try { await apiCall('POST','/customers',{name,mobile,password,referred_by:ref||null}); showAlert(`Customer added! Login: ${mobile} / Password: ${password}`,'success'); closeModal('customerModal'); await loadAdminData(); } catch(e){ showAlert('Error','error'); } }
-    function copyRefCode(){ navigator.clipboard.writeText(document.getElementById('myRefCode').innerText); showAlert('Copied!','success'); }
-
-    // ===== WALLET =====
-    async function loadWalletCustomers(){ try{ const cust=await apiCall('GET','/customers'); const sel=document.getElementById('walletCustomerSelect'); sel.innerHTML='<option>Select Customer</option>'; cust.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}" data-balance="${c.wallet_balance}">${c.name} (${c.mobile}) - ₹${c.wallet_balance}</option>`; }); sel.onchange=function(){ document.getElementById('currentBalance').innerHTML=`₹${this.options[this.selectedIndex]?.dataset.balance||0}`; }; } catch(e){ showAlert('Error loading customers','error'); } }
-    function showWalletControlForCustomer(id){ showWalletControlModal(); setTimeout(()=>{ document.getElementById('walletCustomerSelect').value=id; const bal=document.getElementById('walletCustomerSelect').options[document.getElementById('walletCustomerSelect').selectedIndex]?.dataset.balance||0; document.getElementById('currentBalance').innerHTML=`₹${bal}`; },100); }
-    async function adminAddMoney(){ const cid=document.getElementById('walletCustomerSelect').value,amt=parseFloat(document.getElementById('walletAmount').value),reason=document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/add',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} added!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
-    async function adminDeductMoney(){ const cid=document.getElementById('walletCustomerSelect').value,amt=parseFloat(document.getElementById('walletAmount').value),reason=document.getElementById('walletReason').value; if(!cid||!amt) return showAlert('Select customer & amount','error'); try{ await apiCall('POST','/admin/wallet/deduct',{customer_id:parseInt(cid),amount:amt,reason}); showAlert(`₹${amt} deducted!`,'success'); await loadAdminData(); loadWalletCustomers(); } catch(e){ showAlert('Error','error'); } }
-    function showWalletControlModal(){ showModal('walletControlModal'); loadWalletCustomers(); }
-
-    // ===== TABS =====
-    function switchAdminTab(tab){ document.getElementById('tabBilling').style.display='none'; document.getElementById('tabCustomers').style.display='none'; document.getElementById('tabProducts').style.display='none'; document.getElementById('tabHistory').style.display='none'; document.querySelectorAll('.tab-nav button').forEach(b=>b.classList.remove('active-tab')); if(tab==='billing'){ document.getElementById('tabBilling').style.display='block'; document.querySelector('.tab-nav button:first-child').classList.add('active-tab'); } if(tab==='customers'){ document.getElementById('tabCustomers').style.display='block'; document.querySelector('.tab-nav button:nth-child(2)').classList.add('active-tab'); renderCustomerTable(); } if(tab==='products'){ document.getElementById('tabProducts').style.display='block'; document.querySelector('.tab-nav button:nth-child(3)').classList.add('active-tab'); renderProductTable(); } if(tab==='history'){ document.getElementById('tabHistory').style.display='block'; document.querySelector('.tab-nav button:nth-child(4)').classList.add('active-tab'); renderHistoryTable(); } }
-
-    // ===== LANDING LOADS =====
-    async function loadLandingProducts(){ try { const products=await apiCall('GET','/products'); const container=document.getElementById('landingProductsList'); container.innerHTML=''; products.slice(0,8).forEach(p=>{ const imgUrl=productImages[p.id]||''; container.innerHTML+=`<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF</div></div>`; }); } catch(e){} }
-    async function loadLandingSuper(){ try { const container=document.getElementById('landingSuperList'); container.innerHTML=''; const superProds=allProducts.filter(p=>superDiscountProducts.includes(p.id)); superProds.forEach(p=>{ const cb=(p.selling_price*(p.discount_percent||0))/100; const finalPrice=p.selling_price-cb; container.innerHTML+=`<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0)+(cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(0)}</div></div>`; }); } catch(e){} }
-    function loadLandingJobs(){ const container=document.getElementById('landingJobList'); container.innerHTML=''; const jobs=[{id:1,title:'Software Developer',description:'Full-stack with React'},{id:2,title:'Marketing Manager',description:'Lead campaigns'}]; jobs.forEach(j=>{ container.innerHTML+=`<div class="job-card"><h3>${j.title}</h3><p>${j.description}</p><button class="apply-btn">Apply</button></div>`; }); }
-    function loadCustomerProducts(){ const container=document.getElementById('customerAllProducts'); container.innerHTML=''; allProducts.forEach(p=>{ const imgUrl=productImages[p.id]||''; container.innerHTML+=`<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF</div></div>`; }); }
-    function loadCustomerSuper(){ const container=document.getElementById('customerSuperList'); container.innerHTML=''; const superProds=allProducts.filter(p=>superDiscountProducts.includes(p.id)); superProds.forEach(p=>{ const cb=(p.selling_price*(p.discount_percent||0))/100; const finalPrice=p.selling_price-cb; container.innerHTML+=`<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0)+(cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(0)}</div></div>`; }); }
-    function loadCustomerJobs(){ const container=document.getElementById('customerJobsList'); container.innerHTML=''; const jobs=[{id:1,title:'Software Developer',description:'Full-stack with React'},{id:2,title:'Marketing Manager',description:'Lead campaigns'}]; jobs.forEach(j=>{ container.innerHTML+=`<div class="job-card"><h3>${j.title}</h3><p>${j.description}</p><button class="apply-btn">Apply</button></div>`; }); }
-
-    // ===== INIT =====
-    function init(){ showLandingHome(); setBillingMode('manual'); checkBackend(); setInterval(checkBackend,30000); }
-    async function checkBackend(){ try { const res=await fetch(`${BACKEND_URL}/`); document.getElementById('dbStatus').innerHTML=res.ok?'<span style="background:#27ae60;color:white;padding:5px 12px;border-radius:40px;">✅ Connected</span>':'<span style="background:#e74c3c;color:white;padding:5px 12px;border-radius:40px;">❌ Error</span>'; } catch(e){ document.getElementById('dbStatus').innerHTML='<span style="background:#e74c3c;color:white;padding:5px 12px;border-radius:40px;">❌ Offline</span>'; } }
-    init();
-</script>
+        if(jobVacancies.length === 0) { jobVacancies.push({ id: 1, title: 'Software Developer', description: 'Full-stack developer with React and Node.js experience' }); jobVacancies.push({ id: 2, title: 'Marketing Manager', description: 'Lead our digital marketing campaigns' }); jobVacancies.push({ id: 3, title: 'Customer Support', description: '24/7 customer support' }); }
+        checkBackend(); setInterval(checkBackend,30000);
+        showLandingHome();
+    </script>
 </body>
 </html>
