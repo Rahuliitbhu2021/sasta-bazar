@@ -204,14 +204,11 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
   const { customer_id, items, payment_method } = req.body;
   
   console.log('📝 Creating bill for customer:', customer_id);
-  console.log('📦 Items:', JSON.stringify(items, null, 2));
   
   try {
     let totalAmount = 0;
     let totalCashback = 0;
-    const billItems = [];
     
-    // Process each item
     for (const item of items) {
       const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
       if (product.rows.length === 0) {
@@ -224,59 +221,70 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       }
       
       const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
-      const itemTotal = p.selling_price * item.quantity;
-      
-      totalAmount += itemTotal;
+      totalAmount += p.selling_price * item.quantity;
       totalCashback += cashbackAmount * item.quantity;
       
-      // Update stock
       await query('UPDATE products SET current_stock = current_stock - $1 WHERE id = $2', [item.quantity, p.id]);
-      
-      billItems.push({
-        product_id: p.id,
-        quantity: item.quantity,
-        unit_price: p.selling_price,
-        discount_percent: p.discount_percent || 0,
-        total_price: itemTotal,
-        cashback_amount: cashbackAmount * item.quantity,
-        product_name: p.name
-      });
     }
     
     const billNumber = `INV${Date.now()}`;
     
-    // ✅ Create bill with subtotal
+    // Create bill with subtotal
     const billResult = await query(
       `INSERT INTO bills (bill_number, customer_id, subtotal, total_amount, cashback, payment_method)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [billNumber, customer_id, totalAmount, totalAmount, totalCashback, payment_method || 'cash']
     );
     
-    console.log('✅ Bill created:', billResult.rows[0]);
+    console.log('✅ Bill created:', billResult.rows[0].id);
     
-    // ✅ Save bill items
-    for (const item of billItems) {
-      await query(
-        `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, discount_percent, total_price, cashback_amount)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [
-          billResult.rows[0].id,
-          item.product_id,
-          item.quantity,
-          item.unit_price,
-          item.discount_percent,
-          item.total_price,
-          item.cashback_amount
-        ]
-      );
+    // ✅ Save bill items - WORKS WITH BOTH COLUMN STRUCTURES
+    for (const item of items) {
+      const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
+      const p = product.rows[0];
+      const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
+      
+      // Try with discount_percent column first, if fails try without
+      try {
+        await query(
+          `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, discount_percent, total_price, cashback_amount)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            billResult.rows[0].id,
+            item.product_id,
+            item.quantity,
+            p.selling_price,
+            p.discount_percent || 0,
+            p.selling_price * item.quantity,
+            cashbackAmount * item.quantity
+          ]
+        );
+      } catch (err) {
+        // If discount_percent column doesn't exist, try without it
+        if (err.message.includes('column "discount_percent" does not exist')) {
+          await query(
+            `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, total_price)
+             VALUES ($1, $2, $3, $4, $5)`,
+            [
+              billResult.rows[0].id,
+              item.product_id,
+              item.quantity,
+              p.selling_price,
+              p.selling_price * item.quantity
+            ]
+          );
+        } else {
+          throw err;
+        }
+      }
     }
     console.log('✅ Bill items saved');
     
-    // ✅ Update customer total purchases
+    // Update customer total purchases
     await query('UPDATE customers SET total_purchases = total_purchases + $1 WHERE id = $2', [totalAmount, customer_id]);
     console.log('✅ Customer purchases updated');
     
-    // ✅ Add cashback to wallet
+    // Add cashback to wallet
     if (totalCashback > 0) {
       await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [totalCashback, customer_id]);
       await query(
@@ -287,7 +295,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       console.log('✅ Cashback added to wallet:', totalCashback);
     }
     
-    // ✅ Referral commission
+    // Referral commission
     const customer = await query('SELECT referred_by FROM customers WHERE id = $1', [customer_id]);
     if (customer.rows[0]?.referred_by) {
       const referrer = await query('SELECT id FROM customers WHERE referral_code = $1', [customer.rows[0].referred_by]);
@@ -475,9 +483,7 @@ async function initTables() {
         product_id INT REFERENCES products(id),
         quantity INT NOT NULL,
         unit_price DECIMAL(10,2) NOT NULL,
-        discount_percent DECIMAL(5,2) DEFAULT 0,
         total_price DECIMAL(10,2) NOT NULL,
-        cashback_amount DECIMAL(10,2) DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
