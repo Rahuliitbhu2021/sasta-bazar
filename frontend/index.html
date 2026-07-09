@@ -148,6 +148,22 @@
         .weight-status.stable { color: #27ae60; font-weight: bold; }
         .weight-amount { margin-top: 10px; font-size: 20px; font-weight: bold; color: #27ae60; }
         
+        /* Scanner indicator */
+        .scanner-active-indicator {
+            background: #27ae60;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        .scanner-active-indicator i {
+            margin-right: 8px;
+        }
+        
         @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } .shop-detail-row { flex-wrap: wrap; } }
     </style>
 </head>
@@ -341,7 +357,11 @@
                     <button id="modeManual" onclick="setBillingMode('manual')">✏️ Manual</button>
                     <button class="active-mode" id="modeScanner" onclick="setBillingMode('scanner')">📷 Scanner</button>
                 </div>
-                <!-- BARCODE INPUT BOX REMOVED - Scanner works via keyboard globally -->
+                
+                <!-- ✅ SCANNER MODE INDICATOR -->
+                <div id="scannerIndicator" class="scanner-active-indicator">
+                    <i class="fas fa-camera"></i> Scanner Mode Active - Scan barcode directly
+                </div>
                 
                 <div class="search-dropdown">
                     <input type="text" id="customerSearchInput" placeholder="🔍 Search Customer..." oninput="filterCustomerDropdown()" onfocus="document.getElementById('customerDropdownList').style.display='block'">
@@ -1277,13 +1297,26 @@
                 billingMode = mode; 
                 document.getElementById('modeManual').classList.toggle('active-mode', mode === 'manual'); 
                 document.getElementById('modeScanner').classList.toggle('active-mode', mode === 'scanner'); 
+                
+                // Update scanner indicator visibility
+                const indicator = document.getElementById('scannerIndicator');
+                if (indicator) {
+                    if (mode === 'scanner') {
+                        indicator.style.display = 'inline-block';
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                }
+                
+                console.log('📷 Billing mode:', mode);
             }
 
             // =============================================
-            // BARCODE SCANNER - DIRECT KEYBOARD INPUT (NO BOX)
+            // SETUP BARCODE SCANNER - NO INPUT BOX
             // =============================================
             let barcodeBuffer = '';
             let barcodeTimer = null;
+            let isProcessingBarcode = false;
 
             function setupBarcodeScanner() { 
                 console.log('📷 Scanner mode active - scan barcode directly');
@@ -1291,29 +1324,35 @@
 
             // ✅ GLOBAL KEYBOARD LISTENER FOR SCANNER
             document.addEventListener('keydown', function(e) {
-                // Only process in scanner mode and billing tab
+                // ✅ Only process in scanner mode
                 if (billingMode !== 'scanner') return;
-                if (!document.getElementById('tabBilling')?.style.display || document.getElementById('tabBilling').style.display === 'none') return;
                 
-                // Check if customer is selected
+                // ✅ Check if customer is selected
                 const cust = document.getElementById('selectedCustomerId')?.value;
-                if (!cust) return;
+                if (!cust) {
+                    if (e.key === 'Enter' && barcodeBuffer.trim()) {
+                        showAlert('Please select customer first', 'error');
+                        barcodeBuffer = '';
+                    }
+                    return;
+                }
                 
-                // Enter key = process barcode
+                // ✅ Enter key = process barcode
                 if (e.key === 'Enter') {
                     if (barcodeBuffer.trim()) {
+                        console.log('📷 Processing barcode:', barcodeBuffer);
                         processBarcode(barcodeBuffer.trim());
                         barcodeBuffer = '';
                     }
                     return;
                 }
                 
-                // Ignore if typing in input fields
+                // ✅ Ignore if typing in input fields
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
                     return;
                 }
                 
-                // Collect barcode characters (alphanumeric + hyphen)
+                // ✅ Collect barcode characters
                 if (e.key.length === 1 && e.key.match(/[\w\-]/)) {
                     barcodeBuffer += e.key;
                     clearTimeout(barcodeTimer);
@@ -1327,11 +1366,20 @@
             // PROCESS BARCODE - WITH WEIGHT SUPPORT
             // =============================================
             async function processBarcode(barcode) { 
+                console.log('📷 Processing barcode:', barcode);
+                
                 const cust = document.getElementById('selectedCustomerId').value; 
-                if(!cust) { showAlert('Select customer first','error'); return; } 
+                if(!cust) { 
+                    showAlert('Select customer first','error'); 
+                    return; 
+                } 
+                
                 try { 
                     const p = allProducts.find(p => p.product_code === barcode); 
-                    if(!p) { showAlert('Product not found','error'); return; } 
+                    if(!p) { 
+                        showAlert('Product not found: ' + barcode, 'error'); 
+                        return; 
+                    } 
                     
                     console.log('🔍 Product found:', p);
                     console.log('📦 Product type:', p.product_type);
@@ -1351,7 +1399,10 @@
                     }
                     
                     console.log('📦 Piece product:', p.name);
-                    if(p.current_stock < 1) { showAlert('Out of stock','error'); return; } 
+                    if(p.current_stock < 1) { 
+                        showAlert('Out of stock','error'); 
+                        return; 
+                    } 
                     const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
                     const ex = cart.find(i => i.product_id === p.id && i.type !== 'weight'); 
                     if(ex) { 
