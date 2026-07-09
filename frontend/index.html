@@ -168,6 +168,7 @@
     </style>
 </head>
 <body>
+    
     <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
         
         <!-- ========== LANDING PAGE ========== -->
@@ -332,7 +333,11 @@
 
         <!-- ========== ADMIN DASHBOARD ========== -->
         <div id="adminDashboard" class="admin-container">
-            <div class="admin-header"><h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1><div class="admin-buttons">
+            <div class="admin-header"><h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1>
+                <div id="scaleStatus" style="padding:8px 16px; border-radius:40px; display:inline-block; font-size:13px; background:#e74c3c; color:white; font-weight:600;">
+        ⚖️ Scale: Offline
+    </div>
+                <div class="admin-buttons">
                 <button class="admin-btn admin-btn-primary" onclick="showAddProductModal()">➕ Product</button>
                 <button class="admin-btn admin-btn-success" onclick="showAddCustomerModal()">👤 Customer</button>
                 <button class="admin-btn admin-btn-warning" onclick="showWalletControlModal()">💰 Wallet</button>
@@ -2332,6 +2337,45 @@
                     document.getElementById('dbStatus').innerHTML = '<span style="background:#e74c3c; color:white; padding:5px 12px; border-radius:40px;">❌ Offline</span>'; 
                 } 
             }
+            // =============================================
+// SCALE STATUS CHECK - Auto update every 2 seconds
+// =============================================
+setInterval(async function() {
+    try {
+        // Check if user is logged in
+        if (!authToken) return;
+        
+        const response = await fetch(`${API_URL}/scale/bridge-status`, {
+            headers: { 
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const status = document.getElementById('scaleStatus');
+            
+            if (status) {
+                if (data.connected && data.weight > 0) {
+                    status.textContent = `⚖️ ${data.weight} Kg`;
+                    status.style.background = '#27ae60';
+                    status.style.color = 'white';
+                } else if (data.connected) {
+                    status.textContent = '⚖️ Connected (0 Kg)';
+                    status.style.background = '#f39c12';
+                    status.style.color = 'white';
+                } else {
+                    status.textContent = '⚖️ Offline';
+                    status.style.background = '#e74c3c';
+                    status.style.color = 'white';
+                }
+            }
+        }
+    } catch(e) {
+        // Silent fail
+    }
+}, 2000);
 
             if(jobVacancies.length === 0) { 
                 jobVacancies.push({ id: 1, title: 'Software Developer', description: 'Full-stack developer with React and Node.js experience' }); 
