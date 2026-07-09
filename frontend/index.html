@@ -576,6 +576,7 @@
             let weightTimer = null;
             let currentWeight = 0;
             let stableCount = 0;
+            let scaleConnected = false;
 
             // =============================================
             // UTILITY FUNCTIONS
@@ -1317,6 +1318,7 @@
                 weightStable = false;
                 currentWeight = 0;
                 stableCount = 0;
+                scaleConnected = false;
                 
                 document.getElementById('wcProductName').textContent = product.name;
                 document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
@@ -1325,7 +1327,7 @@
                 document.getElementById('wcCashback').textContent = `Cashback: ${product.cashback_percent || 0}%`;
                 document.getElementById('wcWeightDisplay').textContent = '0.000';
                 document.getElementById('wcWeightDisplay').className = 'weight-display';
-                document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+                document.getElementById('wcStatus').textContent = '⏳ Connecting to scale...';
                 document.getElementById('wcStatus').className = 'weight-status';
                 document.getElementById('wcAmount').textContent = '₹0.00';
                 
@@ -1335,11 +1337,11 @@
             }
 
             // =============================================
-            // CONNECT TO SCALE - MOCK MODE
+            // CONNECT TO I-SCALE - COM14
             // =============================================
             async function connectToScale() {
                 try {
-                    console.log('🔌 Connecting to mock scale...');
+                    console.log('🔌 Connecting to I-Scale on COM14...');
                     
                     const response = await fetch(`${API_URL}/scale/connect`, {
                         method: 'POST',
@@ -1347,25 +1349,34 @@
                             'Authorization': `Bearer ${authToken}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ port: 'MOCK', baudRate: 9600 })
+                        body: JSON.stringify({ port: 'COM14', baudRate: 9600 })
                     });
                     
                     if (response.ok) {
                         const data = await response.json();
-                        console.log('✅ Mock scale connected!');
-                        return true;
+                        if (data.connected) {
+                            console.log('✅ I-Scale connected!');
+                            scaleConnected = true;
+                            return true;
+                        } else {
+                            console.log('⚠️ Scale connection failed:', data.error);
+                            scaleConnected = false;
+                            return false;
+                        }
                     } else {
                         console.log('⚠️ Scale connection failed');
+                        scaleConnected = false;
                         return false;
                     }
                 } catch (e) {
                     console.log('⚠️ Scale connection error:', e.message);
+                    scaleConnected = false;
                     return false;
                 }
             }
 
             // =============================================
-            // LIVE WEIGHT READING - MOCK MODE
+            // LIVE WEIGHT READING - ONLY REAL SCALE DATA
             // =============================================
             function startLiveWeightReading() {
                 if (weightTimer) clearInterval(weightTimer);
@@ -1373,6 +1384,7 @@
                 currentWeight = 0;
                 weightStable = false;
                 
+                // ✅ Try to connect to real scale
                 connectToScale();
                 
                 weightTimer = setInterval(async () => {
@@ -1386,6 +1398,8 @@
                         
                         if (response.ok) {
                             const data = await response.json();
+                            
+                            // ✅ Only update if scale is connected
                             if (data.connected) {
                                 currentWeight = data.weight || 0;
                                 if (data.stable) {
@@ -1393,13 +1407,23 @@
                                 } else {
                                     stableCount = Math.max(0, stableCount - 1);
                                 }
-                                console.log(`⚖️ Weight: ${currentWeight} Kg | Stable: ${data.stable}`);
+                                console.log(`⚖️ Scale: ${currentWeight} Kg | Stable: ${data.stable}`);
+                            } else {
+                                // ✅ Scale not connected - show 0
+                                currentWeight = 0;
+                                stableCount = 0;
+                                console.log('⚠️ Scale not connected');
+                                document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. Please connect weighing machine.';
+                                document.getElementById('wcStatus').className = 'weight-status';
                             }
                         }
                     } catch (e) {
                         console.log('⚠️ Weight read error:', e.message);
+                        currentWeight = 0;
+                        stableCount = 0;
                     }
                     
+                    // ✅ Update UI
                     updateWeightUI();
                     
                 }, 200);
@@ -1414,20 +1438,27 @@
                 const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
                 document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
                 
-                if (stableCount >= 3 && currentWeight > 0.05) {
+                if (currentWeight > 0 && stableCount >= 3) {
                     document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
                     document.getElementById('wcStatus').className = 'weight-status stable';
                     document.getElementById('wcWeightDisplay').className = 'weight-display stable';
                     weightStable = true;
-                } else if (currentWeight > 0.05) {
+                } else if (currentWeight > 0) {
                     document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
                     document.getElementById('wcStatus').className = 'weight-status';
                     document.getElementById('wcWeightDisplay').className = 'weight-display';
                     weightStable = false;
-                } else {
+                } else if (currentWeight === 0 && scaleConnected) {
                     document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
                     document.getElementById('wcStatus').className = 'weight-status';
                     document.getElementById('wcWeightDisplay').className = 'weight-display';
+                    weightStable = false;
+                } else {
+                    // Scale not connected message already set
+                    if (!scaleConnected) {
+                        document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. Please connect weighing machine.';
+                        document.getElementById('wcStatus').className = 'weight-status';
+                    }
                     weightStable = false;
                 }
             }
