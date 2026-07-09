@@ -562,6 +562,7 @@
                         <div id="wcStatus" class="weight-status">⏳ Place item on scale...</div>
                         <div id="wcAmount" class="weight-amount">₹0.00</div>
                     </div>
+                    <button id="wcConnectBtn" onclick="connectScaleSerial()" style="display:none; width:100%; background:#3498db; color:white; border:none; padding:14px; border-radius:40px; font-weight:600; font-size:16px; margin-bottom:12px; cursor:pointer;">🔌 Connect Scale</button>
                     <div style="display:flex; gap:12px;">
                         <button onclick="confirmWeight()" style="flex:1; background:#27ae60; color:white; border:none; padding:15px; border-radius:40px; font-weight:600; font-size:18px;">✅ ENTER to Confirm</button>
                         <button onclick="cancelWeight()" style="flex:1; background:#e74c3c; color:white; border:none; padding:15px; border-radius:40px; font-weight:600;">✖ Cancel</button>
@@ -602,6 +603,12 @@
             let currentWeight = 0;
             let stableCount = 0;
             let scaleConnected = false;
+            // --- Web Serial (direct browser-to-scale) state ---
+            let serialPort = null;
+            let serialReader = null;
+            let serialKeepReading = false;
+            let scaleWeightBuffer = '';
+            let lastScaleWeight = -1;
 
             // ✅ LOGIN PERSISTENCE - No logout on refresh
             if (localStorage.getItem('token') && localStorage.getItem('user')) {
@@ -1460,91 +1467,151 @@
             }
 
             // =============================================
-            // CONNECT TO SCALE
+            // CONNECT TO SCALE (Web Serial API - direct browser-to-scale)
+            // Bridge service ki zaroorat nahi - browser seedha COM port se
+            // baat karta hai. Sirf Chrome/Edge me kaam karta hai.
+            // User gesture (button click) chahiye pehli baar; uske baad
+            // browser permission yaad rakhta hai aur auto-reconnect ho jata hai.
             // =============================================
-            async function connectToScale() {
+            async function connectScaleSerial() {
+                if (!('serial' in navigator)) {
+                    showAlert('⚠️ Yeh feature sirf Chrome ya Edge browser me kaam karta hai', 'error');
+                    return false;
+                }
                 try {
-                    console.log('🔌 Connecting to scale...');
-                    
-                    const response = await fetch(`${API_URL}/scale/connect`, {
-                        method: 'POST',
-                        headers: { 
-                            'Authorization': `Bearer ${authToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ port: 'COM14', baudRate: 9600 })
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.connected) {
-                            console.log('✅ Scale connected!');
-                            scaleConnected = true;
-                            return true;
-                        } else {
-                            console.log('⚠️ Scale connection failed:', data.error);
-                            scaleConnected = false;
-                            return false;
-                        }
-                    } else {
-                        console.log('⚠️ Scale connection failed');
-                        scaleConnected = false;
-                        return false;
-                    }
+                    console.log('🔌 Asking user to select scale COM port...');
+                    serialPort = await navigator.serial.requestPort();
+                    await serialPort.open({ baudRate: 9600 });
+                    scaleConnected = true;
+                    lastScaleWeight = -1;
+                    stableCount = 0;
+                    console.log('✅ Scale connected via Web Serial!');
+                    const btn = document.getElementById('wcConnectBtn');
+                    if (btn) btn.style.display = 'none';
+                    showAlert('✅ Scale connected!', 'success');
+                    readSerialLoop();
+                    return true;
                 } catch (e) {
                     console.log('⚠️ Scale connection error:', e.message);
                     scaleConnected = false;
+                    showAlert('Scale connect nahi ho paya: ' + e.message, 'error');
                     return false;
                 }
             }
 
+            // Pehle se permission-diye hue port se silently reconnect karne
+            // ki koshish karta hai (bina user se popup poochhe). Page load
+            // par aur weight capture screen khulne par call hota hai.
+            async function tryAutoConnectScale() {
+                if (!('serial' in navigator)) return;
+                if (scaleConnected && serialPort) return;
+                try {
+                    const ports = await navigator.serial.getPorts();
+                    if (ports.length > 0) {
+                        serialPort = ports[0];
+                        await serialPort.open({ baudRate: 9600 });
+                        scaleConnected = true;
+                        lastScaleWeight = -1;
+                        stableCount = 0;
+                        console.log('✅ Scale auto-reconnected (Web Serial)');
+                        const btn = document.getElementById('wcConnectBtn');
+                        if (btn) btn.style.display = 'none';
+                        readSerialLoop();
+                    }
+                } catch (e) {
+                    console.log('⚠️ Scale auto-reconnect failed:', e.message);
+                    scaleConnected = false;
+                }
+            }
+
+            // Serial port se continuously data padhta hai aur har line ko
+            // parse karke live weight nikalta hai.
+            async function readSerialLoop() {
+                serialKeepReading = true;
+                scaleWeightBuffer = '';
+                try {
+                    const textDecoder = new TextDecoderStream();
+                    serialPort.readable.pipeTo(textDecoder.writable).catch(() => {});
+                    serialReader = textDecoder.readable.getReader();
+
+                    while (serialKeepReading) {
+                        const { value, done } = await serialReader.read();
+                        if (done) break;
+                        if (value) {
+                            scaleWeightBuffer += value;
+                            const lines = scaleWeightBuffer.split(/[\r\n]+/);
+                            scaleWeightBuffer = lines.pop();
+                            for (const line of lines) {
+                                parseScaleLine(line);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log('⚠️ Scale read error:', e.message);
+                } finally {
+                    scaleConnected = false;
+                    if (serialReader) {
+                        try { serialReader.releaseLock(); } catch (_) {}
+                    }
+                    updateWeightUI();
+                }
+            }
+
+            // Ek scale-line se weight number nikalta hai aur stability
+            // check karta hai (fluctuation < 0.005 Kg, 3 consecutive readings).
+            // NOTE: Agar aapki machine ka data format alag hai (e.g. "ST,GS,+001.234kg"),
+            // yeh regex phir bhi number nikal lega. Console me "Raw scale data"
+            // dekh kar format verify kar sakte hain.
+            function parseScaleLine(line) {
+                if (!line) return;
+                console.log('📟 Raw scale data:', line);
+
+                const numMatch = line.match(/[-+]?\d+\.?\d*/);
+                if (!numMatch) return;
+                const weight = Math.abs(parseFloat(numMatch[0]));
+                if (isNaN(weight)) return;
+
+                scaleConnected = true;
+
+                if (lastScaleWeight >= 0 && Math.abs(weight - lastScaleWeight) < 0.005) {
+                    stableCount = Math.min(stableCount + 1, 3);
+                } else {
+                    stableCount = 0;
+                }
+                lastScaleWeight = weight;
+                currentWeight = weight;
+
+                updateWeightUI();
+            }
+
             // =============================================
-            // LIVE WEIGHT READING
+            // LIVE WEIGHT READING (weight capture screen khulne par call hota hai)
             // =============================================
             function startLiveWeightReading() {
                 if (weightTimer) clearInterval(weightTimer);
                 stableCount = 0;
                 currentWeight = 0;
                 weightStable = false;
-                
-                connectToScale();
-                
-                weightTimer = setInterval(async () => {
-                    try {
-                        const response = await fetch(`${API_URL}/scale/weight`, {
-                            headers: { 
-                                'Authorization': `Bearer ${authToken}`,
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            
-                            if (data.connected) {
-                                currentWeight = data.weight || 0;
-                                if (data.stable) {
-                                    stableCount = 3;
-                                } else {
-                                    stableCount = Math.max(0, stableCount - 1);
-                                }
-                                console.log(`⚖️ Scale: ${currentWeight} Kg | Stable: ${data.stable}`);
-                            } else {
-                                currentWeight = 0;
-                                stableCount = 0;
-                                console.log('⚠️ Scale not connected');
-                                document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. Please connect weighing machine.';
-                                document.getElementById('wcStatus').className = 'weight-status';
-                            }
-                        }
-                    } catch (e) {
-                        console.log('⚠️ Weight read error:', e.message);
-                        currentWeight = 0;
-                        stableCount = 0;
-                    }
-                    
+                lastScaleWeight = -1;
+
+                const btn = document.getElementById('wcConnectBtn');
+
+                if (scaleConnected && serialPort) {
+                    // Scale pehle se connected hai, seedha reading shuru
+                    if (btn) btn.style.display = 'none';
+                    document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+                } else {
+                    // Silently pehle-di-hui permission se reconnect try karo
+                    tryAutoConnectScale();
+                    if (btn) btn.style.display = 'inline-block';
+                    document.getElementById('wcStatus').textContent = '⚠️ "Connect Scale" button dabayein';
+                }
+
+                // Yeh interval sirf UI ko refresh karta hai - weight khud
+                // parseScaleLine() se turant update ho jata hai jab bhi
+                // naya data scale se aata hai.
+                weightTimer = setInterval(() => {
                     updateWeightUI();
-                    
                 }, 200);
             }
 
@@ -1574,8 +1641,10 @@
                     weightStable = false;
                 } else {
                     if (!scaleConnected) {
-                        document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. Please connect weighing machine.';
+                        document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. "Connect Scale" button dabayein.';
                         document.getElementById('wcStatus').className = 'weight-status';
+                        const btn = document.getElementById('wcConnectBtn');
+                        if (btn) btn.style.display = 'inline-block';
                     }
                     weightStable = false;
                 }
@@ -2338,44 +2407,27 @@
                 } 
             }
             // =============================================
-// SCALE STATUS CHECK - Auto update every 2 seconds
+// SCALE STATUS CHECK - Auto update every second
+// Web Serial se seedha local status (browser hi scale se connected hai)
 // =============================================
-setInterval(async function() {
-    try {
-        // Check if user is logged in
-        if (!authToken) return;
-        
-        const response = await fetch(`${API_URL}/scale/bridge-status`, {
-            headers: { 
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            const status = document.getElementById('scaleStatus');
-            
-            if (status) {
-                if (data.connected && data.weight > 0) {
-                    status.textContent = `⚖️ ${data.weight} Kg`;
-                    status.style.background = '#27ae60';
-                    status.style.color = 'white';
-                } else if (data.connected) {
-                    status.textContent = '⚖️ Connected (0 Kg)';
-                    status.style.background = '#f39c12';
-                    status.style.color = 'white';
-                } else {
-                    status.textContent = '⚖️ Offline';
-                    status.style.background = '#e74c3c';
-                    status.style.color = 'white';
-                }
-            }
-        }
-    } catch(e) {
-        // Silent fail
+setInterval(function() {
+    const status = document.getElementById('scaleStatus');
+    if (!status) return;
+
+    if (scaleConnected && currentWeight > 0) {
+        status.textContent = `⚖️ ${currentWeight.toFixed(3)} Kg`;
+        status.style.background = '#27ae60';
+        status.style.color = 'white';
+    } else if (scaleConnected) {
+        status.textContent = '⚖️ Connected (0 Kg)';
+        status.style.background = '#f39c12';
+        status.style.color = 'white';
+    } else {
+        status.textContent = '⚖️ Scale Offline';
+        status.style.background = '#e74c3c';
+        status.style.color = 'white';
     }
-}, 2000);
+}, 1000);
 
             if(jobVacancies.length === 0) { 
                 jobVacancies.push({ id: 1, title: 'Software Developer', description: 'Full-stack developer with React and Node.js experience' }); 
@@ -2389,6 +2441,10 @@ setInterval(async function() {
             // ✅ Initialize with scanner mode by default
             setBillingMode('scanner');
             showLandingHome();
+
+            // ⚖️ Page load hote hi scale se silently reconnect try karo
+            // (agar pehle "Connect Scale" se permission di ja chuki hai)
+            tryAutoConnectScale();
         </script>
     </body>
 </html>
