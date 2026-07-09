@@ -187,6 +187,32 @@
         .footer-address strong { color: #e67e22; }
         
         @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } .shop-detail-row { flex-wrap: wrap; } }
+
+        /* Weight Capture Modal Styles */
+        .weight-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+        .weight-display.stable {
+            color: #27ae60;
+        }
+        .weight-status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #888;
+        }
+        .weight-status.stable {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .weight-amount {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #27ae60;
+        }
     </style>
 </head>
 <body>
@@ -355,7 +381,14 @@
 
         <!-- ========== ADMIN DASHBOARD ========== -->
         <div id="adminDashboard" class="admin-container">
-            <div class="admin-header"><h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1><div class="admin-buttons"><button class="admin-btn admin-btn-primary" onclick="showAddProductModal()">➕ Product</button><button class="admin-btn admin-btn-success" onclick="showAddCustomerModal()">👤 Customer</button><button class="admin-btn admin-btn-warning" onclick="showWalletControlModal()">💰 Wallet</button><button class="admin-btn admin-btn-primary" onclick="showAdminJobPage()">💼 Jobs</button><button class="admin-btn admin-btn-danger" onclick="adminLogout()">🚪 Exit</button></div></div>
+            <div class="admin-header"><h1 style="color:#e67e22;">🛍️ Admin Dashboard</h1><div class="admin-buttons">
+                <button class="admin-btn admin-btn-primary" onclick="showAddProductModal()">➕ Product</button>
+                <button class="admin-btn admin-btn-success" onclick="showAddCustomerModal()">👤 Customer</button>
+                <button class="admin-btn admin-btn-warning" onclick="showWalletControlModal()">💰 Wallet</button>
+                <button class="admin-btn admin-btn-primary" onclick="showAdminJobPage()">💼 Jobs</button>
+                <button class="admin-btn admin-btn-primary" onclick="showWeightProductModal()">⚖️ Add Weight</button>
+                <button class="admin-btn admin-btn-danger" onclick="adminLogout()">🚪 Exit</button>
+            </div></div>
             <div class="stats-row"><div class="stat-card"><h3>Revenue</h3><div class="stat-value" id="adminTotalSales">₹0</div></div><div class="stat-card"><h3>Customers</h3><div class="stat-value" id="adminTotalCustomers">0</div></div><div class="stat-card"><h3>Commission</h3><div class="stat-value" id="adminTotalCommission">₹0</div></div><div class="stat-card"><h3>Low Stock</h3><div class="stat-value" id="adminLowStock">0</div></div></div>
             
             <div class="tab-nav">
@@ -363,6 +396,7 @@
                 <button onclick="switchAdminTab('customers')">👥 All Customers</button>
                 <button onclick="switchAdminTab('products')">📦 All Products</button>
                 <button onclick="switchAdminTab('history')">📜 Sales History</button>
+                <button onclick="switchAdminTab('weight-products')">⚖️ Weight Products</button>
             </div>
 
             <div id="tabBilling" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px;">
@@ -460,6 +494,44 @@
                 <div class="table-responsive"><table style="width:100%;"><thead><tr><th>Bill No</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Cashback</th></tr></thead><tbody id="historyList"></tbody></table></div>
                 <div class="pagination" id="historyPagination"></div>
             </div>
+
+            <!-- Weight Products Tab -->
+            <div id="tabWeightProducts" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px; display:none;">
+                <h2 style="color:#e67e22;">⚖️ Weight Products</h2>
+                <div class="filter-bar">
+                    <input type="text" id="weightProductSearch" placeholder="🔍 Search weight products..." oninput="renderWeightProductsTable()">
+                    <select id="weightProductStatus" onchange="renderWeightProductsTable()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <select id="weightProductPerPage" onchange="renderWeightProductsTable()">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Barcode</th>
+                                <th>Category</th>
+                                <th>Rate/Kg</th>
+                                <th>Stock</th>
+                                <th>Cashback</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminWeightProductsList"></tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="weightProductPagination"></div>
+            </div>
         </div>
 
         <!-- ADMIN JOB PAGE -->
@@ -471,6 +543,72 @@
                 <h2 style="color:#e67e22;text-align:center;">🧾 Bill Preview</h2>
                 <div id="billPreviewContent" class="bill-preview"></div>
                 <button onclick="closeModal('billPreviewModal')" style="margin-top:15px;width:100%;padding:12px;background:#f0f0f0;border:none;border-radius:40px;">Close</button>
+            </div>
+        </div>
+
+        <!-- WEIGHT PRODUCT MODAL -->
+        <div id="weightProductModal" class="modal">
+            <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+                <h2 id="weightProductModalTitle" style="color:#e67e22;">➕ Add Weight Product</h2>
+                <form id="weightProductForm">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <input type="text" id="wpCode" placeholder="Barcode/SKU" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="text" id="wpName" placeholder="Product Name *" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="text" id="wpCategory" placeholder="Category" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="text" id="wpBrand" placeholder="Brand" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <select id="wpUnit" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                            <option value="Kg">Kg</option>
+                            <option value="Gram">Gram</option>
+                        </select>
+                        <input type="number" id="wpRatePerKg" placeholder="Rate Per Kg *" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="number" id="wpMinWeight" placeholder="Min Weight (Kg)" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="number" id="wpMaxWeight" placeholder="Max Weight (Kg)" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="number" id="wpCashback" placeholder="Cashback %" value="0" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="number" id="wpGst" placeholder="GST %" value="0" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="number" id="wpStock" placeholder="Stock (Kg)" value="0" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="number" id="wpReorder" placeholder="Reorder Level" value="5" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <input type="text" id="wpImage" placeholder="Image URL" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                        <select id="wpStatus" style="padding:12px; border-radius:28px; border:1px solid #ddd;">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <textarea id="wpDescription" placeholder="Description" rows="2" style="width:100%; padding:12px; border-radius:28px; border:1px solid #ddd; margin-top:12px;"></textarea>
+                    
+                    <div style="display:flex; gap:12px; margin-top:15px;">
+                        <button type="submit" style="flex:1; background:#27ae60; color:white; border:none; padding:12px; border-radius:40px; font-weight:600;">Save Product</button>
+                        <button type="button" onclick="closeWeightProductModal()" style="flex:1; background:#e74c3c; color:white; border:none; padding:12px; border-radius:40px; font-weight:600;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- WEIGHT CAPTURE MODAL -->
+        <div id="weightCaptureModal" class="modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <h2 style="color:#e67e22; text-align:center;">⚖️ Weight Capture</h2>
+                <div id="weightCaptureContent" style="text-align:center; padding:20px;">
+                    <div id="weightProductInfo">
+                        <h3 id="wcProductName" style="margin:10px 0;">-</h3>
+                        <p id="wcProductCode" style="color:#666;">Barcode: -</p>
+                        <p id="wcRate" style="font-size:18px; font-weight:bold; color:#e67e22;">Rate: ₹0/Kg</p>
+                        <p id="wcGst" style="color:#666;">GST: 0%</p>
+                        <p id="wcCashback" style="color:#27ae60;">Cashback: 0%</p>
+                    </div>
+                    <div style="margin:20px 0; padding:20px; background:#f5f5f5; border-radius:20px;">
+                        <div id="wcWeightDisplay" class="weight-display">0.000</div>
+                        <div style="font-size:14px; color:#666;">Kg</div>
+                        <div id="wcStatus" class="weight-status">⏳ Waiting for stable weight...</div>
+                        <div id="wcAmount" class="weight-amount">₹0.00</div>
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <button onclick="confirmWeight()" style="flex:1; background:#27ae60; color:white; border:none; padding:15px; border-radius:40px; font-weight:600; font-size:18px;">✅ ENTER to Confirm</button>
+                        <button onclick="cancelWeight()" style="flex:1; background:#e74c3c; color:white; border:none; padding:15px; border-radius:40px; font-weight:600;">✖ Cancel</button>
+                    </div>
+                    <div style="margin-top:10px; font-size:12px; color:#888;">
+                        <span id="wcManualEntry">Press ENTER to confirm weight</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -495,6 +633,14 @@
         let salesHistory = [];
         let billingMode = 'manual';
         let customers = [];
+
+        // WEIGHT PRODUCTS VARIABLES
+        let weightProducts = [];
+        let weightProductPage = 1;
+        let weightProductPerPage = 10;
+        let currentWeightProduct = null;
+        let weightStable = false;
+        let weightTimer = null;
 
         // =============================================
         // UTILITY FUNCTIONS
@@ -931,6 +1077,7 @@
                 loadCustomerProducts(); 
                 loadCustomerSuper(); 
                 loadCustomerJobs(); 
+                loadWeightProducts();
             } catch(e) { 
                 showAlert('Error loading data: ' + e.message,'error'); 
             } 
@@ -1155,19 +1302,35 @@
             }); 
         }
         
+        // =============================================
+        // PROCESS BARCODE - WITH WEIGHT PRODUCT SUPPORT
+        // =============================================
         async function processBarcode(barcode) { 
             const cust = document.getElementById('selectedCustomerId').value; 
             if(!cust) { showAlert('Select customer first','error'); return; } 
             try { 
                 const p = allProducts.find(p => p.product_code === barcode); 
                 if(!p) { showAlert('Product not found','error'); return; } 
+                
+                // Check if weight product
+                if(p.product_type === 'weight') {
+                    if(p.status === 'inactive') {
+                        showAlert('Product is inactive', 'error');
+                        return;
+                    }
+                    startWeightCapture(p);
+                    return;
+                }
+                
+                // Piece product - existing logic
                 if(p.current_stock < 1) { showAlert('Out of stock','error'); return; } 
                 const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
-                const ex = cart.find(i => i.product_id === p.id); 
+                const ex = cart.find(i => i.product_id === p.id && i.type !== 'weight'); 
                 if(ex) ex.quantity++; 
                 else cart.push({
                     product_id: p.id, 
                     name: p.name, 
+                    type: 'piece',
                     originalPrice: p.selling_price, 
                     discountPercent: p.discount_percent||0, 
                     cashback: cashback, 
@@ -1179,7 +1342,7 @@
         }
 
         // =============================================
-        // CART FUNCTIONS
+        // CART FUNCTIONS - WITH WEIGHT SUPPORT
         // =============================================
         function addToCart() { 
             if(billingMode === 'scanner') { 
@@ -1206,6 +1369,7 @@
             else cart.push({
                 product_id: parseInt(pid), 
                 name: p ? p.name : 'Product', 
+                type: 'piece',
                 originalPrice: price, 
                 discountPercent: disc, 
                 cashback: cashback, 
@@ -1221,11 +1385,31 @@
             let total = 0, cbTotal = 0; 
             tbody.innerHTML = ''; 
             cart.forEach((item, idx) => { 
-                const itemTotal = item.originalPrice * item.quantity; 
-                const itemCB = item.cashback * item.quantity; 
+                let itemTotal, itemCB, displayName, displayDetails;
+                
+                if (item.type === 'weight') {
+                    itemTotal = item.amount + (item.gst || 0);
+                    itemCB = item.cashback || 0;
+                    displayName = `${item.name} (${item.weight.toFixed(3)} ${item.unit})`;
+                    displayDetails = `@ ₹${item.rate_per_kg}/Kg`;
+                } else {
+                    itemTotal = item.originalPrice * item.quantity; 
+                    itemCB = item.cashback * item.quantity; 
+                    displayName = item.name;
+                    displayDetails = `₹${item.originalPrice} x ${item.quantity}`;
+                }
+                
                 total += itemTotal; 
                 cbTotal += itemCB; 
-                tbody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.originalPrice}</td><td>${item.discountPercent}%</td><td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td><td>₹${itemTotal.toFixed(2)}</td><td><button onclick="removeFromCart(${idx})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Remove</button></td></tr>`; 
+                tbody.innerHTML += `<tr>
+                    <td>${displayName}</td>
+                    <td>${item.type === 'weight' ? '1' : item.quantity}</td>
+                    <td>₹${item.originalPrice}</td>
+                    <td>${item.discountPercent || 0}%</td>
+                    <td style="color:#27ae60;">+₹${itemCB.toFixed(2)}</td>
+                    <td>₹${itemTotal.toFixed(2)}</td>
+                    <td><button onclick="removeFromCart(${idx})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Remove</button></td>
+                </tr>`; 
             }); 
             document.getElementById('cartTotal').innerHTML = total; 
             document.getElementById('cartCashback').innerHTML = cbTotal.toFixed(2); 
@@ -1246,11 +1430,25 @@
             const custName = customers.find(c => c.id == cust)?.name || 'Customer'; 
             let total = 0, cbTotal = 0, itemsHtml = ''; 
             cart.forEach(i => { 
-                const t = i.originalPrice * i.quantity; 
-                const cb = i.cashback * i.quantity; 
+                let t, cb;
+                if (i.type === 'weight') {
+                    t = i.amount + (i.gst || 0);
+                    cb = i.cashback || 0;
+                } else {
+                    t = i.originalPrice * i.quantity; 
+                    cb = i.cashback * i.quantity;
+                }
                 total += t; 
                 cbTotal += cb; 
-                itemsHtml += `<tr><td>${i.name}</td><td>${i.quantity}</td><td>₹${i.originalPrice}</td><td>${i.discountPercent}%</td><td style="color:#27ae60;">+₹${cb.toFixed(2)}</td><td>₹${t.toFixed(2)}</td></tr>`; 
+                const shortName = i.name.length > 8 ? i.name.substring(0, 8) + '..' : i.name;
+                const discText = i.discountPercent > 0 ? i.discountPercent + '%' : '-';
+                itemsHtml += `<tr>
+                    <td style="font-size:6px;padding:1px 0;text-align:left;">${shortName}</td>
+                    <td style="font-size:6px;text-align:center;padding:1px 0;">${i.type === 'weight' ? i.weight.toFixed(2) : i.quantity}</td>
+                    <td style="font-size:6px;text-align:right;padding:1px 0;">₹${i.originalPrice}</td>
+                    <td style="font-size:6px;text-align:center;padding:1px 0;">${discText}</td>
+                    <td style="font-size:6px;text-align:right;padding:1px 0;">₹${t.toFixed(0)}</td>
+                </tr>`; 
             }); 
             const content = document.getElementById('billPreviewContent'); 
             content.innerHTML = `
@@ -1262,7 +1460,7 @@
                 <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
                 <p><strong>Customer:</strong> ${custName}</p>
                 <hr>
-                <table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Disc</th><th>CB</th><th>Total</th></tr>${itemsHtml}</table>
+                <table><tr><th>Item</th><th>Qty/Wt</th><th>Rate</th><th>Disc%</th><th>CB</th><th>Total</th></tr>${itemsHtml}</table>
                 <hr>
                 <p><strong>Total: ₹${total.toFixed(2)}</strong></p>
                 <p style="color:#27ae60;"><strong>Cashback: +₹${cbTotal.toFixed(2)}</strong></p>
@@ -1274,208 +1472,431 @@
         // =============================================
         // PRINT BILL AND UPDATE EVERYTHING
         // =============================================
-       // =============================================
-// PRINT BILL AND UPDATE EVERYTHING (Thermal Printer Friendly)
-// =============================================
-async function printBillAndUpdate() { 
-    if(cart.length === 0) { showAlert('Cart empty','error'); return; } 
-    const cust = document.getElementById('selectedCustomerId').value; 
-    if(!cust) { showAlert('Select customer','error'); return; } 
-    const custName = customers.find(c => c.id == cust)?.name || 'Customer'; 
-    let total = 0, cbTotal = 0, itemsHtml = ''; 
-    
-    cart.forEach(i => { 
-        const t = i.originalPrice * i.quantity; 
-        const cb = i.cashback * i.quantity; 
-        total += t; 
-        cbTotal += cb; 
-        // 45mm ke liye shorter name (8 chars)
-        const shortName = i.name.length > 8 ? i.name.substring(0, 8) + '..' : i.name;
-        const discText = i.discountPercent > 0 ? i.discountPercent + '%' : '-';
-        itemsHtml += `<tr>
-            <td style="font-size:6px;padding:1px 0;text-align:left;">${shortName}</td>
-            <td style="font-size:6px;text-align:center;padding:1px 0;">${i.quantity}</td>
-            <td style="font-size:6px;text-align:right;padding:1px 0;">₹${i.originalPrice}</td>
-            <td style="font-size:6px;text-align:center;padding:1px 0;">${discText}</td>
-            <td style="font-size:6px;text-align:right;padding:1px 0;">₹${t.toFixed(0)}</td>
-        </tr>`; 
-    }); 
-    
-    const billNo = 'SB' + Date.now(); 
-    
-    // PERFECT 45mm THERMAL PRINTER BILL WITH DISCOUNT
-    const win = window.open('', '_blank'); 
-    win.document.write(`<html><head><title>Bill - SASTA BAZAR</title>
-    <style>
-        @page { 
-            size: 45mm auto; 
-            margin: 1.5mm 1mm 1.5mm 1mm;
-        }
-        body { 
-            font-family: 'Courier New', monospace; 
-            font-size: 6.5px; 
-            width: 45mm;
-            max-width: 45mm;
-            margin: 0 auto;
-            padding: 0;
-            line-height: 1.1;
-            background: white;
-        }
-        .header { 
-            text-align: center; 
-            border-bottom: 1px dashed #000; 
-            padding-bottom: 3px; 
-            margin-bottom: 3px; 
-        }
-        .header h2 { 
-            font-size: 10px; 
-            margin: 0; 
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-        .header .sub { 
-            font-size: 5.5px; 
-            margin: 1px 0; 
-            line-height: 1.1;
-        }
-        .header .bill-info {
-            font-size: 5.5px;
-            margin: 1px 0;
-            line-height: 1.1;
-        }
-        .header .customer {
-            font-size: 6.5px;
-            font-weight: bold;
-            margin: 1px 0;
-        }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 5.5px;
-        }
-        th { 
-            text-align: left; 
-            border-bottom: 1px dotted #000; 
-            padding: 1.5px 1px; 
-            font-size: 5px;
-        }
-        td { 
-            padding: 1px 1px; 
-            font-size: 5.5px;
-        }
-        .th-item { text-align: left; width: 30%; }
-        .th-qty { text-align: center; width: 10%; }
-        .th-price { text-align: right; width: 20%; }
-        .th-disc { text-align: center; width: 15%; }
-        .th-total { text-align: right; width: 25%; }
-        
-        .td-qty { text-align: center; }
-        .td-price { text-align: right; }
-        .td-disc { text-align: center; }
-        .td-total { text-align: right; }
-        .td-item { text-align: left; }
-        
-        .totals { 
-            border-top: 1px dashed #000; 
-            padding-top: 2px; 
-            margin-top: 2px; 
-            text-align: right;
-        }
-        .totals .total-amount {
-            font-size: 9px;
-            font-weight: bold;
-        }
-        .totals .cashback-amount {
-            font-size: 7px;
-            color: #27ae60;
-            font-weight: bold;
-        }
-        
-        .footer { 
-            text-align: center; 
-            border-top: 1px dashed #000; 
-            padding-top: 3px; 
-            margin-top: 3px; 
-        }
-        .footer .thankyou {
-            font-size: 7px;
-            font-weight: bold;
-            margin: 1px 0;
-        }
-        .footer .visit {
-            font-size: 5px;
-            margin: 1px 0;
-        }
-        .footer .gst {
-            font-size: 4.5px;
-            color: #888;
-            margin: 1px 0;
-        }
-        
-        .dotted {
-            border-top: 1px dotted #000;
-            margin: 2px 0;
-        }
-    </style>
-    </head>
-    <body onload="window.print();window.close();">
-        <div class="header">
-            <h2>🛍️ SASTA BAZAR</h2>
-            <div class="sub">रामलक्ष्मण, रुद्रपुर</div>
-            <div class="sub">📞 6306088261</div>
-            <div class="dotted"></div>
-            <div class="bill-info">Bill: ${billNo}</div>
-            <div class="bill-info">Date: ${new Date().toLocaleDateString()}</div>
-            <div class="customer">Customer: ${custName}</div>
-        </div>
-        
-        <table>
-            <tr>
-                <th class="th-item">Item</th>
-                <th class="th-qty">Qty</th>
-                <th class="th-price">Price</th>
-                <th class="th-disc">Disc%</th>
-                <th class="th-total">Total</th>
-            </tr>
-            ${itemsHtml}
-        </table>
-        
-        <div class="totals">
-            <div class="total-amount">Total: ₹${total.toFixed(0)}</div>
-            <div class="cashback-amount">Cashback: +₹${cbTotal.toFixed(0)}</div>
-        </div>
-        
-        <div class="footer">
-            <div class="dotted"></div>
-            <div class="thankyou">✨ Thank you! ✨</div>
-            <div class="visit">Visit again! SASTA BAZAR</div>
-            <div class="gst">GST: 27ABCDE1234F1Z5</div>
-        </div>
-    </body></html>`); 
-    win.document.close();
+        async function printBillAndUpdate() { 
+            if(cart.length === 0) { showAlert('Cart empty','error'); return; } 
+            const cust = document.getElementById('selectedCustomerId').value; 
+            if(!cust) { showAlert('Select customer','error'); return; } 
+            const custName = customers.find(c => c.id == cust)?.name || 'Customer'; 
+            let total = 0, cbTotal = 0, itemsHtml = ''; 
+            
+            cart.forEach(i => { 
+                let t, cb;
+                if (i.type === 'weight') {
+                    t = i.amount + (i.gst || 0);
+                    cb = i.cashback || 0;
+                } else {
+                    t = i.originalPrice * i.quantity; 
+                    cb = i.cashback * i.quantity;
+                }
+                total += t; 
+                cbTotal += cb; 
+                const shortName = i.name.length > 8 ? i.name.substring(0, 8) + '..' : i.name;
+                const discText = i.discountPercent > 0 ? i.discountPercent + '%' : '-';
+                itemsHtml += `<tr>
+                    <td style="font-size:6px;padding:1px 0;text-align:left;">${shortName}</td>
+                    <td style="font-size:6px;text-align:center;padding:1px 0;">${i.type === 'weight' ? i.weight.toFixed(2) : i.quantity}</td>
+                    <td style="font-size:6px;text-align:right;padding:1px 0;">₹${i.originalPrice}</td>
+                    <td style="font-size:6px;text-align:center;padding:1px 0;">${discText}</td>
+                    <td style="font-size:6px;text-align:right;padding:1px 0;">₹${t.toFixed(0)}</td>
+                </tr>`; 
+            }); 
+            
+            const billNo = 'SB' + Date.now(); 
+            
+            const win = window.open('', '_blank'); 
+            win.document.write(`<html><head><title>Bill - SASTA BAZAR</title>
+            <style>
+                @page { size: 45mm auto; margin: 1.5mm 1mm 1.5mm 1mm; }
+                body { font-family: 'Courier New', monospace; font-size: 6.5px; width: 45mm; max-width: 45mm; margin: 0 auto; padding: 0; line-height: 1.1; background: white; }
+                .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 3px; margin-bottom: 3px; }
+                .header h2 { font-size: 10px; margin: 0; font-weight: bold; letter-spacing: 0.5px; }
+                .header .sub { font-size: 5.5px; margin: 1px 0; line-height: 1.1; }
+                .header .bill-info { font-size: 5.5px; margin: 1px 0; line-height: 1.1; }
+                .header .customer { font-size: 6.5px; font-weight: bold; margin: 1px 0; }
+                table { width: 100%; border-collapse: collapse; font-size: 5.5px; }
+                th { text-align: left; border-bottom: 1px dotted #000; padding: 1.5px 1px; font-size: 5px; }
+                td { padding: 1px 1px; font-size: 5.5px; }
+                .th-item { text-align: left; width: 30%; }
+                .th-qty { text-align: center; width: 10%; }
+                .th-price { text-align: right; width: 20%; }
+                .th-disc { text-align: center; width: 15%; }
+                .th-total { text-align: right; width: 25%; }
+                .totals { border-top: 1px dashed #000; padding-top: 2px; margin-top: 2px; text-align: right; }
+                .totals .total-amount { font-size: 9px; font-weight: bold; }
+                .totals .cashback-amount { font-size: 7px; color: #27ae60; font-weight: bold; }
+                .footer { text-align: center; border-top: 1px dashed #000; padding-top: 3px; margin-top: 3px; }
+                .footer .thankyou { font-size: 7px; font-weight: bold; margin: 1px 0; }
+                .footer .visit { font-size: 5px; margin: 1px 0; }
+                .footer .gst { font-size: 4.5px; color: #888; margin: 1px 0; }
+                .dotted { border-top: 1px dotted #000; margin: 2px 0; }
+            </style>
+            </head>
+            <body onload="window.print();window.close();">
+                <div class="header">
+                    <h2>🛍️ SASTA BAZAR</h2>
+                    <div class="sub">रामलक्ष्मण, रुद्रपुर</div>
+                    <div class="sub">📞 6306088261</div>
+                    <div class="dotted"></div>
+                    <div class="bill-info">Bill: ${billNo}</div>
+                    <div class="bill-info">Date: ${new Date().toLocaleDateString()}</div>
+                    <div class="customer">Customer: ${custName}</div>
+                </div>
+                <table>
+                    <tr>
+                        <th class="th-item">Item</th>
+                        <th class="th-qty">Qty/Wt</th>
+                        <th class="th-price">Rate</th>
+                        <th class="th-disc">Disc%</th>
+                        <th class="th-total">Total</th>
+                    </tr>
+                    ${itemsHtml}
+                </table>
+                <div class="totals">
+                    <div class="total-amount">Total: ₹${total.toFixed(0)}</div>
+                    <div class="cashback-amount">Cashback: +₹${cbTotal.toFixed(0)}</div>
+                </div>
+                <div class="footer">
+                    <div class="dotted"></div>
+                    <div class="thankyou">✨ Thank you! ✨</div>
+                    <div class="visit">Visit again! SASTA BAZAR</div>
+                    <div class="gst">GST: 27ABCDE1234F1Z5</div>
+                </div>
+            </body></html>`); 
+            win.document.close();
 
-    // UPDATE EVERYTHING IN BACKEND
-    try {
-        const items = cart.map(i => ({ product_id: i.product_id, quantity: i.quantity }));
-        const res = await apiCall('POST', '/bills', {
-            customer_id: parseInt(cust),
-            items: items,
-            payment_method: 'cash'
+            try {
+                const items = cart.map(i => {
+                    if (i.type === 'weight') {
+                        return {
+                            product_id: i.product_id,
+                            quantity: 1,
+                            weight: i.weight,
+                            rate_per_kg: i.rate_per_kg,
+                            type: 'weight'
+                        };
+                    } else {
+                        return {
+                            product_id: i.product_id,
+                            quantity: i.quantity,
+                            type: 'piece'
+                        };
+                    }
+                });
+                const res = await apiCall('POST', '/bills', {
+                    customer_id: parseInt(cust),
+                    items: items,
+                    payment_method: 'cash'
+                });
+                
+                addToHistory(billNo, custName, cart.length, total, cbTotal);
+                cart = [];
+                renderCart();
+                await loadAdminData();
+                await loadCustomerDashboardData();
+                await loadWeightProducts();
+                
+                showAlert(`✅ Bill created! Cashback: ₹${cbTotal.toFixed(0)} added to wallet!`, 'success');
+            } catch(e) {
+                console.error('Error details:', e);
+                showAlert('Error: ' + e.message, 'error');
+            }
+        }
+
+        // =============================================
+        // WEIGHT PRODUCTS FUNCTIONS
+        // =============================================
+        function showWeightProductModal(productId = null) {
+            const modal = document.getElementById('weightProductModal');
+            const form = document.getElementById('weightProductForm');
+            const title = document.getElementById('weightProductModalTitle');
+            
+            if (productId) {
+                title.textContent = '✏️ Edit Weight Product';
+                const product = weightProducts.find(p => p.id === productId);
+                if (product) {
+                    document.getElementById('wpCode').value = product.product_code || '';
+                    document.getElementById('wpName').value = product.name || '';
+                    document.getElementById('wpCategory').value = product.category || '';
+                    document.getElementById('wpBrand').value = product.brand || '';
+                    document.getElementById('wpUnit').value = product.unit || 'Kg';
+                    document.getElementById('wpRatePerKg').value = product.rate_per_kg || '';
+                    document.getElementById('wpMinWeight').value = product.min_weight || '';
+                    document.getElementById('wpMaxWeight').value = product.max_weight || '';
+                    document.getElementById('wpCashback').value = product.cashback_percent || 0;
+                    document.getElementById('wpGst').value = product.gst_percent || 0;
+                    document.getElementById('wpStock').value = product.weight_stock || 0;
+                    document.getElementById('wpReorder').value = product.reorder_level || 5;
+                    document.getElementById('wpImage').value = product.image_url || '';
+                    document.getElementById('wpStatus').value = product.status || 'active';
+                    document.getElementById('wpDescription').value = product.description || '';
+                    
+                    form.dataset.editId = productId;
+                }
+            } else {
+                title.textContent = '➕ Add Weight Product';
+                form.reset();
+                delete form.dataset.editId;
+                document.getElementById('wpStatus').value = 'active';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeWeightProductModal() {
+            document.getElementById('weightProductModal').style.display = 'none';
+        }
+
+        // SAVE WEIGHT PRODUCT
+        document.getElementById('weightProductForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                product_code: document.getElementById('wpCode').value,
+                name: document.getElementById('wpName').value,
+                category: document.getElementById('wpCategory').value,
+                brand: document.getElementById('wpBrand').value,
+                unit: document.getElementById('wpUnit').value,
+                rate_per_kg: parseFloat(document.getElementById('wpRatePerKg').value),
+                min_weight: parseFloat(document.getElementById('wpMinWeight').value) || 0,
+                max_weight: parseFloat(document.getElementById('wpMaxWeight').value) || 0,
+                cashback_percent: parseFloat(document.getElementById('wpCashback').value) || 0,
+                gst_percent: parseFloat(document.getElementById('wpGst').value) || 0,
+                weight_stock: parseFloat(document.getElementById('wpStock').value) || 0,
+                reorder_level: parseInt(document.getElementById('wpReorder').value) || 5,
+                image_url: document.getElementById('wpImage').value,
+                status: document.getElementById('wpStatus').value,
+                description: document.getElementById('wpDescription').value
+            };
+            
+            if (!data.name || !data.rate_per_kg) {
+                showAlert('Please fill Name and Rate Per Kg', 'error');
+                return;
+            }
+            
+            try {
+                const editId = this.dataset.editId;
+                let res;
+                if (editId) {
+                    res = await apiCall('PUT', `/weight-products/${editId}`, data);
+                    showAlert('Weight product updated!', 'success');
+                } else {
+                    res = await apiCall('POST', '/weight-products', data);
+                    showAlert('Weight product added!', 'success');
+                }
+                closeWeightProductModal();
+                await loadWeightProducts();
+            } catch(e) {
+                showAlert('Error: ' + e.message, 'error');
+            }
         });
-        
-        addToHistory(billNo, custName, cart.length, total, cbTotal);
-        cart = [];
-        renderCart();
-        await loadAdminData();
-        await loadCustomerDashboardData();
-        
-        showAlert(`✅ Bill created! Cashback: ₹${cbTotal.toFixed(0)} added to wallet!`, 'success');
-    } catch(e) {
-        console.error('Error details:', e);
-        showAlert('Error: ' + e.message, 'error');
-    }
-}
+
+        // LOAD WEIGHT PRODUCTS
+        async function loadWeightProducts() {
+            try {
+                const res = await apiCall('GET', '/weight-products');
+                weightProducts = res;
+                renderWeightProductsTable();
+            } catch(e) {
+                console.error('Error loading weight products:', e);
+            }
+        }
+
+        // RENDER WEIGHT PRODUCTS TABLE
+        function renderWeightProductsTable() {
+            const search = document.getElementById('weightProductSearch')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('weightProductStatus')?.value || '';
+            const perPage = parseInt(document.getElementById('weightProductPerPage')?.value) || 10;
+            weightProductPerPage = perPage;
+            
+            let filtered = weightProducts.filter(p => {
+                const matchName = p.name.toLowerCase().includes(search);
+                const matchStatus = statusFilter === '' || p.status === statusFilter;
+                return matchName && matchStatus;
+            });
+            
+            const totalPages = Math.ceil(filtered.length / perPage);
+            if (weightProductPage > totalPages) weightProductPage = 1;
+            const start = (weightProductPage - 1) * perPage;
+            const pageData = filtered.slice(start, start + perPage);
+            
+            const tbody = document.getElementById('adminWeightProductsList');
+            tbody.innerHTML = '';
+            
+            pageData.forEach(p => {
+                const imgUrl = p.image_url || '';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${imgUrl}" style="width:40px;height:40px;border-radius:8px;" onerror="this.style.display='none'"></td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.product_code || '-'}</td>
+                        <td>${p.category || '-'}</td>
+                        <td>₹${p.rate_per_kg}/Kg</td>
+                        <td>${p.weight_stock || 0} ${p.unit || 'Kg'}</td>
+                        <td>${p.cashback_percent || 0}%</td>
+                        <td><span style="background:${p.status === 'active' ? '#27ae60' : '#e74c3c'}; color:white; padding:4px 12px; border-radius:20px; font-size:12px;">${p.status}</span></td>
+                        <td>
+                            <button onclick="showWeightProductModal(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button>
+                            <button onclick="deleteWeightProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button>
+                            <button onclick="toggleWeightProductStatus(${p.id}, '${p.status}')" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:20px;">${p.status === 'active' ? 'Deactivate' : 'Activate'}</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            const pag = document.getElementById('weightProductPagination');
+            pag.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                if (i === weightProductPage) btn.classList.add('active-page');
+                btn.onclick = () => { weightProductPage = i; renderWeightProductsTable(); };
+                pag.appendChild(btn);
+            }
+        }
+
+        // DELETE WEIGHT PRODUCT
+        async function deleteWeightProduct(id) {
+            if (!confirm('Delete this weight product?')) return;
+            try {
+                await apiCall('DELETE', `/weight-products/${id}`);
+                showAlert('Product deleted!', 'success');
+                await loadWeightProducts();
+            } catch(e) {
+                showAlert('Error: ' + e.message, 'error');
+            }
+        }
+
+        // TOGGLE WEIGHT PRODUCT STATUS
+        async function toggleWeightProductStatus(id, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            try {
+                await apiCall('PATCH', `/weight-products/${id}/status`, { status: newStatus });
+                showAlert(`Product ${newStatus}!`, 'success');
+                await loadWeightProducts();
+            } catch(e) {
+                showAlert('Error: ' + e.message, 'error');
+            }
+        }
+
+        // =============================================
+        // WEIGHT CAPTURE - BILLING FLOW
+        // =============================================
+        function startWeightCapture(product) {
+            currentWeightProduct = product;
+            weightStable = false;
+            
+            document.getElementById('wcProductName').textContent = product.name;
+            document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
+            document.getElementById('wcRate').textContent = `Rate: ₹${product.rate_per_kg}/Kg`;
+            document.getElementById('wcGst').textContent = `GST: ${product.gst_percent || 0}%`;
+            document.getElementById('wcCashback').textContent = `Cashback: ${product.cashback_percent || 0}%`;
+            document.getElementById('wcWeightDisplay').textContent = '0.000';
+            document.getElementById('wcWeightDisplay').className = 'weight-display';
+            document.getElementById('wcStatus').textContent = '⏳ Waiting for stable weight...';
+            document.getElementById('wcStatus').className = 'weight-status';
+            document.getElementById('wcAmount').textContent = '₹0.00';
+            
+            document.getElementById('weightCaptureModal').style.display = 'flex';
+            
+            // Simulate weight reading
+            simulateWeightReading();
+        }
+
+        function simulateWeightReading() {
+            let weight = 0;
+            let stable = false;
+            
+            if (weightTimer) clearInterval(weightTimer);
+            
+            weightTimer = setInterval(() => {
+                const delta = (Math.random() - 0.5) * 0.2;
+                weight = Math.max(0, weight + delta);
+                
+                if (weight > 0.5 && Math.abs(delta) < 0.02) {
+                    stable = true;
+                } else {
+                    stable = false;
+                }
+                
+                document.getElementById('wcWeightDisplay').textContent = weight.toFixed(3);
+                
+                const amount = weight * (currentWeightProduct?.rate_per_kg || 0);
+                document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
+                
+                if (stable && weight > 0.1) {
+                    document.getElementById('wcStatus').textContent = '✅ Stable weight detected! Press ENTER to confirm';
+                    document.getElementById('wcStatus').className = 'weight-status stable';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display stable';
+                    weightStable = true;
+                } else {
+                    document.getElementById('wcStatus').textContent = '⏳ Waiting for stable weight...';
+                    document.getElementById('wcStatus').className = 'weight-status';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display';
+                    weightStable = false;
+                }
+            }, 200);
+        }
+
+        function confirmWeight() {
+            if (!weightStable) {
+                showAlert('Please wait for stable weight reading', 'error');
+                return;
+            }
+            
+            const weight = parseFloat(document.getElementById('wcWeightDisplay').textContent);
+            if (weight <= 0) {
+                showAlert('Invalid weight reading', 'error');
+                return;
+            }
+            
+            addWeightToCart(currentWeightProduct, weight);
+            document.getElementById('weightCaptureModal').style.display = 'none';
+            if (weightTimer) clearInterval(weightTimer);
+            showAlert(`✅ ${currentWeightProduct.name}: ${weight.toFixed(3)} Kg added to cart!`, 'success');
+        }
+
+        function cancelWeight() {
+            document.getElementById('weightCaptureModal').style.display = 'none';
+            if (weightTimer) clearInterval(weightTimer);
+            weightStable = false;
+        }
+
+        function addWeightToCart(product, weight) {
+            const amount = weight * product.rate_per_kg;
+            const cashback = (amount * (product.cashback_percent || 0)) / 100;
+            const gst = (amount * (product.gst_percent || 0)) / 100;
+            
+            const cartItem = {
+                product_id: product.id,
+                name: product.name,
+                barcode: product.product_code,
+                type: 'weight',
+                weight: weight,
+                rate_per_kg: product.rate_per_kg,
+                unit: product.unit || 'Kg',
+                amount: amount,
+                cashback: cashback,
+                gst: gst,
+                total: amount + gst,
+                discountPercent: product.cashback_percent || 0,
+                originalPrice: product.rate_per_kg,
+                quantity: 1
+            };
+            
+            cart.push(cartItem);
+            renderCart();
+        }
+
+        // Keyboard shortcuts for weight capture
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && document.getElementById('weightCaptureModal').style.display === 'flex') {
+                e.preventDefault();
+                confirmWeight();
+            }
+            if (e.key === 'Escape' && document.getElementById('weightCaptureModal').style.display === 'flex') {
+                cancelWeight();
+            }
+        });
 
         // =============================================
         // PRODUCT CRUD
@@ -1678,6 +2099,7 @@ async function printBillAndUpdate() {
             document.getElementById('tabCustomers').style.display = 'none'; 
             document.getElementById('tabProducts').style.display = 'none'; 
             document.getElementById('tabHistory').style.display = 'none'; 
+            document.getElementById('tabWeightProducts').style.display = 'none';
             document.querySelectorAll('.tab-nav button').forEach(b => b.classList.remove('active-tab')); 
             
             if(tab === 'billing') { 
@@ -1698,7 +2120,12 @@ async function printBillAndUpdate() {
                 document.getElementById('tabHistory').style.display = 'block'; 
                 document.querySelector('.tab-nav button:nth-child(4)').classList.add('active-tab'); 
                 renderHistoryTable(); 
-            } 
+            }
+            if(tab === 'weight-products') {
+                document.getElementById('tabWeightProducts').style.display = 'block';
+                document.querySelector('.tab-nav button:nth-child(5)').classList.add('active-tab');
+                loadWeightProducts();
+            }
         }
 
         // =============================================
