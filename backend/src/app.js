@@ -900,11 +900,18 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
 });
 
 // Get current weight
+// Get current weight from scale
 app.get('/api/scale/weight', authenticateToken, async (req, res) => {
+    // ✅ Only return weight if scale is actually connected
+    const isStable = stableCount >= STABLE_THRESHOLD;
+    
+    // If scale not connected, return 0 weight
+    const weight = scaleConnected ? scaleWeight : 0;
+    
     res.json({ 
-        weight: scaleWeight, 
+        weight: weight, 
         connected: scaleConnected,
-        stable: stableCount >= STABLE_THRESHOLD,
+        stable: isStable && scaleConnected,
         unit: 'Kg'
     });
 });
