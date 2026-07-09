@@ -105,7 +105,6 @@
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f5f5f5; }
         .cart-total-box { background: #fef5e7; border-radius: 20px; padding: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .scanner-input { width: 100%; padding: 14px; border-radius: 40px; border: 1px solid #e67e22; margin-bottom: 15px; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 32px; width: 90%; max-width: 500px; }
@@ -335,13 +334,14 @@
                 <button onclick="switchAdminTab('weight-products')">⚖️ Weight Products</button>
             </div>
 
+            <!-- Billing Tab - Scanner Mode Default, No Barcode Input -->
             <div id="tabBilling" class="admin-section" style="background:white; border-radius:24px; padding:20px; margin-bottom:20px;">
                 <h2 style="color:#e67e22;">🧾 Billing</h2>
                 <div class="mode-toggle">
-                    <button class="active-mode" id="modeManual" onclick="setBillingMode('manual')">✏️ Manual</button>
-                    <button id="modeScanner" onclick="setBillingMode('scanner')">📷 Scanner</button>
+                    <button id="modeManual" onclick="setBillingMode('manual')">✏️ Manual</button>
+                    <button class="active-mode" id="modeScanner" onclick="setBillingMode('scanner')">📷 Scanner</button>
                 </div>
-                <input type="text" id="barcodeInput" placeholder="📷 Scan barcode → Enter" class="scanner-input">
+                <!-- BARCODE INPUT BOX REMOVED - Scanner works via keyboard globally -->
                 
                 <div class="search-dropdown">
                     <input type="text" id="customerSearchInput" placeholder="🔍 Search Customer..." oninput="filterCustomerDropdown()" onfocus="document.getElementById('customerDropdownList').style.display='block'">
@@ -566,7 +566,7 @@
             let productImages = {}, superDiscountProducts = [], jobVacancies = [], jobApplications = [];
             let customerPage=1, customerPerPage=10, productPage=1, productPerPage=10, historyPage=1, historyPerPage=10;
             let salesHistory = [];
-            let billingMode = 'manual';
+            let billingMode = 'scanner'; // ✅ DEFAULT SCANNER MODE
             let customers = [];
             let weightProducts = [];
             let weightProductPage = 1;
@@ -577,6 +577,25 @@
             let currentWeight = 0;
             let stableCount = 0;
             let scaleConnected = false;
+
+            // ✅ LOGIN PERSISTENCE - No logout on refresh
+            if (localStorage.getItem('token') && localStorage.getItem('user')) {
+                authToken = localStorage.getItem('token');
+                currentUser = JSON.parse(localStorage.getItem('user'));
+                
+                if (currentUser.type === 'admin') {
+                    document.getElementById('landingPage').style.display = 'none';
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('adminDashboard').style.display = 'block';
+                    loadAdminData();
+                    setupBarcodeScanner();
+                } else if (currentUser.type === 'customer') {
+                    document.getElementById('landingPage').style.display = 'none';
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('customerDashboard').style.display = 'block';
+                    loadCustomerDashboardData();
+                }
+            }
 
             // =============================================
             // UTILITY FUNCTIONS
@@ -842,6 +861,11 @@
                         const data = await res.json(); 
                         authToken = data.token; 
                         currentUser = { type:'admin' }; 
+                        
+                        // ✅ Save to localStorage
+                        localStorage.setItem('token', authToken);
+                        localStorage.setItem('user', JSON.stringify(currentUser));
+                        
                         document.getElementById('landingPage').style.display = 'none'; 
                         document.getElementById('loginSection').style.display = 'none'; 
                         document.getElementById('adminDashboard').style.display = 'block'; 
@@ -869,6 +893,10 @@
                         const data = await res.json(); 
                         authToken = data.token; 
                         currentUser = { type:'customer', data:data.customer }; 
+                        
+                        localStorage.setItem('token', authToken);
+                        localStorage.setItem('user', JSON.stringify(currentUser));
+                        
                         document.getElementById('landingPage').style.display = 'none'; 
                         document.getElementById('loginSection').style.display = 'none'; 
                         document.getElementById('customerDashboard').style.display = 'block'; 
@@ -897,6 +925,10 @@
                         const data = await res.json(); 
                         authToken = data.token; 
                         currentUser = { type:'customer', data:data.customer }; 
+                        
+                        localStorage.setItem('token', authToken);
+                        localStorage.setItem('user', JSON.stringify(currentUser));
+                        
                         document.getElementById('landingPage').style.display = 'none'; 
                         document.getElementById('loginSection').style.display = 'none'; 
                         document.getElementById('customerDashboard').style.display = 'block'; 
@@ -913,6 +945,8 @@
                 authToken = null; 
                 currentUser = null; 
                 cart = []; 
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 document.getElementById('customerDashboard').style.display = 'none'; 
                 document.getElementById('landingPage').style.display = 'block'; 
                 showAlert('Logged out','info'); 
@@ -922,6 +956,8 @@
                 authToken = null; 
                 currentUser = null; 
                 cart = []; 
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 document.getElementById('adminDashboard').style.display = 'none'; 
                 document.getElementById('landingPage').style.display = 'block'; 
                 showAlert('Logged out','info'); 
@@ -1235,26 +1271,57 @@
             }
 
             // =============================================
-            // BILLING MODES & BARCODE
+            // BILLING MODES - DEFAULT SCANNER
             // =============================================
             function setBillingMode(mode) { 
                 billingMode = mode; 
                 document.getElementById('modeManual').classList.toggle('active-mode', mode === 'manual'); 
                 document.getElementById('modeScanner').classList.toggle('active-mode', mode === 'scanner'); 
-                document.getElementById('barcodeInput').placeholder = mode === 'scanner' ? '📷 Scan barcode → Enter' : '📷 Barcode (Manual)'; 
             }
-            
+
+            // =============================================
+            // BARCODE SCANNER - DIRECT KEYBOARD INPUT (NO BOX)
+            // =============================================
+            let barcodeBuffer = '';
+            let barcodeTimer = null;
+
             function setupBarcodeScanner() { 
-                const input = document.getElementById('barcodeInput'); 
-                if(!input) return; 
-                input.addEventListener('keypress', async function(e) { 
-                    if(e.key === 'Enter' && billingMode === 'scanner') { 
-                        const barcode = this.value.trim(); 
-                        if(barcode) await processBarcode(barcode); 
-                        this.value = ''; 
-                    } 
-                }); 
+                console.log('📷 Scanner mode active - scan barcode directly');
             }
+
+            // ✅ GLOBAL KEYBOARD LISTENER FOR SCANNER
+            document.addEventListener('keydown', function(e) {
+                // Only process in scanner mode and billing tab
+                if (billingMode !== 'scanner') return;
+                if (!document.getElementById('tabBilling')?.style.display || document.getElementById('tabBilling').style.display === 'none') return;
+                
+                // Check if customer is selected
+                const cust = document.getElementById('selectedCustomerId')?.value;
+                if (!cust) return;
+                
+                // Enter key = process barcode
+                if (e.key === 'Enter') {
+                    if (barcodeBuffer.trim()) {
+                        processBarcode(barcodeBuffer.trim());
+                        barcodeBuffer = '';
+                    }
+                    return;
+                }
+                
+                // Ignore if typing in input fields
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                    return;
+                }
+                
+                // Collect barcode characters (alphanumeric + hyphen)
+                if (e.key.length === 1 && e.key.match(/[\w\-]/)) {
+                    barcodeBuffer += e.key;
+                    clearTimeout(barcodeTimer);
+                    barcodeTimer = setTimeout(() => {
+                        barcodeBuffer = '';
+                    }, 1000);
+                }
+            });
 
             // =============================================
             // PROCESS BARCODE - WITH WEIGHT SUPPORT
@@ -1337,11 +1404,11 @@
             }
 
             // =============================================
-            // CONNECT TO I-SCALE - COM14
+            // CONNECT TO SCALE
             // =============================================
             async function connectToScale() {
                 try {
-                    console.log('🔌 Connecting to I-Scale on COM14...');
+                    console.log('🔌 Connecting to scale...');
                     
                     const response = await fetch(`${API_URL}/scale/connect`, {
                         method: 'POST',
@@ -1355,7 +1422,7 @@
                     if (response.ok) {
                         const data = await response.json();
                         if (data.connected) {
-                            console.log('✅ I-Scale connected!');
+                            console.log('✅ Scale connected!');
                             scaleConnected = true;
                             return true;
                         } else {
@@ -1376,7 +1443,7 @@
             }
 
             // =============================================
-            // LIVE WEIGHT READING - ONLY REAL SCALE DATA
+            // LIVE WEIGHT READING
             // =============================================
             function startLiveWeightReading() {
                 if (weightTimer) clearInterval(weightTimer);
@@ -1384,7 +1451,6 @@
                 currentWeight = 0;
                 weightStable = false;
                 
-                // ✅ Try to connect to real scale
                 connectToScale();
                 
                 weightTimer = setInterval(async () => {
@@ -1399,7 +1465,6 @@
                         if (response.ok) {
                             const data = await response.json();
                             
-                            // ✅ Only update if scale is connected
                             if (data.connected) {
                                 currentWeight = data.weight || 0;
                                 if (data.stable) {
@@ -1409,7 +1474,6 @@
                                 }
                                 console.log(`⚖️ Scale: ${currentWeight} Kg | Stable: ${data.stable}`);
                             } else {
-                                // ✅ Scale not connected - show 0
                                 currentWeight = 0;
                                 stableCount = 0;
                                 console.log('⚠️ Scale not connected');
@@ -1423,7 +1487,6 @@
                         stableCount = 0;
                     }
                     
-                    // ✅ Update UI
                     updateWeightUI();
                     
                 }, 200);
@@ -1454,7 +1517,6 @@
                     document.getElementById('wcWeightDisplay').className = 'weight-display';
                     weightStable = false;
                 } else {
-                    // Scale not connected message already set
                     if (!scaleConnected) {
                         document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. Please connect weighing machine.';
                         document.getElementById('wcStatus').className = 'weight-status';
@@ -1536,7 +1598,7 @@
             // =============================================
             function addToCart() { 
                 if(billingMode === 'scanner') { 
-                    showAlert('Scanner mode: use barcode input','error'); 
+                    showAlert('Scanner mode: use barcode scanner','error'); 
                     return; 
                 } 
                 const cust = document.getElementById('selectedCustomerId').value; 
@@ -2228,6 +2290,9 @@
             
             checkBackend(); 
             setInterval(checkBackend, 30000);
+            
+            // ✅ Initialize with scanner mode by default
+            setBillingMode('scanner');
             showLandingHome();
         </script>
     </body>
