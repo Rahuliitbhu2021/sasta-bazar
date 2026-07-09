@@ -123,9 +123,9 @@ app.post('/api/products', authenticateToken, async (req, res) => {
   
   try {
     const result = await query(
-      `INSERT INTO products (product_code, name, purchase_price, selling_price, current_stock, discount_percent)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [product_code, name, purchase_price || selling_price * 0.7, selling_price, current_stock || 0, discount_percent || 0]
+      `INSERT INTO products (product_code, name, purchase_price, selling_price, current_stock, discount_percent, product_type, unit)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [product_code, name, purchase_price || selling_price * 0.7, selling_price, current_stock || 0, discount_percent || 0, 'piece', 'piece']
     );
     res.json(result.rows[0]);
   } catch (error) {
@@ -199,7 +199,7 @@ app.post('/api/customers', authenticateToken, async (req, res) => {
   }
 });
 
-// ============ BILL ROUTES - FULLY FIXED ============
+// ============ BILL ROUTES - WITH WEIGHT PRODUCT SUPPORT ============
 app.post('/api/bills', authenticateToken, async (req, res) => {
   const { customer_id, items, payment_method } = req.body;
   
@@ -216,15 +216,44 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       }
       const p = product.rows[0];
       
-      if (p.current_stock < item.quantity) {
-        return res.status(400).json({ error: `Insufficient stock for ${p.name}` });
+      // Check if weight product
+      if (p.product_type === 'weight' && item.weight) {
+        // Weight product
+        if (p.weight_stock > 0 && item.weight > p.weight_stock) {
+          return res.status(400).json({ error: `Only ${p.weight_stock} ${p.unit} available` });
+        }
+        
+        const cashbackAmount = (item.weight * p.rate_per_kg * (p.cashback_percent || 0)) / 100;
+        const amount = item.weight * p.rate_per_kg;
+        const gstAmount = (amount * (p.gst_percent || 0)) / 100;
+        
+        totalAmount += amount + gstAmount;
+        totalCashback += cashbackAmount;
+        
+        // Update weight stock
+        if (p.weight_stock > 0) {
+          const newStock = p.weight_stock - item.weight;
+          await query('UPDATE products SET weight_stock = $1 WHERE id = $2', [newStock, p.id]);
+          
+          // Log inventory transaction
+          await query(
+            `INSERT INTO inventory_transactions (product_id, transaction_type, quantity, previous_stock, new_stock, reference_id)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [p.id, 'OUT', item.weight, p.weight_stock, newStock, `bill_${Date.now()}`]
+          );
+        }
+      } else {
+        // Piece product
+        if (p.current_stock < item.quantity) {
+          return res.status(400).json({ error: `Insufficient stock for ${p.name}` });
+        }
+        
+        const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
+        totalAmount += p.selling_price * item.quantity;
+        totalCashback += cashbackAmount * item.quantity;
+        
+        await query('UPDATE products SET current_stock = current_stock - $1 WHERE id = $2', [item.quantity, p.id]);
       }
-      
-      const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
-      totalAmount += p.selling_price * item.quantity;
-      totalCashback += cashbackAmount * item.quantity;
-      
-      await query('UPDATE products SET current_stock = current_stock - $1 WHERE id = $2', [item.quantity, p.id]);
     }
     
     const billNumber = `INV${Date.now()}`;
@@ -238,44 +267,30 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
     
     console.log('✅ Bill created:', billResult.rows[0].id);
     
-    // ✅ Save bill items - WORKS WITH BOTH COLUMN STRUCTURES
+    // Save bill items with weight support
     for (const item of items) {
       const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
       const p = product.rows[0];
-      const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
       
-      // Try with discount_percent column first, if fails try without
-      try {
+      if (p.product_type === 'weight' && item.weight) {
+        // Save weight transaction
+        const cashbackAmount = (item.weight * p.rate_per_kg * (p.cashback_percent || 0)) / 100;
+        const amount = item.weight * p.rate_per_kg;
+        const gstAmount = (amount * (p.gst_percent || 0)) / 100;
+        
         await query(
-          `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, discount_percent, total_price, cashback_amount)
+          `INSERT INTO weight_transactions (bill_id, product_id, weight, rate_per_kg, amount, gst_amount, cashback_amount)
            VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [
-            billResult.rows[0].id,
-            item.product_id,
-            item.quantity,
-            p.selling_price,
-            p.discount_percent || 0,
-            p.selling_price * item.quantity,
-            cashbackAmount * item.quantity
-          ]
+          [billResult.rows[0].id, item.product_id, item.weight, p.rate_per_kg, amount, gstAmount, cashbackAmount]
         );
-      } catch (err) {
-        // If discount_percent column doesn't exist, try without it
-        if (err.message.includes('column "discount_percent" does not exist')) {
-          await query(
-            `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, total_price)
-             VALUES ($1, $2, $3, $4, $5)`,
-            [
-              billResult.rows[0].id,
-              item.product_id,
-              item.quantity,
-              p.selling_price,
-              p.selling_price * item.quantity
-            ]
-          );
-        } else {
-          throw err;
-        }
+      } else {
+        // Save piece product
+        const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
+        await query(
+          `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, total_price)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [billResult.rows[0].id, item.product_id, item.quantity, p.selling_price, p.selling_price * item.quantity]
+        );
       }
     }
     console.log('✅ Bill items saved');
@@ -355,13 +370,257 @@ app.get('/api/bills/:id/items', authenticateToken, async (req, res) => {
   }
 });
 
+// ============ WEIGHT PRODUCTS ROUTES ============
+
+// GET all weight products
+app.get('/api/weight-products', authenticateToken, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT * FROM products WHERE product_type = 'weight' ORDER BY id DESC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// CREATE weight product
+app.post('/api/weight-products', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  
+  const {
+    product_code, name, category, brand, unit,
+    rate_per_kg, min_weight, max_weight,
+    cashback_percent, gst_percent, description,
+    status, weight_stock, reorder_level, image_url
+  } = req.body;
+  
+  try {
+    const rate_per_gram = rate_per_kg / 1000;
+    
+    const result = await query(
+      `INSERT INTO products (
+        product_code, name, category, brand, unit,
+        rate_per_kg, rate_per_gram, min_weight, max_weight,
+        cashback_percent, gst_percent, description,
+        status, weight_stock, reorder_level, image_url,
+        product_type, selling_price, purchase_price
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING *`,
+      [
+        product_code, name, category || 'General', brand || '',
+        unit || 'Kg', rate_per_kg, rate_per_gram,
+        min_weight || 0, max_weight || 0,
+        cashback_percent || 0, gst_percent || 0,
+        description || '', status || 'active',
+        weight_stock || 0, reorder_level || 5,
+        image_url || '', 'weight', rate_per_kg, rate_per_kg * 0.7
+      ]
+    );
+    
+    // Audit log
+    await query(
+      `INSERT INTO audit_logs (user_id, action, entity_type, entity_id, new_data)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [req.user.id, 'CREATE_WEIGHT_PRODUCT', 'product', result.rows[0].id, JSON.stringify(result.rows[0])]
+    );
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Create weight product error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE weight product
+app.put('/api/weight-products/:id', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  
+  const { id } = req.params;
+  const {
+    product_code, name, category, brand, unit,
+    rate_per_kg, min_weight, max_weight,
+    cashback_percent, gst_percent, description,
+    status, weight_stock, reorder_level, image_url
+  } = req.body;
+  
+  try {
+    const oldData = await query('SELECT * FROM products WHERE id = $1', [id]);
+    const rate_per_gram = rate_per_kg / 1000;
+    
+    const result = await query(
+      `UPDATE products SET
+        product_code = $1, name = $2, category = $3, brand = $4,
+        unit = $5, rate_per_kg = $6, rate_per_gram = $7,
+        min_weight = $8, max_weight = $9,
+        cashback_percent = $10, gst_percent = $11,
+        description = $12, status = $13,
+        weight_stock = $14, reorder_level = $15,
+        image_url = $16, selling_price = $17
+       WHERE id = $18 RETURNING *`,
+      [
+        product_code, name, category, brand,
+        unit, rate_per_kg, rate_per_gram,
+        min_weight, max_weight,
+        cashback_percent, gst_percent,
+        description, status,
+        weight_stock, reorder_level,
+        image_url, rate_per_kg, id
+      ]
+    );
+    
+    // Audit log
+    await query(
+      `INSERT INTO audit_logs (user_id, action, entity_type, entity_id, old_data, new_data)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user.id, 'UPDATE_WEIGHT_PRODUCT', 'product', id, JSON.stringify(oldData.rows[0]), JSON.stringify(result.rows[0])]
+    );
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Update weight product error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE weight product
+app.delete('/api/weight-products/:id', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  
+  const { id } = req.params;
+  
+  try {
+    const result = await query('DELETE FROM products WHERE id = $1 AND product_type = $2 RETURNING *', [id, 'weight']);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Weight product not found' });
+    }
+    
+    // Audit log
+    await query(
+      `INSERT INTO audit_logs (user_id, action, entity_type, entity_id, old_data)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [req.user.id, 'DELETE_WEIGHT_PRODUCT', 'product', id, JSON.stringify(result.rows[0])]
+    );
+    
+    res.json({ message: 'Weight product deleted successfully' });
+  } catch (error) {
+    console.error('Delete weight product error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE weight product status
+app.patch('/api/weight-products/:id/status', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  
+  const { id } = req.params;
+  const { status } = req.body;
+  
+  try {
+    const result = await query(
+      'UPDATE products SET status = $1 WHERE id = $2 AND product_type = $3 RETURNING *',
+      [status, id, 'weight']
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE weight product rate
+app.patch('/api/weight-products/:id/rate', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  
+  const { id } = req.params;
+  const { rate_per_kg } = req.body;
+  
+  try {
+    const result = await query(
+      'UPDATE products SET rate_per_kg = $1, rate_per_gram = $1/1000, selling_price = $1 WHERE id = $2 AND product_type = $3 RETURNING *',
+      [rate_per_kg, id, 'weight']
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE weight product cashback
+app.patch('/api/weight-products/:id/cashback', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  
+  const { id } = req.params;
+  const { cashback_percent } = req.body;
+  
+  try {
+    const result = await query(
+      'UPDATE products SET cashback_percent = $1 WHERE id = $2 AND product_type = $3 RETURNING *',
+      [cashback_percent, id, 'weight']
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET weight transactions by bill
+app.get('/api/weight-transactions/:billId', authenticateToken, async (req, res) => {
+  const { billId } = req.params;
+  try {
+    const result = await query(`
+      SELECT wt.*, p.name, p.product_code, p.unit
+      FROM weight_transactions wt
+      JOIN products p ON wt.product_id = p.id
+      WHERE wt.bill_id = $1
+    `, [billId]);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============ WEIGHT PRODUCTS REPORT ============
+app.get('/api/reports/weight-products', authenticateToken, async (req, res) => {
+  try {
+    const result = await query(`
+      SELECT 
+        p.id, p.name, p.product_code, p.category,
+        p.rate_per_kg, p.weight_stock,
+        COUNT(wt.id) as total_sales,
+        COALESCE(SUM(wt.weight), 0) as total_weight_sold,
+        COALESCE(SUM(wt.amount), 0) as total_revenue,
+        COALESCE(SUM(wt.cashback_amount), 0) as total_cashback
+      FROM products p
+      LEFT JOIN weight_transactions wt ON p.id = wt.product_id
+      WHERE p.product_type = 'weight'
+      GROUP BY p.id
+      ORDER BY total_revenue DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ============ REPORT ROUTES ============
 app.get('/api/reports/dashboard', authenticateToken, async (req, res) => {
   try {
     const totalSales = await query('SELECT COALESCE(SUM(total_amount), 0) as total FROM bills');
     const totalCustomers = await query('SELECT COUNT(*) as total FROM customers');
     const totalCommission = await query('SELECT COALESCE(SUM(amount), 0) as total FROM wallet_transactions WHERE transaction_type = $1', ['CREDIT']);
-    const lowStock = await query('SELECT COUNT(*) as total FROM products WHERE current_stock <= 5');
+    const lowStock = await query('SELECT COUNT(*) as total FROM products WHERE current_stock <= 5 OR weight_stock <= 5');
     
     res.json({
       total_sales: parseFloat(totalSales.rows[0].total),
@@ -459,6 +718,20 @@ async function initTables() {
         selling_price DECIMAL,
         current_stock INT DEFAULT 0,
         discount_percent DECIMAL DEFAULT 0,
+        product_type VARCHAR(20) DEFAULT 'piece',
+        unit VARCHAR(20) DEFAULT 'piece',
+        rate_per_kg DECIMAL(10,2) DEFAULT 0,
+        rate_per_gram DECIMAL(10,2) DEFAULT 0,
+        min_weight DECIMAL(10,2) DEFAULT 0,
+        max_weight DECIMAL(10,2) DEFAULT 0,
+        gst_percent DECIMAL(5,2) DEFAULT 0,
+        brand VARCHAR(100),
+        description TEXT,
+        status VARCHAR(20) DEFAULT 'active',
+        reorder_level INT DEFAULT 5,
+        weight_stock DECIMAL(10,3) DEFAULT 0,
+        image_url TEXT,
+        cashback_percent DECIMAL DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
@@ -489,6 +762,20 @@ async function initTables() {
     `);
     
     await query(`
+      CREATE TABLE IF NOT EXISTS weight_transactions (
+        id SERIAL PRIMARY KEY,
+        bill_id INT REFERENCES bills(id) ON DELETE CASCADE,
+        product_id INT REFERENCES products(id),
+        weight DECIMAL(10,3) NOT NULL,
+        rate_per_kg DECIMAL(10,2) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        gst_amount DECIMAL(10,2) DEFAULT 0,
+        cashback_amount DECIMAL(10,2) DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
       CREATE TABLE IF NOT EXISTS wallet_transactions (
         id SERIAL PRIMARY KEY,
         customer_id INT,
@@ -510,6 +797,57 @@ async function initTables() {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS inventory_transactions (
+        id SERIAL PRIMARY KEY,
+        product_id INT REFERENCES products(id),
+        transaction_type VARCHAR(20) NOT NULL,
+        quantity DECIMAL(10,3) NOT NULL,
+        previous_stock DECIMAL(10,3) NOT NULL,
+        new_stock DECIMAL(10,3) NOT NULL,
+        reference_id VARCHAR(100),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS audit_logs (
+        id SERIAL PRIMARY KEY,
+        user_id INT,
+        action VARCHAR(100) NOT NULL,
+        entity_type VARCHAR(50) NOT NULL,
+        entity_id INT,
+        old_data JSONB,
+        new_data JSONB,
+        ip_address VARCHAR(45),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await query(`
+      CREATE TABLE IF NOT EXISTS hardware_settings (
+        id SERIAL PRIMARY KEY,
+        setting_key VARCHAR(100) UNIQUE NOT NULL,
+        setting_value TEXT,
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    // Insert default hardware settings if not exists
+    await query(`
+      INSERT INTO hardware_settings (setting_key, setting_value) 
+      VALUES 
+        ('weighing_machine_type', 'none'),
+        ('weighing_machine_port', ''),
+        ('weighing_machine_baudrate', '9600'),
+        ('scale_stable_timeout', '2'),
+        ('manual_weight_fallback', 'true')
+      ON CONFLICT (setting_key) DO NOTHING
+    `);
+    
+    // Update existing products to piece type
+    await query(`UPDATE products SET product_type = 'piece', unit = 'piece' WHERE product_type IS NULL`);
     
     console.log('✅ Tables created successfully');
   } catch (error) {
