@@ -1147,51 +1147,63 @@
             // =============================================
             // PRODUCTS TABLE with Pagination
             // =============================================
-            function renderProductTable() { 
-                const search = document.getElementById('productSearch').value.toLowerCase(); 
-                const cat = document.getElementById('productCategoryFilter').value; 
-                const perPage = parseInt(document.getElementById('productPerPage').value) || 10; 
-                productPerPage = perPage; 
-                let filtered = allProducts.filter(p => p.name.toLowerCase().includes(search) && (cat === '' || p.category === cat)); 
-                const totalPages = Math.ceil(filtered.length / perPage); 
-                if(productPage > totalPages) productPage = 1; 
-                const start = (productPage - 1) * perPage; 
-                const pageData = filtered.slice(start, start + perPage); 
-                const tbody = document.getElementById('adminProductsList'); 
-                tbody.innerHTML = ''; 
-                pageData.forEach(p => { 
-                    const imgUrl = productImages[p.id] || ''; 
-                    const isSuper = superDiscountProducts.includes(p.id);
-                    let stockDisplay = p.current_stock || 0;
-                    let stockUnit = '';
-                    if (p.product_type === 'weight') {
-                        stockDisplay = p.weight_stock || 0;
-                        stockUnit = ' Kg';
-                    }
-                    tbody.innerHTML += `<tr>
-                        <td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td>
-                        <td>${p.product_code}</td>
-                        <td>${p.name} ${p.product_type === 'weight' ? '⚖️' : ''}</td>
-                        <td>₹${p.selling_price}</td>
-                        <td>${p.discount_percent||0}%</td>
-                        <td>${stockDisplay}${stockUnit}</td>
-                        <td>${isSuper ? '🔥' : '-'}</td>
-                        <td>
-                            <button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button>
-                            <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button>
-                        </td>
-                    </tr>`; 
-                }); 
-                const pag = document.getElementById('productPagination'); 
-                pag.innerHTML = ''; 
-                for(let i = 1; i <= totalPages; i++) { 
-                    const btn = document.createElement('button'); 
-                    btn.textContent = i; 
-                    if(i === productPage) btn.classList.add('active-page'); 
-                    btn.onclick = () => { productPage = i; renderProductTable(); }; 
-                    pag.appendChild(btn); 
-                } 
-            }
+           // =============================================
+// RENDER PRODUCTS TABLE - WITH WEIGHT SUPPORT
+// =============================================
+function renderProductTable() { 
+    const search = document.getElementById('productSearch').value.toLowerCase(); 
+    const cat = document.getElementById('productCategoryFilter').value; 
+    const perPage = parseInt(document.getElementById('productPerPage').value) || 10; 
+    productPerPage = perPage; 
+    
+    let filtered = allProducts.filter(p => p.name.toLowerCase().includes(search) && (cat === '' || p.category === cat)); 
+    const totalPages = Math.ceil(filtered.length / perPage); 
+    if(productPage > totalPages) productPage = 1; 
+    const start = (productPage - 1) * perPage; 
+    const pageData = filtered.slice(start, start + perPage); 
+    const tbody = document.getElementById('adminProductsList'); 
+    tbody.innerHTML = ''; 
+    
+    pageData.forEach(p => { 
+        const imgUrl = productImages[p.id] || ''; 
+        const isSuper = superDiscountProducts.includes(p.id);
+        
+        // ✅ CORRECT STOCK DISPLAY
+        let stockDisplay = 0;
+        let stockUnit = '';
+        if (p.product_type === 'weight') {
+            stockDisplay = p.weight_stock || 0;
+            stockUnit = ' Kg';
+        } else {
+            stockDisplay = p.current_stock || 0;
+            stockUnit = '';
+        }
+        
+        tbody.innerHTML += `<tr>
+            <td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td>
+            <td>${p.product_code}</td>
+            <td>${p.name} ${p.product_type === 'weight' ? '⚖️' : ''}</td>
+            <td>₹${p.selling_price}</td>
+            <td>${p.discount_percent||0}%</td>
+            <td>${stockDisplay}${stockUnit}</td>
+            <td>${isSuper ? '🔥' : '-'}</td>
+            <td>
+                <button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button>
+                <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button>
+            </td>
+        </tr>`; 
+    }); 
+    
+    const pag = document.getElementById('productPagination'); 
+    pag.innerHTML = ''; 
+    for(let i = 1; i <= totalPages; i++) { 
+        const btn = document.createElement('button'); 
+        btn.textContent = i; 
+        if(i === productPage) btn.classList.add('active-page'); 
+        btn.onclick = () => { productPage = i; renderProductTable(); }; 
+        pag.appendChild(btn); 
+    } 
+}
 
             // =============================================
             // SALES HISTORY
@@ -1478,41 +1490,59 @@ function startLiveWeightReading() {
             // =============================================
             // CART FUNCTIONS
             // =============================================
-            function addToCart() { 
-                if(billingMode === 'scanner') { 
-                    showAlert('Scanner mode: use barcode input','error'); 
-                    return; 
-                } 
-                const cust = document.getElementById('selectedCustomerId').value; 
-                const pid = document.getElementById('selectedProductId').value; 
-                const qty = parseInt(document.getElementById('billQuantity').value) || 1; 
-                if(!cust) { showAlert('Select customer','error'); return; } 
-                if(!pid) { showAlert('Select product','error'); return; } 
-                if(!qty || qty < 1) { showAlert('Enter quantity','error'); return; } 
-                
-                const price = parseFloat(document.getElementById('selectedProductPrice').value); 
-                const disc = parseFloat(document.getElementById('selectedProductDiscount').value) || 0; 
-                const cashback = parseFloat(document.getElementById('selectedProductCashback').value) || 0; 
-                const stock = parseInt(document.getElementById('selectedProductStock').value) || 0; 
-                
-                if(stock < qty) { showAlert(`Only ${stock} left`,'error'); return; } 
-                
-                const p = allProducts.find(p => p.id == pid); 
-                const ex = cart.find(i => i.product_id === parseInt(pid)); 
-                if(ex) ex.quantity += qty; 
-                else cart.push({
-                    product_id: parseInt(pid), 
-                    name: p ? p.name : 'Product', 
-                    type: 'piece',
-                    originalPrice: price, 
-                    discountPercent: disc, 
-                    cashback: cashback, 
-                    quantity: qty
-                }); 
-                renderCart(); 
-                document.getElementById('billQuantity').value = '1'; 
-                showAlert(`${p ? p.name : 'Product'} added`,'success'); 
-            }
+           // =============================================
+// ADD TO CART - WITH WEIGHT SUPPORT
+// =============================================
+function addToCart() { 
+    if(billingMode === 'scanner') { 
+        showAlert('Scanner mode: use barcode input','error'); 
+        return; 
+    } 
+    
+    const cust = document.getElementById('selectedCustomerId').value; 
+    const pid = document.getElementById('selectedProductId').value; 
+    const qty = parseInt(document.getElementById('billQuantity').value) || 1; 
+    
+    if(!cust) { showAlert('Select customer','error'); return; } 
+    if(!pid) { showAlert('Select product','error'); return; } 
+    if(!qty || qty < 1) { showAlert('Enter quantity','error'); return; } 
+    
+    const p = allProducts.find(p => p.id == pid); 
+    if(!p) { showAlert('Product not found','error'); return; }
+    
+    // ✅ CHECK IF WEIGHT PRODUCT
+    if(p.product_type === 'weight') {
+        console.log('⚖️ Weight product in manual mode - opening capture screen');
+        startWeightCapture(p);
+        return;
+    }
+    
+    // ✅ PIECE PRODUCT
+    const price = parseFloat(document.getElementById('selectedProductPrice').value); 
+    const disc = parseFloat(document.getElementById('selectedProductDiscount').value) || 0; 
+    const cashback = parseFloat(document.getElementById('selectedProductCashback').value) || 0; 
+    const stock = parseInt(document.getElementById('selectedProductStock').value) || 0; 
+    
+    if(stock < qty) { showAlert(`Only ${stock} left`,'error'); return; } 
+    
+    const ex = cart.find(i => i.product_id === parseInt(pid)); 
+    if(ex) { 
+        ex.quantity += qty; 
+    } else {
+        cart.push({
+            product_id: parseInt(pid), 
+            name: p.name, 
+            type: 'piece',
+            originalPrice: price, 
+            discountPercent: disc, 
+            cashback: cashback, 
+            quantity: qty
+        }); 
+    }
+    renderCart(); 
+    document.getElementById('billQuantity').value = '1'; 
+    showAlert(`${p.name} added`,'success'); 
+}
             
             function renderCart() { 
                 const tbody = document.getElementById('cartList'); 
