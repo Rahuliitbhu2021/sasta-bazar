@@ -223,7 +223,6 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       }
       const p = product.rows[0];
       
-      // ✅ WEIGHT PRODUCT
       if (p.product_type === 'weight') {
         const weight = item.weight || 0;
         
@@ -249,7 +248,6 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
           await query('UPDATE products SET weight_stock = $1 WHERE id = $2', [newStock, p.id]);
         }
       } else {
-        // ✅ PIECE PRODUCT
         if (p.current_stock < item.quantity) {
           return res.status(400).json({ error: `Insufficient stock for ${p.name}` });
         }
@@ -272,7 +270,6 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
     
     console.log('✅ Bill created:', billResult.rows[0].id);
     
-    // ✅ SAVE BILL ITEMS
     for (const item of items) {
       const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
       const p = product.rows[0];
@@ -296,10 +293,8 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       }
     }
     
-    // Update customer total purchases
     await query('UPDATE customers SET total_purchases = total_purchases + $1 WHERE id = $2', [totalAmount, customer_id]);
     
-    // Add cashback to wallet
     if (totalCashback > 0) {
       await query('UPDATE customers SET wallet_balance = wallet_balance + $1 WHERE id = $2', [totalCashback, customer_id]);
       await query(
@@ -310,7 +305,6 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       console.log('✅ Cashback added to wallet:', totalCashback);
     }
     
-    // Referral commission
     const customer = await query('SELECT referred_by FROM customers WHERE id = $1', [customer_id]);
     if (customer.rows[0]?.referred_by) {
       const referrer = await query('SELECT id FROM customers WHERE referral_code = $1', [customer.rows[0].referred_by]);
@@ -785,7 +779,6 @@ app.post('/api/scale/bridge', authenticateToken, async (req, res) => {
     bridgeConnected = connected || false;
     bridgeLastUpdate = new Date();
     
-    // Stability detection
     if (bridgeConnected && bridgeWeight > 0) {
         bridgeStableCount++;
         if (bridgeStableCount > BRIDGE_STABLE_THRESHOLD) {
@@ -801,7 +794,6 @@ app.post('/api/scale/bridge', authenticateToken, async (req, res) => {
 
 // Get weight from bridge
 app.get('/api/scale/weight', authenticateToken, async (req, res) => {
-    // Check if bridge updated within last 5 seconds
     const isRecent = bridgeLastUpdate && (new Date() - bridgeLastUpdate) < 5000;
     const isConnected = bridgeConnected && isRecent;
     const isStable = isConnected && bridgeStableCount >= BRIDGE_STABLE_THRESHOLD;
