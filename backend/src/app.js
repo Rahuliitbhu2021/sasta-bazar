@@ -767,189 +767,63 @@ async function initTables() {
 }
 
 // =============================================
-// SERIALPORT - OPTIONAL DEPENDENCY
-// =============================================
-let SerialPort, ReadlineParser;
-let scalePort = null;
-let scaleWeight = 0;
-let scaleConnected = false;
-let lastWeight = 0;
-let stableCount = 0;
-const STABLE_THRESHOLD = 3;
-let scaleDataBuffer = '';
-
-try {
-    const serialport = require('serialport');
-    const parser = require('@serialport/parser-readline');
-    SerialPort = serialport.SerialPort;
-    ReadlineParser = parser.ReadlineParser;
-    console.log('✅ Serialport loaded');
-} catch (error) {
-    console.log('⚠️ Serialport not available - scale disabled');
-    SerialPort = null;
-    ReadlineParser = class MockParser { constructor() { return { on: () => {} }; } };
-}
-
-// =============================================
-// I-SCALE / MiScale WEIGHING MACHINE - COM14
+// SCALE BRIDGE API - Receive weight from any laptop
 // =============================================
 
-// Connect to scale
-app.post('/api/scale/connect', authenticateToken, async (req, res) => {
-    const { port, baudRate } = req.body;
+// Store latest weight from bridge
+let bridgeWeight = 0;
+let bridgeConnected = false;
+let bridgeLastUpdate = null;
+let bridgeStableCount = 0;
+const BRIDGE_STABLE_THRESHOLD = 3;
+
+// Receive weight from bridge service
+app.post('/api/scale/bridge', authenticateToken, async (req, res) => {
+    const { weight, connected } = req.body;
     
-    try {
-        if (scalePort) {
-            try { scalePort.close(); } catch (e) {}
-            scalePort = null;
+    bridgeWeight = weight || 0;
+    bridgeConnected = connected || false;
+    bridgeLastUpdate = new Date();
+    
+    // Stability detection
+    if (bridgeConnected && bridgeWeight > 0) {
+        bridgeStableCount++;
+        if (bridgeStableCount > BRIDGE_STABLE_THRESHOLD) {
+            bridgeStableCount = BRIDGE_STABLE_THRESHOLD;
         }
-        
-        const portName = port || 'COM14';
-        const baud = baudRate || 9600;
-        
-        console.log(`🔌 Connecting to scale on ${portName} at ${baud} baud...`);
-        
-        // ✅ If SerialPort not available
-        if (!SerialPort) {
-            console.log('⚠️ SerialPort not available');
-            scaleConnected = false;
-            scaleWeight = 0;
-            return res.json({ connected: false, error: 'SerialPort not available' });
-        }
-        
-        scalePort = new SerialPort({ 
-            path: portName, 
-            baudRate: baud,
-            autoOpen: false,
-            dataBits: 8,
-            parity: 'none',
-            stopBits: 1
-        });
-        
-        scalePort.open((err) => {
-            if (err) {
-                console.error('❌ Failed to open port:', err.message);
-                scaleConnected = false;
-                scaleWeight = 0;
-                return res.json({ connected: false, error: err.message });
-            }
-            
-            scaleConnected = true;
-            console.log(`✅ Scale connected on ${portName}`);
-            
-            // ✅ Send commands to start reading
-            try { 
-                scalePort.write('C\r\n'); 
-                console.log('📤 Sent "C" command');
-            } catch (e) {}
-            try { 
-                scalePort.write('S\r\n'); 
-                console.log('📤 Sent "S" command');
-            } catch (e) {}
-            
-            res.json({ connected: true, message: `Scale connected on ${portName}` });
-        });
-        
-        const parser = scalePort.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-        
-        parser.on('data', (data) => {
-            try {
-                const trimmed = data.toString().trim();
-                console.log('📊 RAW SCALE DATA:', JSON.stringify(trimmed));
-                
-                if (!trimmed) return;
-                
-                let weight = null;
-                
-                // ✅ Support multiple formats
-                const match = trimmed.match(/([\d.]+)\s*kg/i) ||
-                              trimmed.match(/ST,GS,([\d.]+),/i) ||
-                              trimmed.match(/ST,GS,\+?([\d.]+),/i) ||
-                              trimmed.match(/([\d.]+)/);
-                
-                if (match) {
-                    weight = parseFloat(match[1]);
-                }
-                
-                if (weight !== null && !isNaN(weight) && weight >= 0 && weight <= 50) {
-                    const newWeight = parseFloat(weight.toFixed(3));
-                    if (lastWeight > 0 && Math.abs(newWeight - lastWeight) <= 0.005) {
-                        stableCount++;
-                    } else {
-                        stableCount = 0;
-                    }
-                    lastWeight = newWeight;
-                    scaleWeight = newWeight;
-                    console.log(`⚖️ Weight: ${newWeight} Kg | Stable: ${stableCount >= STABLE_THRESHOLD}`);
-                }
-            } catch (e) {
-                console.log('⚠️ Parse error:', e.message);
-            }
-        });
-        
-        scalePort.on('error', (err) => {
-            console.error('❌ Scale error:', err.message);
-            scaleConnected = false;
-            scaleWeight = 0;
-        });
-        
-        scalePort.on('close', () => {
-            console.log('⚠️ Scale port closed');
-            scaleConnected = false;
-            scaleWeight = 0;
-        });
-        
-        setTimeout(() => {
-            if (!res.headersSent) {
-                scaleConnected = false;
-                scaleWeight = 0;
-                res.json({ connected: false, error: 'Connection timeout' });
-            }
-        }, 5000);
-        
-    } catch (error) {
-        console.error('❌ Scale connection error:', error);
-        scaleConnected = false;
-        scaleWeight = 0;
-        res.json({ connected: false, error: error.message });
+    } else {
+        bridgeStableCount = 0;
     }
+    
+    console.log(`⚖️ Bridge Weight: ${bridgeWeight} Kg | Connected: ${bridgeConnected} | Stable: ${bridgeStableCount >= BRIDGE_STABLE_THRESHOLD}`);
+    res.json({ success: true });
 });
 
-// ✅ GET CURRENT WEIGHT
+// Get weight from bridge
 app.get('/api/scale/weight', authenticateToken, async (req, res) => {
-    const isStable = stableCount >= STABLE_THRESHOLD;
+    // Check if bridge updated within last 5 seconds
+    const isRecent = bridgeLastUpdate && (new Date() - bridgeLastUpdate) < 5000;
+    const isConnected = bridgeConnected && isRecent;
+    const isStable = isConnected && bridgeStableCount >= BRIDGE_STABLE_THRESHOLD;
+    
     res.json({ 
-        weight: scaleWeight, 
-        connected: scaleConnected,
-        stable: isStable && scaleConnected,
-        unit: 'Kg'
+        weight: isConnected ? bridgeWeight : 0,
+        connected: isConnected,
+        stable: isStable,
+        unit: 'Kg',
+        source: 'bridge'
     });
 });
 
-// ✅ DISCONNECT SCALE
-app.post('/api/scale/disconnect', authenticateToken, async (req, res) => {
-    try {
-        if (scalePort) {
-            scalePort.close();
-            scalePort = null;
-        }
-        scaleConnected = false;
-        scaleWeight = 0;
-        lastWeight = 0;
-        stableCount = 0;
-        res.json({ success: true, message: 'Scale disconnected' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ✅ GET SCALE STATUS
-app.get('/api/scale/status', authenticateToken, async (req, res) => {
-    res.json({ 
-        connected: scaleConnected,
-        weight: scaleWeight,
-        port: scalePort?.path || 'COM14',
-        stable: stableCount >= STABLE_THRESHOLD
+// Bridge status
+app.get('/api/scale/bridge-status', authenticateToken, async (req, res) => {
+    const isRecent = bridgeLastUpdate && (new Date() - bridgeLastUpdate) < 5000;
+    res.json({
+        connected: bridgeConnected && isRecent,
+        weight: bridgeWeight,
+        lastUpdate: bridgeLastUpdate,
+        isRecent: isRecent,
+        stable: bridgeStableCount >= BRIDGE_STABLE_THRESHOLD
     });
 });
 
@@ -962,6 +836,6 @@ initTables().then(() => {
     console.log(`✅ PostgreSQL Database Connected`);
     console.log(`📋 Admin: admin@shop.com / MyStrongPass@0424`);
     console.log(`📋 Customer: 9876543210 / 9876543210\n`);
-    console.log(`⚖️ Scale configured on COM14 at 9600 baud`);
+    console.log(`⚖️ Scale Bridge API ready on /api/scale/bridge`);
   });
 });
