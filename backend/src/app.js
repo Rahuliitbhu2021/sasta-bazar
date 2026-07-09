@@ -767,9 +767,6 @@ async function initTables() {
 }
 
 // =============================================
-// SERIALPORT - OPTIONAL DEPENDENCY (FIXED FOR RENDER)
-// =============================================
-// =============================================
 // SERIALPORT - OPTIONAL DEPENDENCY
 // =============================================
 let SerialPort, ReadlineParser;
@@ -787,8 +784,7 @@ try {
     ReadlineParser = parser.ReadlineParser;
     console.log('✅ Serialport loaded');
 } catch (error) {
-    console.log('⚠️ Serialport not available');
-    // Mock for Render
+    console.log('⚠️ Serialport not available - using mock');
     SerialPort = class MockSerialPort {
         constructor(options) { 
             console.log(`⚠️ Mock scale on ${options.path}`);
@@ -803,11 +799,10 @@ try {
 }
 
 // =============================================
-// I-SCALE WEIGHING MACHINE - COM13
+// I-SCALE WEIGHING MACHINE - COM14
 // =============================================
 
-// Connect to scale
-// Connect to I-Scale
+// ✅ CONNECT TO SCALE
 app.post('/api/scale/connect', authenticateToken, async (req, res) => {
     const { port, baudRate } = req.body;
     
@@ -817,7 +812,6 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
             scalePort = null;
         }
         
-        // ✅ COM14 DEFAULT
         const portName = port || 'COM14';
         const baud = baudRate || 9600;
         
@@ -836,19 +830,18 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
         
         parser.on('data', (data) => {
             try {
-                const trimmed = data.trim();
-                if (!trimmed || trimmed.length < 2) return;
+                const trimmed = data.toString().trim();
+                console.log('📊 RAW SCALE DATA:', JSON.stringify(trimmed));
                 
-                // ✅ LOG RAW DATA TO CONSOLE
-                console.log('📊 RAW:', trimmed);
+                if (!trimmed || trimmed.length < 2) return;
                 
                 let weight = null;
                 
-                // I-Scale format: "ST,GS,0.071,kg" (71 grams = 0.071 Kg)
+                // I-Scale formats
                 const match = trimmed.match(/ST,GS,([\d.]+),/i) || 
                               trimmed.match(/ST,GS,\+?([\d.]+),/i) ||
                               trimmed.match(/([\d.]+)\s*kg/i) ||
-                              trimmed.match(/([\d.]+)/);
+                              trimmed.match(/(\d+\.\d+)/);
                 
                 if (match) {
                     weight = parseFloat(match[1]);
@@ -866,16 +859,20 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
                     lastWeight = newWeight;
                     scaleWeight = newWeight;
                     
-                    console.log(`⚖️ Weight: ${newWeight} Kg (${newWeight * 1000} grams) | Stable: ${stableCount >= STABLE_THRESHOLD}`);
+                    console.log(`⚖️ Weight: ${newWeight} Kg | Stable: ${stableCount >= STABLE_THRESHOLD}`);
                 }
             } catch (e) {
-                // Silent ignore
+                // Silent
             }
         });
         
         scalePort.on('open', () => {
             scaleConnected = true;
-            console.log(`✅ I-Scale connected on ${portName}`);
+            console.log(`✅ Scale connected on ${portName}`);
+            
+            // Send command to start reading
+            scalePort.write('C\r\n');
+            
             if (!res.headersSent) {
                 res.json({ success: true, message: `Scale connected on ${portName}` });
             }
@@ -901,7 +898,18 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
     }
 });
 
-// Disconnect scale
+// ✅ GET CURRENT WEIGHT
+app.get('/api/scale/weight', authenticateToken, async (req, res) => {
+    const isStable = stableCount >= STABLE_THRESHOLD;
+    res.json({ 
+        weight: scaleWeight, 
+        connected: scaleConnected,
+        stable: isStable && scaleConnected,
+        unit: 'Kg'
+    });
+});
+
+// ✅ DISCONNECT SCALE
 app.post('/api/scale/disconnect', authenticateToken, async (req, res) => {
     try {
         if (scalePort) {
@@ -918,12 +926,12 @@ app.post('/api/scale/disconnect', authenticateToken, async (req, res) => {
     }
 });
 
-// Get scale status
+// ✅ GET SCALE STATUS
 app.get('/api/scale/status', authenticateToken, async (req, res) => {
     res.json({ 
         connected: scaleConnected,
         weight: scaleWeight,
-        port: scalePort?.path || 'COM13',
+        port: scalePort?.path || 'COM14',
         stable: stableCount >= STABLE_THRESHOLD
     });
 });
