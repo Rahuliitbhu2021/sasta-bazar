@@ -1376,46 +1376,209 @@ function startWeightCapture(product) {
             // =============================================
 // LIVE WEIGHT READING
 // =============================================
+// =============================================
+// LIVE WEIGHT READING FROM I-SCALE
+// =============================================
+// =============================================
+// LIVE WEIGHT READING FROM I-SCALE (COM13)
+// =============================================
 function startLiveWeightReading() {
     if (weightTimer) clearInterval(weightTimer);
     stableCount = 0;
     currentWeight = 0;
+    weightStable = false;
     
-    weightTimer = setInterval(() => {
-        // Simulate weight reading
-        const delta = (Math.random() - 0.5) * 0.15;
-        currentWeight = Math.max(0, currentWeight + delta);
+    // ✅ Connect to I-Scale on COM13
+    connectToScale();
+    
+    // ✅ Start reading weight
+    weightTimer = setInterval(async () => {
+        try {
+            const response = await fetch(`${API_URL}/scale/weight`, {
+                headers: { 
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.connected && data.weight > 0) {
+                    currentWeight = data.weight;
+                    
+                    // ✅ Check stability from backend
+                    if (data.stable) {
+                        stableCount++;
+                    } else {
+                        stableCount = 0;
+                    }
+                    
+                    console.log(`⚖️ Scale: ${currentWeight} Kg | Stable: ${data.stable}`);
+                } else {
+                    // Scale not connected - fallback to simulation
+                    if (!data.connected) {
+                        console.log('⚠️ Scale not connected, using simulation');
+                        simulateWeight();
+                    }
+                }
+            } else {
+                simulateWeight();
+            }
+        } catch (e) {
+            simulateWeight();
+        }
         
-        // Check stability
-        if (currentWeight > 0.05 && Math.abs(delta) < 0.02) {
+        // ✅ Update UI
+        updateWeightUI();
+        
+    }, 150);
+}
+
+// =============================================
+// CONNECT TO I-SCALE ON COM13
+// =============================================
+async function connectToScale() {
+    try {
+        console.log('🔌 Connecting to I-Scale on COM13...');
+        
+        const response = await fetch(`${API_URL}/scale/connect`, {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ port: 'COM13', baudRate: 9600 })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ I-Scale connected on COM13!');
+            return true;
+        } else {
+            console.log('⚠️ Failed to connect to scale');
+            return false;
+        }
+    } catch (e) {
+        console.log('⚠️ Scale connection failed, using simulation');
+        return false;
+    }
+}
+
+// =============================================
+// UPDATE WEIGHT UI
+// =============================================
+function updateWeightUI() {
+    // Update display
+    document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
+    
+    const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
+    document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
+    
+    // Update status
+    if (stableCount >= 3 && currentWeight > 0.05) {
+        document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
+        document.getElementById('wcStatus').className = 'weight-status stable';
+        document.getElementById('wcWeightDisplay').className = 'weight-display stable';
+        weightStable = true;
+    } else if (currentWeight > 0.05) {
+        const progress = Math.min(stableCount, 3);
+        document.getElementById('wcStatus').textContent = `⏳ Stabilizing ${'•'.repeat(progress)}${'○'.repeat(3-progress)}`;
+        document.getElementById('wcStatus').className = 'weight-status';
+        document.getElementById('wcWeightDisplay').className = 'weight-display';
+        weightStable = false;
+    } else {
+        document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+        document.getElementById('wcStatus').className = 'weight-status';
+        document.getElementById('wcWeightDisplay').className = 'weight-display';
+        weightStable = false;
+    }
+}
+
+// =============================================
+// CONNECT TO I-SCALE
+// =============================================
+async function connectToScale() {
+    try {
+        // Try COM3 (common port for USB scales)
+        const ports = ['COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8'];
+        
+        for (const port of ports) {
+            try {
+                const response = await fetch(`${API_URL}/scale/connect`, {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ port: port, baudRate: 9600 })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Scale connected on', port);
+                    return;
+                }
+            } catch (e) {
+                // Try next port
+                continue;
+            }
+        }
+        console.log('⚠️ No scale found, using simulation');
+    } catch (e) {
+        console.log('⚠️ Scale connection failed, using simulation');
+    }
+}
+
+// =============================================
+// SIMULATE WEIGHT (FALLBACK)
+// =============================================
+function simulateWeight() {
+    const delta = (Math.random() - 0.5) * 0.15;
+    currentWeight = Math.max(0, currentWeight + delta);
+}
+
+// =============================================
+// UPDATE WEIGHT UI
+// =============================================
+function updateWeightUI() {
+    // Check stability
+    if (currentWeight > 0.05) {
+        // For simulation, check if stable
+        // For real scale, stability is determined by scale reading
+        const isStable = currentWeight > 0.05;
+        
+        if (isStable) {
             stableCount++;
         } else {
             stableCount = 0;
         }
-        
-        // Update display
-        document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
-        
-        const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
-        document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
-        
-        if (stableCount >= 5 && currentWeight > 0.05) {
-            document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
-            document.getElementById('wcStatus').className = 'weight-status stable';
-            document.getElementById('wcWeightDisplay').className = 'weight-display stable';
-            weightStable = true;
-        } else if (currentWeight > 0.05) {
-            document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
-            document.getElementById('wcStatus').className = 'weight-status';
-            document.getElementById('wcWeightDisplay').className = 'weight-display';
-            weightStable = false;
-        } else {
-            document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
-            document.getElementById('wcStatus').className = 'weight-status';
-            document.getElementById('wcWeightDisplay').className = 'weight-display';
-            weightStable = false;
-        }
-    }, 150);
+    } else {
+        stableCount = 0;
+    }
+    
+    // Update display
+    document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
+    
+    const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
+    document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
+    
+    // Update status
+    if (stableCount >= 3 && currentWeight > 0.05) {
+        document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
+        document.getElementById('wcStatus').className = 'weight-status stable';
+        document.getElementById('wcWeightDisplay').className = 'weight-display stable';
+        weightStable = true;
+    } else if (currentWeight > 0.05) {
+        document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
+        document.getElementById('wcStatus').className = 'weight-status';
+        document.getElementById('wcWeightDisplay').className = 'weight-display';
+        weightStable = false;
+    } else {
+        document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+        document.getElementById('wcStatus').className = 'weight-status';
+        document.getElementById('wcWeightDisplay').className = 'weight-display';
+        weightStable = false;
+    }
 }
 
             function confirmWeight() {

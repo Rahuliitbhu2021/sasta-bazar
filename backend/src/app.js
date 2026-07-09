@@ -765,7 +765,158 @@ async function initTables() {
     console.error('Table creation error:', error.message);
   }
 }
+// =============================================
+// I-SCALE WEIGHING MACHINE INTEGRATION
+// =============================================
+// =============================================
+// I-SCALE WEIGHING MACHINE INTEGRATION - COM13
+// =============================================
+const { SerialPort } = require('serialport');
+const { ReadlineParser } = require('@serialport/parser-readline');
 
+let scalePort = null;
+let scaleWeight = 0;
+let scaleConnected = false;
+let lastWeight = 0;
+let stableCount = 0;
+const STABLE_THRESHOLD = 3;
+
+// Connect to I-Scale on COM13
+app.post('/api/scale/connect', authenticateToken, async (req, res) => {
+    const { port, baudRate } = req.body;
+    
+    try {
+        if (scalePort) {
+            scalePort.close();
+            scalePort = null;
+        }
+        
+        // ✅ COM13 DEFAULT
+        const portName = port || 'COM13';
+        const baud = baudRate || 9600;
+        
+        console.log(`🔌 Connecting to I-Scale on ${portName} at ${baud} baud...`);
+        
+        scalePort = new SerialPort({ 
+            path: portName, 
+            baudRate: baud,
+            autoOpen: true,
+            dataBits: 8,
+            parity: 'none',
+            stopBits: 1
+        });
+        
+        const parser = scalePort.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+        
+        parser.on('data', (data) => {
+            try {
+                const trimmed = data.trim();
+                console.log('📊 Raw scale data:', trimmed);
+                
+                let weight = null;
+                const patterns = [
+                    /ST,GS,([\d.]+),/i,
+                    /ST,GS,\+?([\d.]+),/i,
+                    /WT,([\d.]+),/i,
+                    /GS,([\d.]+),/i,
+                    /([\d.]+)\s*kg/i,
+                    /([\d.]+)/i
+                ];
+                
+                for (const pattern of patterns) {
+                    const match = trimmed.match(pattern);
+                    if (match) {
+                        weight = parseFloat(match[1]);
+                        if (!isNaN(weight) && weight > 0) {
+                            break;
+                        }
+                    }
+                }
+                
+                if (weight !== null && !isNaN(weight) && weight > 0) {
+                    const newWeight = parseFloat(weight.toFixed(3));
+                    
+                    if (Math.abs(newWeight - lastWeight) < 0.005) {
+                        stableCount++;
+                    } else {
+                        stableCount = 0;
+                    }
+                    
+                    lastWeight = newWeight;
+                    scaleWeight = newWeight;
+                    
+                    console.log(`⚖️ Weight: ${newWeight} Kg (Stable: ${stableCount >= STABLE_THRESHOLD})`);
+                }
+            } catch (e) {
+                console.log('⚠️ Error parsing scale data:', e.message);
+            }
+        });
+        
+        scalePort.on('open', () => {
+            scaleConnected = true;
+            console.log('✅ I-Scale connected successfully on COM13!');
+            if (!res.headersSent) {
+                res.json({ success: true, message: 'Scale connected on COM13' });
+            }
+        });
+        
+        scalePort.on('error', (err) => {
+            console.error('❌ Scale error:', err.message);
+            scaleConnected = false;
+            if (!res.headersSent) {
+                res.status(500).json({ error: err.message });
+            }
+        });
+        
+        setTimeout(() => {
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Connection timeout' });
+            }
+        }, 5000);
+        
+    } catch (error) {
+        console.error('❌ Scale connection error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get current weight from scale
+app.get('/api/scale/weight', authenticateToken, async (req, res) => {
+    const isStable = stableCount >= STABLE_THRESHOLD;
+    res.json({ 
+        weight: scaleWeight, 
+        connected: scaleConnected,
+        stable: isStable,
+        unit: 'Kg'
+    });
+});
+
+// Disconnect scale
+app.post('/api/scale/disconnect', authenticateToken, async (req, res) => {
+    try {
+        if (scalePort) {
+            scalePort.close();
+            scalePort = null;
+        }
+        scaleConnected = false;
+        scaleWeight = 0;
+        lastWeight = 0;
+        stableCount = 0;
+        res.json({ success: true, message: 'Scale disconnected' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get scale status
+app.get('/api/scale/status', authenticateToken, async (req, res) => {
+    res.json({ 
+        connected: scaleConnected,
+        weight: scaleWeight,
+        port: 'COM13',
+        stable: stableCount >= STABLE_THRESHOLD
+    });
+});
 // ============ START SERVER ============
 const PORT = process.env.PORT || 5000;
 
