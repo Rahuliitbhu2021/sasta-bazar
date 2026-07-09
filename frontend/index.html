@@ -143,16 +143,11 @@
         .footer-address p { color: #333; margin: 4px 0; }
         .footer-address strong { color: #e67e22; }
         
-        /* WEIGHT CAPTURE SCREEN STYLES */
         .weight-display { font-size: 48px; font-weight: bold; color: #333; font-family: 'Courier New', monospace; }
         .weight-display.stable { color: #27ae60; }
         .weight-status { margin-top: 10px; font-size: 14px; color: #888; }
         .weight-status.stable { color: #27ae60; font-weight: bold; }
         .weight-amount { margin-top: 10px; font-size: 20px; font-weight: bold; color: #27ae60; }
-        .weight-product-info { margin-bottom: 15px; }
-        .weight-product-info h3 { margin: 5px 0; }
-        .weight-product-info p { color: #666; margin: 3px 0; }
-        .weight-box { margin: 20px 0; padding: 20px; background: #f5f5f5; border-radius: 20px; }
         
         @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } .shop-detail-row { flex-wrap: wrap; } }
     </style>
@@ -524,7 +519,7 @@
             </div>
         </div>
 
-        <!-- WEIGHT CAPTURE MODAL - LIVE WEIGHT READING -->
+        <!-- WEIGHT CAPTURE MODAL -->
         <div id="weightCaptureModal" class="modal">
             <div class="modal-content" style="max-width: 500px;">
                 <h2 style="color:#e67e22; text-align:center;">⚖️ Weight Capture</h2>
@@ -581,8 +576,10 @@
             let weightTimer = null;
             let currentWeight = 0;
             let stableCount = 0;
-            const stableThreshold = 5;
 
+            // =============================================
+            // UTILITY FUNCTIONS
+            // =============================================
             function showAlert(msg, type) { 
                 const a = document.getElementById('alert'); 
                 a.textContent = msg; 
@@ -1147,63 +1144,51 @@
             // =============================================
             // PRODUCTS TABLE with Pagination
             // =============================================
-           // =============================================
-// RENDER PRODUCTS TABLE - WITH WEIGHT SUPPORT
-// =============================================
-function renderProductTable() { 
-    const search = document.getElementById('productSearch').value.toLowerCase(); 
-    const cat = document.getElementById('productCategoryFilter').value; 
-    const perPage = parseInt(document.getElementById('productPerPage').value) || 10; 
-    productPerPage = perPage; 
-    
-    let filtered = allProducts.filter(p => p.name.toLowerCase().includes(search) && (cat === '' || p.category === cat)); 
-    const totalPages = Math.ceil(filtered.length / perPage); 
-    if(productPage > totalPages) productPage = 1; 
-    const start = (productPage - 1) * perPage; 
-    const pageData = filtered.slice(start, start + perPage); 
-    const tbody = document.getElementById('adminProductsList'); 
-    tbody.innerHTML = ''; 
-    
-    pageData.forEach(p => { 
-        const imgUrl = productImages[p.id] || ''; 
-        const isSuper = superDiscountProducts.includes(p.id);
-        
-        // ✅ CORRECT STOCK DISPLAY
-        let stockDisplay = 0;
-        let stockUnit = '';
-        if (p.product_type === 'weight') {
-            stockDisplay = p.weight_stock || 0;
-            stockUnit = ' Kg';
-        } else {
-            stockDisplay = p.current_stock || 0;
-            stockUnit = '';
-        }
-        
-        tbody.innerHTML += `<tr>
-            <td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td>
-            <td>${p.product_code}</td>
-            <td>${p.name} ${p.product_type === 'weight' ? '⚖️' : ''}</td>
-            <td>₹${p.selling_price}</td>
-            <td>${p.discount_percent||0}%</td>
-            <td>${stockDisplay}${stockUnit}</td>
-            <td>${isSuper ? '🔥' : '-'}</td>
-            <td>
-                <button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button>
-                <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button>
-            </td>
-        </tr>`; 
-    }); 
-    
-    const pag = document.getElementById('productPagination'); 
-    pag.innerHTML = ''; 
-    for(let i = 1; i <= totalPages; i++) { 
-        const btn = document.createElement('button'); 
-        btn.textContent = i; 
-        if(i === productPage) btn.classList.add('active-page'); 
-        btn.onclick = () => { productPage = i; renderProductTable(); }; 
-        pag.appendChild(btn); 
-    } 
-}
+            function renderProductTable() { 
+                const search = document.getElementById('productSearch').value.toLowerCase(); 
+                const cat = document.getElementById('productCategoryFilter').value; 
+                const perPage = parseInt(document.getElementById('productPerPage').value) || 10; 
+                productPerPage = perPage; 
+                let filtered = allProducts.filter(p => p.name.toLowerCase().includes(search) && (cat === '' || p.category === cat)); 
+                const totalPages = Math.ceil(filtered.length / perPage); 
+                if(productPage > totalPages) productPage = 1; 
+                const start = (productPage - 1) * perPage; 
+                const pageData = filtered.slice(start, start + perPage); 
+                const tbody = document.getElementById('adminProductsList'); 
+                tbody.innerHTML = ''; 
+                pageData.forEach(p => { 
+                    const imgUrl = productImages[p.id] || ''; 
+                    const isSuper = superDiscountProducts.includes(p.id);
+                    let stockDisplay = p.current_stock || 0;
+                    let stockUnit = '';
+                    if (p.product_type === 'weight') {
+                        stockDisplay = p.weight_stock || 0;
+                        stockUnit = ' Kg';
+                    }
+                    tbody.innerHTML += `<tr>
+                        <td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td>
+                        <td>${p.product_code}</td>
+                        <td>${p.name} ${p.product_type === 'weight' ? '⚖️' : ''}</td>
+                        <td>₹${p.selling_price}</td>
+                        <td>${p.discount_percent||0}%</td>
+                        <td>${stockDisplay}${stockUnit}</td>
+                        <td>${isSuper ? '🔥' : '-'}</td>
+                        <td>
+                            <button onclick="editProduct(${p.id})" style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button>
+                            <button onclick="deleteProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:20px;">Del</button>
+                        </td>
+                    </tr>`; 
+                }); 
+                const pag = document.getElementById('productPagination'); 
+                pag.innerHTML = ''; 
+                for(let i = 1; i <= totalPages; i++) { 
+                    const btn = document.createElement('button'); 
+                    btn.textContent = i; 
+                    if(i === productPage) btn.classList.add('active-page'); 
+                    btn.onclick = () => { productPage = i; renderProductTable(); }; 
+                    pag.appendChild(btn); 
+                } 
+            }
 
             // =============================================
             // SALES HISTORY
@@ -1273,417 +1258,179 @@ function renderProductTable() {
             // =============================================
             // PROCESS BARCODE - WITH WEIGHT SUPPORT
             // =============================================
-          // =============================================
-// PROCESS BARCODE - WITH WEIGHT SUPPORT (FIXED)
-// =============================================
-async function processBarcode(barcode) { 
-    const cust = document.getElementById('selectedCustomerId').value; 
-    if(!cust) { 
-        showAlert('Select customer first','error'); 
-        return; 
-    } 
-    
-    try { 
-        const p = allProducts.find(p => p.product_code === barcode); 
-        if(!p) { 
-            showAlert('Product not found','error'); 
-            return; 
-        } 
-        
-        console.log('🔍 Product found:', p);
-        console.log('📦 Product type:', p.product_type);
-        console.log('⚖️ Weight stock:', p.weight_stock);
-        
-        // ✅ WEIGHT PRODUCT - OPEN CAPTURE SCREEN
-        if(p.product_type === 'weight') {
-            console.log('⚖️ This is a WEIGHT product! Opening capture screen...');
-            
-            if(p.status === 'inactive') {
-                showAlert('Product is inactive', 'error');
-                return;
-            }
-            if(p.weight_stock <= 0) {
-                showAlert('Out of stock', 'error');
-                return;
-            }
-            
-            startWeightCapture(p);
-            return;
-        }
-        
-        // ✅ PIECE PRODUCT
-        console.log('📦 This is a PIECE product');
-        if(p.current_stock < 1) { 
-            showAlert('Out of stock','error'); 
-            return; 
-        } 
-        const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
-        const ex = cart.find(i => i.product_id === p.id && i.type !== 'weight'); 
-        if(ex) { 
-            ex.quantity++; 
-        } else {
-            cart.push({
-                product_id: p.id, 
-                name: p.name, 
-                type: 'piece',
-                originalPrice: p.selling_price, 
-                discountPercent: p.discount_percent||0, 
-                cashback: cashback, 
-                quantity: 1
-            }); 
-        }
-        renderCart(); 
-        showAlert(`✅ ${p.name} added!`,'success'); 
-    } catch(e) { 
-        console.error('Error:', e);
-        showAlert('Error: ' + e.message,'error'); 
-    } 
-}
-
-            // =============================================
-            // WEIGHT CAPTURE - LIVE READING
-            // =============================================
-           // =============================================
-// START WEIGHT CAPTURE
-// =============================================
-function startWeightCapture(product) {
-    console.log('⚖️ startWeightCapture called for:', product.name);
-    
-    currentWeightProduct = product;
-    weightStable = false;
-    currentWeight = 0;
-    stableCount = 0;
-    
-    document.getElementById('wcProductName').textContent = product.name;
-    document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
-    document.getElementById('wcRate').textContent = `Rate: ₹${product.rate_per_kg}/Kg`;
-    document.getElementById('wcGst').textContent = `GST: ${product.gst_percent || 0}%`;
-    document.getElementById('wcCashback').textContent = `Cashback: ${product.cashback_percent || 0}%`;
-    document.getElementById('wcWeightDisplay').textContent = '0.000';
-    document.getElementById('wcWeightDisplay').className = 'weight-display';
-    document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
-    document.getElementById('wcStatus').className = 'weight-status';
-    document.getElementById('wcAmount').textContent = '₹0.00';
-    
-    document.getElementById('weightCaptureModal').style.display = 'flex';
-    
-    startLiveWeightReading();
-}
-
-            // =============================================
-            // LIVE WEIGHT READING - SIMULATED / HARDWARE
-            // =============================================
-            // =============================================
-// LIVE WEIGHT READING
-// =============================================
-// =============================================
-// LIVE WEIGHT READING FROM I-SCALE
-// =============================================
-// =============================================
-// LIVE WEIGHT READING FROM I-SCALE (COM13)
-// =============================================
-// =============================================
-// LIVE WEIGHT READING - STABLE FIX
-// =============================================
-// =============================================
-// LIVE WEIGHT READING - NO RANDOM READINGS
-// =============================================
-function startLiveWeightReading() {
-    if (weightTimer) clearInterval(weightTimer);
-    stableCount = 0;
-    currentWeight = 0;
-    weightStable = false;
-    let scaleConnected = false;
-    let attempts = 0;
-    
-    // ✅ Try to connect to scale
-    document.getElementById('wcStatus').textContent = '⏳ Connecting to scale...';
-    
-    connectToScale().then(connected => {
-        scaleConnected = connected;
-        if (!connected) {
-            document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. Waiting for connection...';
-            // Show "Scale Not Connected" message but don't show random readings
-        }
-    });
-    
-    weightTimer = setInterval(async () => {
-        try {
-            const response = await fetch(`${API_URL}/scale/weight`, {
-                headers: { 
-                    'Authorization': `Bearer ${authToken}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.connected && data.weight > 0) {
-                    // ✅ REAL SCALE DATA - Use it
-                    currentWeight = data.weight;
-                    if (data.stable) {
-                        stableCount = 3;
+            async function processBarcode(barcode) { 
+                const cust = document.getElementById('selectedCustomerId').value; 
+                if(!cust) { showAlert('Select customer first','error'); return; } 
+                try { 
+                    const p = allProducts.find(p => p.product_code === barcode); 
+                    if(!p) { showAlert('Product not found','error'); return; } 
+                    
+                    console.log('🔍 Product found:', p);
+                    console.log('📦 Product type:', p.product_type);
+                    
+                    if(p.product_type === 'weight') {
+                        if(p.status === 'inactive') {
+                            showAlert('Product is inactive', 'error');
+                            return;
+                        }
+                        if(p.weight_stock <= 0) {
+                            showAlert('Out of stock', 'error');
+                            return;
+                        }
+                        console.log('⚖️ Opening weight capture for:', p.name);
+                        startWeightCapture(p);
+                        return;
+                    }
+                    
+                    console.log('📦 Piece product:', p.name);
+                    if(p.current_stock < 1) { showAlert('Out of stock','error'); return; } 
+                    const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
+                    const ex = cart.find(i => i.product_id === p.id && i.type !== 'weight'); 
+                    if(ex) { 
+                        ex.quantity++; 
                     } else {
-                        stableCount = Math.max(0, stableCount - 1);
+                        cart.push({
+                            product_id: p.id, 
+                            name: p.name, 
+                            type: 'piece',
+                            originalPrice: p.selling_price, 
+                            discountPercent: p.discount_percent||0, 
+                            cashback: cashback, 
+                            quantity: 1
+                        }); 
                     }
-                    scaleConnected = true;
-                    console.log('⚖️ Scale weight:', currentWeight, 'Kg');
-                } else {
-                    // ✅ Scale not connected - DON'T simulate random readings
-                    scaleConnected = false;
-                    if (currentWeight === 0) {
-                        // Keep showing 0
-                        currentWeight = 0;
-                        stableCount = 0;
-                    }
-                }
-            } else {
-                scaleConnected = false;
+                    renderCart(); 
+                    showAlert(`✅ ${p.name} added!`,'success'); 
+                } catch(e) { 
+                    console.error('Error:', e);
+                    showAlert('Error: ' + e.message,'error'); 
+                } 
             }
-        } catch (e) {
-            scaleConnected = false;
-        }
-        
-        // ✅ Update UI
-        updateWeightUI(scaleConnected);
-        
-    }, 200);
-}
 
-// =============================================
-// CONNECT TO SCALE
-// =============================================
-// =============================================
-// CONNECT TO I-SCALE ON COM14
-// =============================================
-async function connectToScale() {
-    try {
-        console.log('🔌 Connecting to I-Scale on COM14...');
-        
-        const response = await fetch(`${API_URL}/scale/connect`, {
-            method: 'POST',
-            headers: { 
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ port: 'COM14', baudRate: 9600 })  // ✅ COM14
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            console.log('✅ I-Scale connected on COM14!');
-            return true;
-        } else {
-            console.log('⚠️ Scale connection failed');
-            return false;
-        }
-    } catch (e) {
-        console.log('⚠️ Scale connection error:', e.message);
-        return false;
-    }
-}
-
-// =============================================
-// UPDATE WEIGHT UI - NO RANDOM READINGS
-// =============================================
-function updateWeightUI(scaleConnected) {
-    // ✅ Only show weight if scale is connected
-    if (scaleConnected) {
-        document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
-        const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
-        document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
-        
-        if (stableCount >= 3 && currentWeight > 0.05) {
-            document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
-            document.getElementById('wcStatus').className = 'weight-status stable';
-            document.getElementById('wcWeightDisplay').className = 'weight-display stable';
-            weightStable = true;
-        } else if (currentWeight > 0.05) {
-            document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
-            document.getElementById('wcStatus').className = 'weight-status';
-            document.getElementById('wcWeightDisplay').className = 'weight-display';
-            weightStable = false;
-        } else {
-            document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
-            document.getElementById('wcStatus').className = 'weight-status';
-            document.getElementById('wcWeightDisplay').className = 'weight-display';
-            weightStable = false;
-        }
-    } else {
-        // ✅ Scale not connected - Show proper message, NO random readings
-        document.getElementById('wcWeightDisplay').textContent = '---';
-        document.getElementById('wcWeightDisplay').className = 'weight-display';
-        document.getElementById('wcAmount').textContent = '₹0.00';
-        document.getElementById('wcStatus').textContent = '⚠️ Scale not connected. Please connect weighing machine.';
-        document.getElementById('wcStatus').className = 'weight-status';
-        weightStable = false;
-    }
-}
-
-// =============================================
-// SIMULATE WEIGHT (Fallback)
-// =============================================
-function simulateWeight() {
-    // Only simulate if scale not connected
-    // This ensures real scale data is used when available
-    if (currentWeight < 0.01) {
-        // Slowly increase to simulate placing item
-        currentWeight = Math.min(1.5, currentWeight + (Math.random() * 0.05));
-    } else {
-        // Small fluctuations
-        const delta = (Math.random() - 0.5) * 0.02;
-        currentWeight = Math.max(0, currentWeight + delta);
-    }
-}
-
-// =============================================
-// CONNECT TO I-SCALE ON COM13
-// =============================================
-async function connectToScale() {
-    try {
-        console.log('🔌 Connecting to I-Scale on COM13...');
-        
-        const response = await fetch(`${API_URL}/scale/connect`, {
-            method: 'POST',
-            headers: { 
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ port: 'COM13', baudRate: 9600 })
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            console.log('✅ I-Scale connected on COM13!');
-            return true;
-        } else {
-            console.log('⚠️ Failed to connect to scale');
-            return false;
-        }
-    } catch (e) {
-        console.log('⚠️ Scale connection failed, using simulation');
-        return false;
-    }
-}
-
-// =============================================
-// UPDATE WEIGHT UI
-// =============================================
-// =============================================
-// UPDATE WEIGHT UI - STABLE FIX
-// =============================================
-function updateWeightUI() {
-    // Update display
-    document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
-    
-    const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
-    document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
-    
-    // ✅ Stability check - only stable after 3 consecutive stable readings
-    if (stableCount >= 3 && currentWeight > 0.05) {
-        document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
-        document.getElementById('wcStatus').className = 'weight-status stable';
-        document.getElementById('wcWeightDisplay').className = 'weight-display stable';
-        weightStable = true;
-    } else if (currentWeight > 0.05) {
-        document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
-        document.getElementById('wcStatus').className = 'weight-status';
-        document.getElementById('wcWeightDisplay').className = 'weight-display';
-        weightStable = false;
-    } else {
-        document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
-        document.getElementById('wcStatus').className = 'weight-status';
-        document.getElementById('wcWeightDisplay').className = 'weight-display';
-        weightStable = false;
-    }
-}
-
-// =============================================
-// CONNECT TO I-SCALE
-// =============================================
-async function connectToScale() {
-    try {
-        // Try COM3 (common port for USB scales)
-        const ports = ['COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8'];
-        
-        for (const port of ports) {
-            try {
-                const response = await fetch(`${API_URL}/scale/connect`, {
-                    method: 'POST',
-                    headers: { 
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ port: port, baudRate: 9600 })
-                });
+            // =============================================
+            // START WEIGHT CAPTURE
+            // =============================================
+            function startWeightCapture(product) {
+                console.log('⚖️ startWeightCapture called for:', product.name);
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('✅ Scale connected on', port);
-                    return;
-                }
-            } catch (e) {
-                // Try next port
-                continue;
+                currentWeightProduct = product;
+                weightStable = false;
+                currentWeight = 0;
+                stableCount = 0;
+                
+                document.getElementById('wcProductName').textContent = product.name;
+                document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
+                document.getElementById('wcRate').textContent = `Rate: ₹${product.rate_per_kg}/Kg`;
+                document.getElementById('wcGst').textContent = `GST: ${product.gst_percent || 0}%`;
+                document.getElementById('wcCashback').textContent = `Cashback: ${product.cashback_percent || 0}%`;
+                document.getElementById('wcWeightDisplay').textContent = '0.000';
+                document.getElementById('wcWeightDisplay').className = 'weight-display';
+                document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+                document.getElementById('wcStatus').className = 'weight-status';
+                document.getElementById('wcAmount').textContent = '₹0.00';
+                
+                document.getElementById('weightCaptureModal').style.display = 'flex';
+                
+                startLiveWeightReading();
             }
-        }
-        console.log('⚠️ No scale found, using simulation');
-    } catch (e) {
-        console.log('⚠️ Scale connection failed, using simulation');
-    }
-}
 
-// =============================================
-// SIMULATE WEIGHT (FALLBACK)
-// =============================================
-function simulateWeight() {
-    const delta = (Math.random() - 0.5) * 0.15;
-    currentWeight = Math.max(0, currentWeight + delta);
-}
+            // =============================================
+            // CONNECT TO SCALE - MOCK MODE
+            // =============================================
+            async function connectToScale() {
+                try {
+                    console.log('🔌 Connecting to mock scale...');
+                    
+                    const response = await fetch(`${API_URL}/scale/connect`, {
+                        method: 'POST',
+                        headers: { 
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ port: 'MOCK', baudRate: 9600 })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('✅ Mock scale connected!');
+                        return true;
+                    } else {
+                        console.log('⚠️ Scale connection failed');
+                        return false;
+                    }
+                } catch (e) {
+                    console.log('⚠️ Scale connection error:', e.message);
+                    return false;
+                }
+            }
 
-// =============================================
-// UPDATE WEIGHT UI
-// =============================================
-function updateWeightUI() {
-    // Check stability
-    if (currentWeight > 0.05) {
-        // For simulation, check if stable
-        // For real scale, stability is determined by scale reading
-        const isStable = currentWeight > 0.05;
-        
-        if (isStable) {
-            stableCount++;
-        } else {
-            stableCount = 0;
-        }
-    } else {
-        stableCount = 0;
-    }
-    
-    // Update display
-    document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
-    
-    const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
-    document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
-    
-    // Update status
-    if (stableCount >= 3 && currentWeight > 0.05) {
-        document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
-        document.getElementById('wcStatus').className = 'weight-status stable';
-        document.getElementById('wcWeightDisplay').className = 'weight-display stable';
-        weightStable = true;
-    } else if (currentWeight > 0.05) {
-        document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
-        document.getElementById('wcStatus').className = 'weight-status';
-        document.getElementById('wcWeightDisplay').className = 'weight-display';
-        weightStable = false;
-    } else {
-        document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
-        document.getElementById('wcStatus').className = 'weight-status';
-        document.getElementById('wcWeightDisplay').className = 'weight-display';
-        weightStable = false;
-    }
-}
+            // =============================================
+            // LIVE WEIGHT READING - MOCK MODE
+            // =============================================
+            function startLiveWeightReading() {
+                if (weightTimer) clearInterval(weightTimer);
+                stableCount = 0;
+                currentWeight = 0;
+                weightStable = false;
+                
+                connectToScale();
+                
+                weightTimer = setInterval(async () => {
+                    try {
+                        const response = await fetch(`${API_URL}/scale/weight`, {
+                            headers: { 
+                                'Authorization': `Bearer ${authToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.connected) {
+                                currentWeight = data.weight || 0;
+                                if (data.stable) {
+                                    stableCount = 3;
+                                } else {
+                                    stableCount = Math.max(0, stableCount - 1);
+                                }
+                                console.log(`⚖️ Weight: ${currentWeight} Kg | Stable: ${data.stable}`);
+                            }
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Weight read error:', e.message);
+                    }
+                    
+                    updateWeightUI();
+                    
+                }, 200);
+            }
+
+            // =============================================
+            // UPDATE WEIGHT UI
+            // =============================================
+            function updateWeightUI() {
+                document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
+                
+                const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
+                document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
+                
+                if (stableCount >= 3 && currentWeight > 0.05) {
+                    document.getElementById('wcStatus').textContent = '✅ Stable! Press ENTER to confirm';
+                    document.getElementById('wcStatus').className = 'weight-status stable';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display stable';
+                    weightStable = true;
+                } else if (currentWeight > 0.05) {
+                    document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
+                    document.getElementById('wcStatus').className = 'weight-status';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display';
+                    weightStable = false;
+                } else {
+                    document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+                    document.getElementById('wcStatus').className = 'weight-status';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display';
+                    weightStable = false;
+                }
+            }
 
             function confirmWeight() {
                 if (!weightStable) {
@@ -1716,7 +1463,6 @@ function updateWeightUI() {
                 const cashback = (amount * (product.cashback_percent || 0)) / 100;
                 const gst = (amount * (product.gst_percent || 0)) / 100;
                 
-                // Check stock
                 if (product.weight_stock > 0 && weight > product.weight_stock) {
                     showAlert(`Only ${product.weight_stock} ${product.unit} available`, 'error');
                     return;
@@ -1757,59 +1503,52 @@ function updateWeightUI() {
             // =============================================
             // CART FUNCTIONS
             // =============================================
-           // =============================================
-// ADD TO CART - WITH WEIGHT SUPPORT
-// =============================================
-function addToCart() { 
-    if(billingMode === 'scanner') { 
-        showAlert('Scanner mode: use barcode input','error'); 
-        return; 
-    } 
-    
-    const cust = document.getElementById('selectedCustomerId').value; 
-    const pid = document.getElementById('selectedProductId').value; 
-    const qty = parseInt(document.getElementById('billQuantity').value) || 1; 
-    
-    if(!cust) { showAlert('Select customer','error'); return; } 
-    if(!pid) { showAlert('Select product','error'); return; } 
-    if(!qty || qty < 1) { showAlert('Enter quantity','error'); return; } 
-    
-    const p = allProducts.find(p => p.id == pid); 
-    if(!p) { showAlert('Product not found','error'); return; }
-    
-    // ✅ CHECK IF WEIGHT PRODUCT
-    if(p.product_type === 'weight') {
-        console.log('⚖️ Weight product in manual mode - opening capture screen');
-        startWeightCapture(p);
-        return;
-    }
-    
-    // ✅ PIECE PRODUCT
-    const price = parseFloat(document.getElementById('selectedProductPrice').value); 
-    const disc = parseFloat(document.getElementById('selectedProductDiscount').value) || 0; 
-    const cashback = parseFloat(document.getElementById('selectedProductCashback').value) || 0; 
-    const stock = parseInt(document.getElementById('selectedProductStock').value) || 0; 
-    
-    if(stock < qty) { showAlert(`Only ${stock} left`,'error'); return; } 
-    
-    const ex = cart.find(i => i.product_id === parseInt(pid)); 
-    if(ex) { 
-        ex.quantity += qty; 
-    } else {
-        cart.push({
-            product_id: parseInt(pid), 
-            name: p.name, 
-            type: 'piece',
-            originalPrice: price, 
-            discountPercent: disc, 
-            cashback: cashback, 
-            quantity: qty
-        }); 
-    }
-    renderCart(); 
-    document.getElementById('billQuantity').value = '1'; 
-    showAlert(`${p.name} added`,'success'); 
-}
+            function addToCart() { 
+                if(billingMode === 'scanner') { 
+                    showAlert('Scanner mode: use barcode input','error'); 
+                    return; 
+                } 
+                const cust = document.getElementById('selectedCustomerId').value; 
+                const pid = document.getElementById('selectedProductId').value; 
+                const qty = parseInt(document.getElementById('billQuantity').value) || 1; 
+                if(!cust) { showAlert('Select customer','error'); return; } 
+                if(!pid) { showAlert('Select product','error'); return; } 
+                if(!qty || qty < 1) { showAlert('Enter quantity','error'); return; } 
+                
+                const p = allProducts.find(p => p.id == pid); 
+                if(!p) { showAlert('Product not found','error'); return; }
+                
+                if(p.product_type === 'weight') {
+                    console.log('⚖️ Weight product in manual mode - opening capture screen');
+                    startWeightCapture(p);
+                    return;
+                }
+                
+                const price = parseFloat(document.getElementById('selectedProductPrice').value); 
+                const disc = parseFloat(document.getElementById('selectedProductDiscount').value) || 0; 
+                const cashback = parseFloat(document.getElementById('selectedProductCashback').value) || 0; 
+                const stock = parseInt(document.getElementById('selectedProductStock').value) || 0; 
+                
+                if(stock < qty) { showAlert(`Only ${stock} left`,'error'); return; } 
+                
+                const ex = cart.find(i => i.product_id === parseInt(pid)); 
+                if(ex) { 
+                    ex.quantity += qty; 
+                } else {
+                    cart.push({
+                        product_id: parseInt(pid), 
+                        name: p.name, 
+                        type: 'piece',
+                        originalPrice: price, 
+                        discountPercent: disc, 
+                        cashback: cashback, 
+                        quantity: qty
+                    }); 
+                }
+                renderCart(); 
+                document.getElementById('billQuantity').value = '1'; 
+                showAlert(`${p.name} added`,'success'); 
+            }
             
             function renderCart() { 
                 const tbody = document.getElementById('cartList'); 
