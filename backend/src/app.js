@@ -765,21 +765,86 @@ async function initTables() {
     console.error('Table creation error:', error.message);
   }
 }
-// =============================================
-// I-SCALE WEIGHING MACHINE INTEGRATION
-// =============================================
-// =============================================
-// I-SCALE WEIGHING MACHINE INTEGRATION - COM13
-// =============================================
-const { SerialPort } = require('serialport');
-const { ReadlineParser } = require('@serialport/parser-readline');
 
+// =============================================
+// SERIALPORT - OPTIONAL DEPENDENCY (FIXED FOR RENDER)
+// =============================================
+let SerialPort, ReadlineParser;
 let scalePort = null;
 let scaleWeight = 0;
 let scaleConnected = false;
 let lastWeight = 0;
 let stableCount = 0;
 const STABLE_THRESHOLD = 3;
+let scaleAvailable = false;
+
+try {
+    const serialport = require('serialport');
+    const parser = require('@serialport/parser-readline');
+    SerialPort = serialport.SerialPort;
+    ReadlineParser = parser.ReadlineParser;
+    scaleAvailable = true;
+    console.log('✅ Serialport loaded successfully');
+} catch (error) {
+    console.log('⚠️ Serialport not available - Scale features disabled');
+    // Mock classes for production
+    SerialPort = class MockSerialPort {
+        constructor(options) { 
+            console.log(`⚠️ Mock SerialPort: Would connect to ${options.path}`);
+            this.path = options.path;
+            this.isOpen = true;
+            setTimeout(() => {
+                if (this._events?.open) this._events.open();
+            }, 100);
+        }
+        pipe() { 
+            return { 
+                on: (event, callback) => {
+                    if (event === 'data') {
+                        // Simulate data after 2 seconds
+                        setTimeout(() => {
+                            callback('ST,GS,1.234,kg');
+                            setTimeout(() => callback('ST,GS,1.245,kg'), 200);
+                            setTimeout(() => callback('ST,GS,1.238,kg'), 400);
+                            setTimeout(() => callback('ST,GS,1.240,kg'), 600);
+                        }, 2000);
+                    }
+                } 
+            }; 
+        }
+        on(event, callback) { 
+            this._events = this._events || {};
+            this._events[event] = callback;
+            if (event === 'open') {
+                setTimeout(callback, 100);
+            }
+            if (event === 'error') {
+                // No error simulation
+            }
+        }
+        close(callback) { 
+            if (callback) callback();
+            this.isOpen = false;
+        }
+        write(data) { console.log('Mock SerialPort write:', data); }
+    };
+    ReadlineParser = class MockParser {
+        constructor() { 
+            return { 
+                on: (event, callback) => {
+                    if (event === 'data') {
+                        // Will be handled by pipe
+                    }
+                } 
+            };
+        }
+    };
+    scaleAvailable = false;
+}
+
+// =============================================
+// I-SCALE WEIGHING MACHINE INTEGRATION - COM13
+// =============================================
 
 // Connect to I-Scale on COM13
 app.post('/api/scale/connect', authenticateToken, async (req, res) => {
@@ -791,11 +856,17 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
             scalePort = null;
         }
         
-        // ✅ COM13 DEFAULT
         const portName = port || 'COM13';
         const baud = baudRate || 9600;
         
         console.log(`🔌 Connecting to I-Scale on ${portName} at ${baud} baud...`);
+        
+        if (!scaleAvailable) {
+            console.log('⚠️ Serialport not available - using mock scale');
+            scalePort = new SerialPort({ path: portName, baudRate: baud });
+            scaleConnected = true;
+            return res.json({ success: true, message: 'Mock scale connected' });
+        }
         
         scalePort = new SerialPort({ 
             path: portName, 
@@ -854,9 +925,9 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
         
         scalePort.on('open', () => {
             scaleConnected = true;
-            console.log('✅ I-Scale connected successfully on COM13!');
+            console.log(`✅ I-Scale connected successfully on ${portName}!`);
             if (!res.headersSent) {
-                res.json({ success: true, message: 'Scale connected on COM13' });
+                res.json({ success: true, message: `Scale connected on ${portName}` });
             }
         });
         
@@ -913,10 +984,12 @@ app.get('/api/scale/status', authenticateToken, async (req, res) => {
     res.json({ 
         connected: scaleConnected,
         weight: scaleWeight,
-        port: 'COM13',
-        stable: stableCount >= STABLE_THRESHOLD
+        port: scalePort?.path || 'COM13',
+        stable: stableCount >= STABLE_THRESHOLD,
+        available: scaleAvailable
     });
 });
+
 // ============ START SERVER ============
 const PORT = process.env.PORT || 5000;
 
