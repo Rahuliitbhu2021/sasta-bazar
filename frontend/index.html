@@ -143,11 +143,16 @@
         .footer-address p { color: #333; margin: 4px 0; }
         .footer-address strong { color: #e67e22; }
         
+        /* WEIGHT CAPTURE SCREEN STYLES */
         .weight-display { font-size: 48px; font-weight: bold; color: #333; font-family: 'Courier New', monospace; }
         .weight-display.stable { color: #27ae60; }
         .weight-status { margin-top: 10px; font-size: 14px; color: #888; }
         .weight-status.stable { color: #27ae60; font-weight: bold; }
         .weight-amount { margin-top: 10px; font-size: 20px; font-weight: bold; color: #27ae60; }
+        .weight-product-info { margin-bottom: 15px; }
+        .weight-product-info h3 { margin: 5px 0; }
+        .weight-product-info p { color: #666; margin: 3px 0; }
+        .weight-box { margin: 20px 0; padding: 20px; background: #f5f5f5; border-radius: 20px; }
         
         @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } .shop-detail-row { flex-wrap: wrap; } }
     </style>
@@ -519,19 +524,19 @@
             </div>
         </div>
 
-        <!-- WEIGHT CAPTURE MODAL -->
+        <!-- WEIGHT CAPTURE MODAL - LIVE WEIGHT READING -->
         <div id="weightCaptureModal" class="modal">
             <div class="modal-content" style="max-width: 500px;">
                 <h2 style="color:#e67e22; text-align:center;">⚖️ Weight Capture</h2>
                 <div id="weightCaptureContent" style="text-align:center; padding:20px;">
-                    <div id="weightProductInfo">
-                        <h3 id="wcProductName" style="margin:10px 0;">-</h3>
+                    <div class="weight-product-info">
+                        <h3 id="wcProductName" style="margin:10px 0; font-size:20px;">-</h3>
                         <p id="wcProductCode" style="color:#666;">Barcode: -</p>
                         <p id="wcRate" style="font-size:18px; font-weight:bold; color:#e67e22;">Rate: ₹0/Kg</p>
                         <p id="wcGst" style="color:#666;">GST: 0%</p>
                         <p id="wcCashback" style="color:#27ae60;">Cashback: 0%</p>
                     </div>
-                    <div style="margin:20px 0; padding:20px; background:#f5f5f5; border-radius:20px;">
+                    <div class="weight-box">
                         <div id="wcWeightDisplay" class="weight-display">0.000</div>
                         <div style="font-size:14px; color:#666;">Kg</div>
                         <div id="wcStatus" class="weight-status">⏳ Place item on scale...</div>
@@ -574,6 +579,9 @@
             let currentWeightProduct = null;
             let weightStable = false;
             let weightTimer = null;
+            let currentWeight = 0;
+            let stableCount = 0;
+            const stableThreshold = 5;
 
             function showAlert(msg, type) { 
                 const a = document.getElementById('alert'); 
@@ -1137,7 +1145,7 @@
             }
 
             // =============================================
-            // PRODUCTS TABLE with Pagination - FIXED
+            // PRODUCTS TABLE with Pagination
             // =============================================
             function renderProductTable() { 
                 const search = document.getElementById('productSearch').value.toLowerCase(); 
@@ -1249,9 +1257,9 @@
                     } 
                 }); 
             }
-            
+
             // =============================================
-            // PROCESS BARCODE - WITH WEIGHT PRODUCT SUPPORT
+            // PROCESS BARCODE - WITH WEIGHT SUPPORT
             // =============================================
             async function processBarcode(barcode) { 
                 const cust = document.getElementById('selectedCustomerId').value; 
@@ -1260,6 +1268,7 @@
                     const p = allProducts.find(p => p.product_code === barcode); 
                     if(!p) { showAlert('Product not found','error'); return; } 
                     
+                    // ✅ WEIGHT PRODUCT - OPEN CAPTURE SCREEN
                     if(p.product_type === 'weight') {
                         if(p.status === 'inactive') {
                             showAlert('Product is inactive', 'error');
@@ -1273,7 +1282,7 @@
                         return;
                     }
                     
-                    if(p.current_stock < 1) { showAlert('Out of stock','error'); return; } 
+                    // Piece product                    if(p.current_stock < 1) { showAlert('Out of stock','error'); return; } 
                     const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
                     const ex = cart.find(i => i.product_id === p.id && i.type !== 'weight'); 
                     if(ex) ex.quantity++; 
@@ -1292,11 +1301,13 @@
             }
 
             // =============================================
-            // WEIGHT CAPTURE FUNCTIONS
+            // WEIGHT CAPTURE - LIVE READING
             // =============================================
             function startWeightCapture(product) {
                 currentWeightProduct = product;
                 weightStable = false;
+                currentWeight = 0;
+                stableCount = 0;
                 
                 document.getElementById('wcProductName').textContent = product.name;
                 document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
@@ -1310,37 +1321,45 @@
                 document.getElementById('wcAmount').textContent = '₹0.00';
                 
                 document.getElementById('weightCaptureModal').style.display = 'flex';
-                simulateWeightReading();
+                
+                // ✅ Start live weight reading
+                startLiveWeightReading();
             }
 
-            function simulateWeightReading() {
-                let weight = 0;
-                let stableCount = 0;
-                const stableThreshold = 3;
-                
+            // =============================================
+            // LIVE WEIGHT READING - SIMULATED / HARDWARE
+            // =============================================
+            function startLiveWeightReading() {
                 if (weightTimer) clearInterval(weightTimer);
+                stableCount = 0;
                 
+                // ✅ Simulated weight reading (Replace with actual hardware connection)
                 weightTimer = setInterval(() => {
-                    const delta = (Math.random() - 0.5) * 0.3;
-                    weight = Math.max(0, weight + delta);
+                    // ✅ Simulate weight fluctuation (like a real scale)
+                    const delta = (Math.random() - 0.5) * 0.15;
+                    currentWeight = Math.max(0, currentWeight + delta);
                     
-                    if (weight > 0.1 && Math.abs(delta) < 0.02) {
+                    // ✅ Check stability
+                    if (currentWeight > 0.05 && Math.abs(delta) < 0.02) {
                         stableCount++;
                     } else {
                         stableCount = 0;
                     }
                     
-                    document.getElementById('wcWeightDisplay').textContent = weight.toFixed(3);
+                    // ✅ Update display
+                    document.getElementById('wcWeightDisplay').textContent = currentWeight.toFixed(3);
                     
-                    const amount = weight * (currentWeightProduct?.rate_per_kg || 0);
+                    // ✅ Calculate amount
+                    const amount = currentWeight * (currentWeightProduct?.rate_per_kg || 0);
                     document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
                     
-                    if (stableCount >= stableThreshold && weight > 0.1) {
+                    // ✅ Update status
+                    if (stableCount >= stableThreshold && currentWeight > 0.05) {
                         document.getElementById('wcStatus').textContent = '✅ Stable weight detected! Press ENTER to confirm';
                         document.getElementById('wcStatus').className = 'weight-status stable';
                         document.getElementById('wcWeightDisplay').className = 'weight-display stable';
                         weightStable = true;
-                    } else if (weight > 0.1) {
+                    } else if (currentWeight > 0.05) {
                         document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
                         document.getElementById('wcStatus').className = 'weight-status';
                         document.getElementById('wcWeightDisplay').className = 'weight-display';
@@ -1351,7 +1370,7 @@
                         document.getElementById('wcWeightDisplay').className = 'weight-display';
                         weightStable = false;
                     }
-                }, 200);
+                }, 150);
             }
 
             function confirmWeight() {
@@ -1376,6 +1395,8 @@
                 document.getElementById('weightCaptureModal').style.display = 'none';
                 if (weightTimer) clearInterval(weightTimer);
                 weightStable = false;
+                currentWeight = 0;
+                stableCount = 0;
             }
 
             function addWeightToCart(product, weight) {
@@ -1383,6 +1404,7 @@
                 const cashback = (amount * (product.cashback_percent || 0)) / 100;
                 const gst = (amount * (product.gst_percent || 0)) / 100;
                 
+                // Check stock
                 if (product.weight_stock > 0 && weight > product.weight_stock) {
                     showAlert(`Only ${product.weight_stock} ${product.unit} available`, 'error');
                     return;
@@ -1409,6 +1431,7 @@
                 renderCart();
             }
 
+            // Keyboard shortcuts
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && document.getElementById('weightCaptureModal').style.display === 'flex') {
                     e.preventDefault();
@@ -2108,4 +2131,4 @@
             showLandingHome();
         </script>
     </body>
-    </html>
+</html>
