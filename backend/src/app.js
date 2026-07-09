@@ -126,13 +126,13 @@ app.get('/api/products', authenticateToken, async (req, res) => {
 });
 
 app.post('/api/products', authenticateToken, async (req, res) => {
-  const { product_code, name, purchase_price, selling_price, current_stock, discount_percent } = req.body;
+  const { product_code, name, purchase_price, selling_price, current_stock, discount_percent, category } = req.body;
   
   try {
     const result = await query(
-      `INSERT INTO products (product_code, name, purchase_price, selling_price, current_stock, discount_percent, product_type, unit)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [product_code, name, purchase_price || selling_price * 0.7, selling_price, current_stock || 0, discount_percent || 0, 'piece', 'piece']
+      `INSERT INTO products (product_code, name, purchase_price, selling_price, current_stock, discount_percent, product_type, unit, category)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [product_code, name, purchase_price || selling_price * 0.7, selling_price, current_stock || 0, discount_percent || 0, 'piece', 'piece', category || 'General']
     );
     res.json(result.rows[0]);
   } catch (error) {
@@ -143,12 +143,12 @@ app.post('/api/products', authenticateToken, async (req, res) => {
 
 app.put('/api/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { product_code, name, purchase_price, selling_price, discount_percent } = req.body;
+  const { product_code, name, purchase_price, selling_price, discount_percent, category } = req.body;
   
   try {
     await query(
-      `UPDATE products SET product_code=$1, name=$2, purchase_price=$3, selling_price=$4, discount_percent=$5 WHERE id=$6`,
-      [product_code, name, purchase_price, selling_price, discount_percent, id]
+      `UPDATE products SET product_code=$1, name=$2, purchase_price=$3, selling_price=$4, discount_percent=$5, category=$6 WHERE id=$7`,
+      [product_code, name, purchase_price, selling_price, discount_percent, category || 'General', id]
     );
     const result = await query('SELECT * FROM products WHERE id = $1', [id]);
     res.json(result.rows[0]);
