@@ -206,7 +206,7 @@ app.post('/api/customers', authenticateToken, async (req, res) => {
   }
 });
 
-// ============ BILL ROUTES - COMPLETE FIX ============
+// ============ BILL ROUTES - WITH WEIGHT SUPPORT ============
 app.post('/api/bills', authenticateToken, async (req, res) => {
   const { customer_id, items, payment_method } = req.body;
   
@@ -223,7 +223,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       }
       const p = product.rows[0];
       
-      // WEIGHT PRODUCT
+      // ✅ WEIGHT PRODUCT
       if (p.product_type === 'weight') {
         const weight = item.weight || 0;
         
@@ -249,7 +249,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
           await query('UPDATE products SET weight_stock = $1 WHERE id = $2', [newStock, p.id]);
         }
       } else {
-        // PIECE PRODUCT
+        // ✅ PIECE PRODUCT
         if (p.current_stock < item.quantity) {
           return res.status(400).json({ error: `Insufficient stock for ${p.name}` });
         }
@@ -272,7 +272,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
     
     console.log('✅ Bill created:', billResult.rows[0].id);
     
-    // SAVE BILL ITEMS
+    // ✅ SAVE BILL ITEMS
     for (const item of items) {
       const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
       const p = product.rows[0];
@@ -750,8 +750,8 @@ async function initTables() {
     await query(`
       INSERT INTO hardware_settings (setting_key, setting_value) 
       VALUES 
-        ('weighing_machine_type', 'none'),
-        ('weighing_machine_port', ''),
+        ('weighing_machine_type', 'simulated'),
+        ('weighing_machine_port', 'COM1'),
         ('weighing_machine_baudrate', '9600'),
         ('scale_stable_timeout', '2'),
         ('manual_weight_fallback', 'true')
