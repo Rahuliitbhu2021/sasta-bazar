@@ -807,6 +807,7 @@ try {
 // =============================================
 
 // Connect to scale
+// Connect to I-Scale
 app.post('/api/scale/connect', authenticateToken, async (req, res) => {
     const { port, baudRate } = req.body;
     
@@ -816,10 +817,11 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
             scalePort = null;
         }
         
-        const portName = port || 'COM13';
+        // ✅ COM14 DEFAULT
+        const portName = port || 'COM14';
         const baud = baudRate || 9600;
         
-        console.log(`🔌 Connecting to ${portName} at ${baud} baud...`);
+        console.log(`🔌 Connecting to I-Scale on ${portName} at ${baud} baud...`);
         
         scalePort = new SerialPort({ 
             path: portName, 
@@ -832,15 +834,17 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
         
         const parser = scalePort.pipe(new ReadlineParser({ delimiter: '\r\n' }));
         
-        // ✅ FIXED: Stable weight parser
         parser.on('data', (data) => {
             try {
                 const trimmed = data.trim();
                 if (!trimmed || trimmed.length < 2) return;
                 
+                // ✅ LOG RAW DATA TO CONSOLE
+                console.log('📊 RAW:', trimmed);
+                
                 let weight = null;
                 
-                // I-Scale format: "ST,GS,1.234,kg"
+                // I-Scale format: "ST,GS,0.071,kg" (71 grams = 0.071 Kg)
                 const match = trimmed.match(/ST,GS,([\d.]+),/i) || 
                               trimmed.match(/ST,GS,\+?([\d.]+),/i) ||
                               trimmed.match(/([\d.]+)\s*kg/i) ||
@@ -850,11 +854,9 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
                     weight = parseFloat(match[1]);
                 }
                 
-                // Only process valid weights (0 to 50 Kg)
                 if (weight !== null && !isNaN(weight) && weight >= 0 && weight <= 50) {
                     const newWeight = parseFloat(weight.toFixed(3));
                     
-                    // ✅ Stability: fluctuation must be <= 0.005 Kg
                     if (lastWeight > 0 && Math.abs(newWeight - lastWeight) <= 0.005) {
                         stableCount++;
                     } else {
@@ -864,7 +866,7 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
                     lastWeight = newWeight;
                     scaleWeight = newWeight;
                     
-                    console.log(`⚖️ ${newWeight} Kg | Stable: ${stableCount >= STABLE_THRESHOLD}`);
+                    console.log(`⚖️ Weight: ${newWeight} Kg (${newWeight * 1000} grams) | Stable: ${stableCount >= STABLE_THRESHOLD}`);
                 }
             } catch (e) {
                 // Silent ignore
@@ -873,7 +875,7 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
         
         scalePort.on('open', () => {
             scaleConnected = true;
-            console.log(`✅ Scale connected on ${portName}`);
+            console.log(`✅ I-Scale connected on ${portName}`);
             if (!res.headersSent) {
                 res.json({ success: true, message: `Scale connected on ${portName}` });
             }
@@ -897,23 +899,6 @@ app.post('/api/scale/connect', authenticateToken, async (req, res) => {
         console.error('❌ Scale connection error:', error);
         res.status(500).json({ error: error.message });
     }
-});
-
-// Get current weight
-// Get current weight from scale
-app.get('/api/scale/weight', authenticateToken, async (req, res) => {
-    // ✅ Only return weight if scale is actually connected
-    const isStable = stableCount >= STABLE_THRESHOLD;
-    
-    // If scale not connected, return 0 weight
-    const weight = scaleConnected ? scaleWeight : 0;
-    
-    res.json({ 
-        weight: weight, 
-        connected: scaleConnected,
-        stable: isStable && scaleConnected,
-        unit: 'Kg'
-    });
 });
 
 // Disconnect scale

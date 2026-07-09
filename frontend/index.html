@@ -1453,9 +1453,12 @@ function startLiveWeightReading() {
 // =============================================
 // CONNECT TO SCALE
 // =============================================
+// =============================================
+// CONNECT TO I-SCALE ON COM14
+// =============================================
 async function connectToScale() {
     try {
-        console.log('🔌 Connecting to I-Scale on COM13...');
+        console.log('🔌 Connecting to I-Scale on COM14...');
         
         const response = await fetch(`${API_URL}/scale/connect`, {
             method: 'POST',
@@ -1463,12 +1466,12 @@ async function connectToScale() {
                 'Authorization': `Bearer ${authToken}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ port: 'COM13', baudRate: 9600 })
+            body: JSON.stringify({ port: 'COM14', baudRate: 9600 })  // ✅ COM14
         });
         
         if (response.ok) {
             const data = await response.json();
-            console.log('✅ I-Scale connected!');
+            console.log('✅ I-Scale connected on COM14!');
             return true;
         } else {
             console.log('⚠️ Scale connection failed');
