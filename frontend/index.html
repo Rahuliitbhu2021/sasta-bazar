@@ -186,9 +186,7 @@
         .footer-address p { color: #333; margin: 4px 0; }
         .footer-address strong { color: #e67e22; }
         
-        @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } .shop-detail-row { flex-wrap: wrap; } }
-
-        /* Weight Capture Modal Styles */
+        /* Weight Capture Styles */
         .weight-display {
             font-size: 48px;
             font-weight: bold;
@@ -213,6 +211,8 @@
             font-weight: bold;
             color: #27ae60;
         }
+        
+        @media (max-width: 768px) { .navbar { flex-direction: column; } .nav-buttons { justify-content: center; } .admin-header { flex-direction: column; text-align: center; } .shop-detail-row { flex-wrap: wrap; } }
     </style>
 </head>
 <body>
@@ -521,7 +521,7 @@
                                 <th>Barcode</th>
                                 <th>Category</th>
                                 <th>Rate/Kg</th>
-                                <th>Stock</th>
+                                <th>Stock (Kg)</th>
                                 <th>Cashback</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -598,7 +598,7 @@
                     <div style="margin:20px 0; padding:20px; background:#f5f5f5; border-radius:20px;">
                         <div id="wcWeightDisplay" class="weight-display">0.000</div>
                         <div style="font-size:14px; color:#666;">Kg</div>
-                        <div id="wcStatus" class="weight-status">⏳ Waiting for stable weight...</div>
+                        <div id="wcStatus" class="weight-status">⏳ Place item on scale...</div>
                         <div id="wcAmount" class="weight-amount">₹0.00</div>
                     </div>
                     <div style="display:flex; gap:12px;">
@@ -623,8 +623,7 @@
         // =============================================
         // BACKEND CONFIGURATION
         // =============================================
-        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com'; // Render URL
-        // Local testing ke liye: const BACKEND_URL = 'http://localhost:5000';
+        const BACKEND_URL = 'https://sasta-bazar-backend.onrender.com';
         const API_URL = `${BACKEND_URL}/api`;
         
         let authToken = null, currentUser = null, cart = [], editingId = null, allProducts = [];
@@ -633,8 +632,6 @@
         let salesHistory = [];
         let billingMode = 'manual';
         let customers = [];
-
-        // WEIGHT PRODUCTS VARIABLES
         let weightProducts = [];
         let weightProductPage = 1;
         let weightProductPerPage = 10;
@@ -1312,17 +1309,21 @@
                 const p = allProducts.find(p => p.product_code === barcode); 
                 if(!p) { showAlert('Product not found','error'); return; } 
                 
-                // Check if weight product
+                // CHECK IF WEIGHT PRODUCT
                 if(p.product_type === 'weight') {
                     if(p.status === 'inactive') {
                         showAlert('Product is inactive', 'error');
+                        return;
+                    }
+                    if(p.weight_stock <= 0) {
+                        showAlert('Out of stock', 'error');
                         return;
                     }
                     startWeightCapture(p);
                     return;
                 }
                 
-                // Piece product - existing logic
+                // Piece product
                 if(p.current_stock < 1) { showAlert('Out of stock','error'); return; } 
                 const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
                 const ex = cart.find(i => i.product_id === p.id && i.type !== 'weight'); 
@@ -1340,6 +1341,138 @@
                 showAlert(`✅ ${p.name} added!`,'success'); 
             } catch(e) { showAlert('Error: ' + e.message,'error'); } 
         }
+
+        // =============================================
+        // WEIGHT CAPTURE FUNCTIONS
+        // =============================================
+        function startWeightCapture(product) {
+            currentWeightProduct = product;
+            weightStable = false;
+            
+            document.getElementById('wcProductName').textContent = product.name;
+            document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
+            document.getElementById('wcRate').textContent = `Rate: ₹${product.rate_per_kg}/Kg`;
+            document.getElementById('wcGst').textContent = `GST: ${product.gst_percent || 0}%`;
+            document.getElementById('wcCashback').textContent = `Cashback: ${product.cashback_percent || 0}%`;
+            document.getElementById('wcWeightDisplay').textContent = '0.000';
+            document.getElementById('wcWeightDisplay').className = 'weight-display';
+            document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+            document.getElementById('wcStatus').className = 'weight-status';
+            document.getElementById('wcAmount').textContent = '₹0.00';
+            
+            document.getElementById('weightCaptureModal').style.display = 'flex';
+            
+            // Simulate weight reading
+            simulateWeightReading();
+        }
+
+        function simulateWeightReading() {
+            let weight = 0;
+            let stableCount = 0;
+            const stableThreshold = 3;
+            
+            if (weightTimer) clearInterval(weightTimer);
+            
+            weightTimer = setInterval(() => {
+                const delta = (Math.random() - 0.5) * 0.3;
+                weight = Math.max(0, weight + delta);
+                
+                if (weight > 0.1 && Math.abs(delta) < 0.02) {
+                    stableCount++;
+                } else {
+                    stableCount = 0;
+                }
+                
+                document.getElementById('wcWeightDisplay').textContent = weight.toFixed(3);
+                
+                const amount = weight * (currentWeightProduct?.rate_per_kg || 0);
+                document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
+                
+                if (stableCount >= stableThreshold && weight > 0.1) {
+                    document.getElementById('wcStatus').textContent = '✅ Stable weight detected! Press ENTER to confirm';
+                    document.getElementById('wcStatus').className = 'weight-status stable';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display stable';
+                    weightStable = true;
+                } else if (weight > 0.1) {
+                    document.getElementById('wcStatus').textContent = '⏳ Stabilizing...';
+                    document.getElementById('wcStatus').className = 'weight-status';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display';
+                    weightStable = false;
+                } else {
+                    document.getElementById('wcStatus').textContent = '⏳ Place item on scale...';
+                    document.getElementById('wcStatus').className = 'weight-status';
+                    document.getElementById('wcWeightDisplay').className = 'weight-display';
+                    weightStable = false;
+                }
+            }, 200);
+        }
+
+        function confirmWeight() {
+            if (!weightStable) {
+                showAlert('Please wait for stable weight reading', 'error');
+                return;
+            }
+            
+            const weight = parseFloat(document.getElementById('wcWeightDisplay').textContent);
+            if (weight <= 0) {
+                showAlert('Invalid weight reading', 'error');
+                return;
+            }
+            
+            addWeightToCart(currentWeightProduct, weight);
+            document.getElementById('weightCaptureModal').style.display = 'none';
+            if (weightTimer) clearInterval(weightTimer);
+            showAlert(`✅ ${currentWeightProduct.name}: ${weight.toFixed(3)} Kg added to cart!`, 'success');
+        }
+
+        function cancelWeight() {
+            document.getElementById('weightCaptureModal').style.display = 'none';
+            if (weightTimer) clearInterval(weightTimer);
+            weightStable = false;
+        }
+
+        function addWeightToCart(product, weight) {
+            const amount = weight * product.rate_per_kg;
+            const cashback = (amount * (product.cashback_percent || 0)) / 100;
+            const gst = (amount * (product.gst_percent || 0)) / 100;
+            
+            // Check stock
+            if (product.weight_stock > 0 && weight > product.weight_stock) {
+                showAlert(`Only ${product.weight_stock} ${product.unit} available`, 'error');
+                return;
+            }
+            
+            const cartItem = {
+                product_id: product.id,
+                name: product.name,
+                barcode: product.product_code,
+                type: 'weight',
+                weight: weight,
+                rate_per_kg: product.rate_per_kg,
+                unit: product.unit || 'Kg',
+                amount: amount,
+                cashback: cashback,
+                gst: gst,
+                total: amount + gst,
+                discountPercent: product.cashback_percent || 0,
+                originalPrice: product.rate_per_kg,
+                quantity: 1
+            };
+            
+            cart.push(cartItem);
+            renderCart();
+        }
+
+        // Keyboard shortcuts for weight capture
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && document.getElementById('weightCaptureModal').style.display === 'flex') {
+                e.preventDefault();
+                confirmWeight();
+            }
+            if (e.key === 'Escape' && document.getElementById('weightCaptureModal').style.display === 'flex') {
+                cancelWeight();
+            }
+        });
 
         // =============================================
         // CART FUNCTIONS - WITH WEIGHT SUPPORT
@@ -1385,18 +1518,16 @@
             let total = 0, cbTotal = 0; 
             tbody.innerHTML = ''; 
             cart.forEach((item, idx) => { 
-                let itemTotal, itemCB, displayName, displayDetails;
+                let itemTotal, itemCB, displayName;
                 
                 if (item.type === 'weight') {
                     itemTotal = item.amount + (item.gst || 0);
                     itemCB = item.cashback || 0;
                     displayName = `${item.name} (${item.weight.toFixed(3)} ${item.unit})`;
-                    displayDetails = `@ ₹${item.rate_per_kg}/Kg`;
                 } else {
                     itemTotal = item.originalPrice * item.quantity; 
                     itemCB = item.cashback * item.quantity; 
                     displayName = item.name;
-                    displayDetails = `₹${item.originalPrice} x ${item.quantity}`;
                 }
                 
                 total += itemTotal; 
@@ -1421,7 +1552,7 @@
         }
 
         // =============================================
-        // GENERATE BILL PREVIEW (NO UPDATE)
+        // GENERATE BILL PREVIEW
         // =============================================
         function generateBillPreview() { 
             if(cart.length === 0) { showAlert('Cart empty','error'); return; } 
@@ -1430,13 +1561,15 @@
             const custName = customers.find(c => c.id == cust)?.name || 'Customer'; 
             let total = 0, cbTotal = 0, itemsHtml = ''; 
             cart.forEach(i => { 
-                let t, cb;
+                let t, cb, qtyDisplay;
                 if (i.type === 'weight') {
                     t = i.amount + (i.gst || 0);
                     cb = i.cashback || 0;
+                    qtyDisplay = i.weight.toFixed(2) + ' Kg';
                 } else {
                     t = i.originalPrice * i.quantity; 
                     cb = i.cashback * i.quantity;
+                    qtyDisplay = i.quantity;
                 }
                 total += t; 
                 cbTotal += cb; 
@@ -1444,7 +1577,7 @@
                 const discText = i.discountPercent > 0 ? i.discountPercent + '%' : '-';
                 itemsHtml += `<tr>
                     <td style="font-size:6px;padding:1px 0;text-align:left;">${shortName}</td>
-                    <td style="font-size:6px;text-align:center;padding:1px 0;">${i.type === 'weight' ? i.weight.toFixed(2) : i.quantity}</td>
+                    <td style="font-size:6px;text-align:center;padding:1px 0;">${qtyDisplay}</td>
                     <td style="font-size:6px;text-align:right;padding:1px 0;">₹${i.originalPrice}</td>
                     <td style="font-size:6px;text-align:center;padding:1px 0;">${discText}</td>
                     <td style="font-size:6px;text-align:right;padding:1px 0;">₹${t.toFixed(0)}</td>
@@ -1479,14 +1612,33 @@
             const custName = customers.find(c => c.id == cust)?.name || 'Customer'; 
             let total = 0, cbTotal = 0, itemsHtml = ''; 
             
+            const billItems = cart.map(i => {
+                if (i.type === 'weight') {
+                    return {
+                        product_id: i.product_id,
+                        quantity: 1,
+                        weight: i.weight,
+                        type: 'weight'
+                    };
+                } else {
+                    return {
+                        product_id: i.product_id,
+                        quantity: i.quantity,
+                        type: 'piece'
+                    };
+                }
+            });
+            
             cart.forEach(i => { 
-                let t, cb;
+                let t, cb, qtyDisplay;
                 if (i.type === 'weight') {
                     t = i.amount + (i.gst || 0);
                     cb = i.cashback || 0;
+                    qtyDisplay = i.weight.toFixed(2) + ' Kg';
                 } else {
                     t = i.originalPrice * i.quantity; 
                     cb = i.cashback * i.quantity;
+                    qtyDisplay = i.quantity;
                 }
                 total += t; 
                 cbTotal += cb; 
@@ -1494,7 +1646,7 @@
                 const discText = i.discountPercent > 0 ? i.discountPercent + '%' : '-';
                 itemsHtml += `<tr>
                     <td style="font-size:6px;padding:1px 0;text-align:left;">${shortName}</td>
-                    <td style="font-size:6px;text-align:center;padding:1px 0;">${i.type === 'weight' ? i.weight.toFixed(2) : i.quantity}</td>
+                    <td style="font-size:6px;text-align:center;padding:1px 0;">${qtyDisplay}</td>
                     <td style="font-size:6px;text-align:right;padding:1px 0;">₹${i.originalPrice}</td>
                     <td style="font-size:6px;text-align:center;padding:1px 0;">${discText}</td>
                     <td style="font-size:6px;text-align:right;padding:1px 0;">₹${t.toFixed(0)}</td>
@@ -1516,11 +1668,11 @@
                 table { width: 100%; border-collapse: collapse; font-size: 5.5px; }
                 th { text-align: left; border-bottom: 1px dotted #000; padding: 1.5px 1px; font-size: 5px; }
                 td { padding: 1px 1px; font-size: 5.5px; }
-                .th-item { text-align: left; width: 30%; }
-                .th-qty { text-align: center; width: 10%; }
-                .th-price { text-align: right; width: 20%; }
-                .th-disc { text-align: center; width: 15%; }
-                .th-total { text-align: right; width: 25%; }
+                .th-item { text-align: left; width: 28%; }
+                .th-qty { text-align: center; width: 15%; }
+                .th-price { text-align: right; width: 18%; }
+                .th-disc { text-align: center; width: 12%; }
+                .th-total { text-align: right; width: 27%; }
                 .totals { border-top: 1px dashed #000; padding-top: 2px; margin-top: 2px; text-align: right; }
                 .totals .total-amount { font-size: 9px; font-weight: bold; }
                 .totals .cashback-amount { font-size: 7px; color: #27ae60; font-weight: bold; }
@@ -1565,26 +1717,9 @@
             win.document.close();
 
             try {
-                const items = cart.map(i => {
-                    if (i.type === 'weight') {
-                        return {
-                            product_id: i.product_id,
-                            quantity: 1,
-                            weight: i.weight,
-                            rate_per_kg: i.rate_per_kg,
-                            type: 'weight'
-                        };
-                    } else {
-                        return {
-                            product_id: i.product_id,
-                            quantity: i.quantity,
-                            type: 'piece'
-                        };
-                    }
-                });
                 const res = await apiCall('POST', '/bills', {
                     customer_id: parseInt(cust),
-                    items: items,
+                    items: billItems,
                     payment_method: 'cash'
                 });
                 
@@ -1603,7 +1738,7 @@
         }
 
         // =============================================
-        // WEIGHT PRODUCTS FUNCTIONS
+        // WEIGHT PRODUCTS CRUD
         // =============================================
         function showWeightProductModal(productId = null) {
             const modal = document.getElementById('weightProductModal');
@@ -1685,6 +1820,7 @@
                 }
                 closeWeightProductModal();
                 await loadWeightProducts();
+                await loadAdminData(); // Refresh all data
             } catch(e) {
                 showAlert('Error: ' + e.message, 'error');
             }
@@ -1730,7 +1866,7 @@
                         <td><strong>${p.name}</strong></td>
                         <td>${p.product_code || '-'}</td>
                         <td>${p.category || '-'}</td>
-                        <td>₹${p.rate_per_kg}/Kg</td>
+                        <td>₹${p.rate_per_kg}</td>
                         <td>${p.weight_stock || 0} ${p.unit || 'Kg'}</td>
                         <td>${p.cashback_percent || 0}%</td>
                         <td><span style="background:${p.status === 'active' ? '#27ae60' : '#e74c3c'}; color:white; padding:4px 12px; border-radius:20px; font-size:12px;">${p.status}</span></td>
@@ -1761,6 +1897,7 @@
                 await apiCall('DELETE', `/weight-products/${id}`);
                 showAlert('Product deleted!', 'success');
                 await loadWeightProducts();
+                await loadAdminData();
             } catch(e) {
                 showAlert('Error: ' + e.message, 'error');
             }
@@ -1773,130 +1910,11 @@
                 await apiCall('PATCH', `/weight-products/${id}/status`, { status: newStatus });
                 showAlert(`Product ${newStatus}!`, 'success');
                 await loadWeightProducts();
+                await loadAdminData();
             } catch(e) {
                 showAlert('Error: ' + e.message, 'error');
             }
         }
-
-        // =============================================
-        // WEIGHT CAPTURE - BILLING FLOW
-        // =============================================
-        function startWeightCapture(product) {
-            currentWeightProduct = product;
-            weightStable = false;
-            
-            document.getElementById('wcProductName').textContent = product.name;
-            document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
-            document.getElementById('wcRate').textContent = `Rate: ₹${product.rate_per_kg}/Kg`;
-            document.getElementById('wcGst').textContent = `GST: ${product.gst_percent || 0}%`;
-            document.getElementById('wcCashback').textContent = `Cashback: ${product.cashback_percent || 0}%`;
-            document.getElementById('wcWeightDisplay').textContent = '0.000';
-            document.getElementById('wcWeightDisplay').className = 'weight-display';
-            document.getElementById('wcStatus').textContent = '⏳ Waiting for stable weight...';
-            document.getElementById('wcStatus').className = 'weight-status';
-            document.getElementById('wcAmount').textContent = '₹0.00';
-            
-            document.getElementById('weightCaptureModal').style.display = 'flex';
-            
-            // Simulate weight reading
-            simulateWeightReading();
-        }
-
-        function simulateWeightReading() {
-            let weight = 0;
-            let stable = false;
-            
-            if (weightTimer) clearInterval(weightTimer);
-            
-            weightTimer = setInterval(() => {
-                const delta = (Math.random() - 0.5) * 0.2;
-                weight = Math.max(0, weight + delta);
-                
-                if (weight > 0.5 && Math.abs(delta) < 0.02) {
-                    stable = true;
-                } else {
-                    stable = false;
-                }
-                
-                document.getElementById('wcWeightDisplay').textContent = weight.toFixed(3);
-                
-                const amount = weight * (currentWeightProduct?.rate_per_kg || 0);
-                document.getElementById('wcAmount').textContent = `₹${amount.toFixed(2)}`;
-                
-                if (stable && weight > 0.1) {
-                    document.getElementById('wcStatus').textContent = '✅ Stable weight detected! Press ENTER to confirm';
-                    document.getElementById('wcStatus').className = 'weight-status stable';
-                    document.getElementById('wcWeightDisplay').className = 'weight-display stable';
-                    weightStable = true;
-                } else {
-                    document.getElementById('wcStatus').textContent = '⏳ Waiting for stable weight...';
-                    document.getElementById('wcStatus').className = 'weight-status';
-                    document.getElementById('wcWeightDisplay').className = 'weight-display';
-                    weightStable = false;
-                }
-            }, 200);
-        }
-
-        function confirmWeight() {
-            if (!weightStable) {
-                showAlert('Please wait for stable weight reading', 'error');
-                return;
-            }
-            
-            const weight = parseFloat(document.getElementById('wcWeightDisplay').textContent);
-            if (weight <= 0) {
-                showAlert('Invalid weight reading', 'error');
-                return;
-            }
-            
-            addWeightToCart(currentWeightProduct, weight);
-            document.getElementById('weightCaptureModal').style.display = 'none';
-            if (weightTimer) clearInterval(weightTimer);
-            showAlert(`✅ ${currentWeightProduct.name}: ${weight.toFixed(3)} Kg added to cart!`, 'success');
-        }
-
-        function cancelWeight() {
-            document.getElementById('weightCaptureModal').style.display = 'none';
-            if (weightTimer) clearInterval(weightTimer);
-            weightStable = false;
-        }
-
-        function addWeightToCart(product, weight) {
-            const amount = weight * product.rate_per_kg;
-            const cashback = (amount * (product.cashback_percent || 0)) / 100;
-            const gst = (amount * (product.gst_percent || 0)) / 100;
-            
-            const cartItem = {
-                product_id: product.id,
-                name: product.name,
-                barcode: product.product_code,
-                type: 'weight',
-                weight: weight,
-                rate_per_kg: product.rate_per_kg,
-                unit: product.unit || 'Kg',
-                amount: amount,
-                cashback: cashback,
-                gst: gst,
-                total: amount + gst,
-                discountPercent: product.cashback_percent || 0,
-                originalPrice: product.rate_per_kg,
-                quantity: 1
-            };
-            
-            cart.push(cartItem);
-            renderCart();
-        }
-
-        // Keyboard shortcuts for weight capture
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.getElementById('weightCaptureModal').style.display === 'flex') {
-                e.preventDefault();
-                confirmWeight();
-            }
-            if (e.key === 'Escape' && document.getElementById('weightCaptureModal').style.display === 'flex') {
-                cancelWeight();
-            }
-        });
 
         // =============================================
         // PRODUCT CRUD
