@@ -2341,9 +2341,20 @@
                 } 
             }
             
-            function editProduct(id) { 
+            async function editProduct(id) { 
                 const product = allProducts.find(p => p.id === id); 
                 if(!product) return;
+
+                // Weight product hai to uske apne (Weight Product) edit form mein
+                // le jao - piece-product form mein rate_per_kg, weight_stock,
+                // cashback_percent jaise fields hote hi nahi, isliye wahan se
+                // edit karne par asli billing fields update nahi hote.
+                if(product.product_type === 'weight') {
+                    await loadWeightProducts(); // fresh data taaki latest values dikhein
+                    showWeightProductModal(id);
+                    return;
+                }
+
                 editingId = id; 
                 document.getElementById('productCode').value = product.product_code; 
                 document.getElementById('productName').value = product.name; 
