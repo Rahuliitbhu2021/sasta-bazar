@@ -381,8 +381,8 @@ app.post('/api/weight-products', authenticateToken, async (req, res) => {
         rate_per_kg, rate_per_gram, min_weight, max_weight,
         cashback_percent, gst_percent, description,
         status, weight_stock, reorder_level, image_url,
-        product_type, selling_price, purchase_price
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING *`,
+        product_type, selling_price, purchase_price, discount_percent
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING *`,
       [
         product_code, name, category || 'General', brand || '',
         unit || 'Kg', rate_per_kg, rate_per_gram,
@@ -390,7 +390,8 @@ app.post('/api/weight-products', authenticateToken, async (req, res) => {
         cashback_percent || 0, gst_percent || 0,
         description || '', status || 'active',
         weight_stock || 0, reorder_level || 5,
-        image_url || '', 'weight', rate_per_kg, rate_per_kg * 0.7
+        image_url || '', 'weight', rate_per_kg, rate_per_kg * 0.7,
+        cashback_percent || 0
       ]
     );
     
@@ -415,6 +416,7 @@ app.put('/api/weight-products/:id', authenticateToken, async (req, res) => {
   } = req.body;
   
   try {
+    const rate_per_gram = rate_per_kg / 1000;
     const result = await query(
       `UPDATE products SET
         product_code = $1, name = $2, category = $3, brand = $4,
@@ -423,8 +425,8 @@ app.put('/api/weight-products/:id', authenticateToken, async (req, res) => {
         cashback_percent = $10, gst_percent = $11,
         description = $12, status = $13,
         weight_stock = $14, reorder_level = $15,
-        image_url = $16, selling_price = $17
-       WHERE id = $18 RETURNING *`,
+        image_url = $16, selling_price = $17, discount_percent = $18
+       WHERE id = $19 RETURNING *`,
       [
         product_code, name, category, brand,
         unit, rate_per_kg, rate_per_gram,
@@ -432,7 +434,7 @@ app.put('/api/weight-products/:id', authenticateToken, async (req, res) => {
         cashback_percent, gst_percent,
         description, status,
         weight_stock, reorder_level,
-        image_url, rate_per_kg, id
+        image_url, rate_per_kg, cashback_percent || 0, id
       ]
     );
     
