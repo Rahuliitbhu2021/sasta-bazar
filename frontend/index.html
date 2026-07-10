@@ -543,7 +543,7 @@
                                 <th>Category</th>
                                 <th>Rate/Kg</th>
                                 <th>Stock (Kg)</th>
-                                <th>Cashback</th>
+                                <th>Discount</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -584,7 +584,7 @@
                         <input type="number" id="wpRatePerKg" placeholder="Rate Per Kg *" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpMinWeight" placeholder="Min Weight (Kg)" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpMaxWeight" placeholder="Max Weight (Kg)" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
-                        <input type="number" id="wpCashback" placeholder="Cashback %" value="0" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
+                        <input type="number" id="wpCashback" placeholder="Discount %" value="0" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpGst" placeholder="GST %" value="0" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpStock" placeholder="Stock (Kg)" value="0" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpReorder" placeholder="Reorder Level" value="5" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
@@ -812,7 +812,10 @@
                     const products = await apiCall('GET','/products'); 
                     renderProductsByCategory(products, 'landingCategoryTabs', 'landingProductsList', (p) => {
                         const imgUrl = productImages[p.id] || ''; 
-                        return `<div class="product-card" onclick="showProductDetail(${p.id})"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF</div></div>`;
+                        const isWeight = p.product_type === 'weight';
+                        const priceHtml = isWeight ? `₹${p.rate_per_kg}/${p.unit || 'Kg'}` : `₹${p.selling_price}`;
+                        const offerHtml = isWeight ? `${p.cashback_percent||0}% OFF` : `${p.discount_percent||0}% OFF`;
+                        return `<div class="product-card" onclick="showProductDetail(${p.id})"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">${priceHtml}</div><div class="product-discount">${offerHtml}</div></div>`;
                     }, 'landing');
                 } catch(e) { console.log('Error loading products:', e); } 
             }
@@ -851,7 +854,11 @@
             function showProductDetail(id) { 
                 const product = allProducts.find(p => p.id === id); 
                 if(product) { 
-                    alert(`🛍️ ${product.name}\n💰 Price: ₹${product.selling_price}\n🎁 Discount: ${product.discount_percent||0}%\n💵 Cashback: ₹${((product.selling_price*(product.discount_percent||0))/100).toFixed(0)}`); 
+                    if(product.product_type === 'weight') {
+                        alert(`🛍️ ${product.name}\n⚖️ Rate: ₹${product.rate_per_kg}/${product.unit || 'Kg'}\n🎁 Discount: ${product.cashback_percent||0}%\n💵 Cashback: as per weight purchased`);
+                    } else {
+                        alert(`🛍️ ${product.name}\n💰 Price: ₹${product.selling_price}\n🎁 Discount: ${product.discount_percent||0}%\n💵 Cashback: ₹${((product.selling_price*(product.discount_percent||0))/100).toFixed(0)}`); 
+                    }
                 } 
             }
 
@@ -880,9 +887,13 @@
                 try { 
                     const products = await apiCall('GET','/products'); 
                     renderProductsByCategory(products, 'customerCategoryTabs', 'customerAllProducts', (p) => {
-                        const cb = (p.selling_price * (p.discount_percent||0))/100; 
+                        const isWeight = p.product_type === 'weight';
+                        const discountPct = isWeight ? (p.cashback_percent||0) : (p.discount_percent||0);
+                        const priceHtml = isWeight ? `₹${p.rate_per_kg}/${p.unit || 'Kg'}` : `₹${p.selling_price}`;
+                        const cb = isWeight ? 0 : (p.selling_price * discountPct)/100; 
                         const imgUrl = productImages[p.id] || ''; 
-                        return `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">₹${p.selling_price}</div><div class="product-discount">${p.discount_percent||0}% OFF | +₹${cb.toFixed(0)} cashback</div><div class="discount-circle">${p.discount_percent||0}%</div></div>`;
+                        const cashbackNote = isWeight ? '' : ` | +₹${cb.toFixed(0)} cashback`;
+                        return `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">${priceHtml}</div><div class="product-discount">${discountPct}% OFF${cashbackNote}</div><div class="discount-circle">${discountPct}%</div></div>`;
                     }, 'customer');
                 } catch(e) { showAlert('Error loading products','error'); } 
             }
@@ -1540,7 +1551,7 @@
                 document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
                 document.getElementById('wcRate').textContent = `Rate: ₹${product.rate_per_kg}/Kg`;
                 document.getElementById('wcGst').textContent = `GST: ${product.gst_percent || 0}%`;
-                document.getElementById('wcCashback').textContent = `Cashback: ${product.cashback_percent || 0}%`;
+                document.getElementById('wcCashback').textContent = `Discount: ${product.cashback_percent || 0}%`;
                 document.getElementById('wcWeightDisplay').textContent = '0.000';
                 document.getElementById('wcWeightDisplay').className = 'weight-display';
                 document.getElementById('wcStatus').textContent = '⏳ Connecting to scale...';
