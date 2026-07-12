@@ -1,3 +1,5 @@
+
+
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -170,7 +172,7 @@ app.delete('/api/products/:id', authenticateToken, async (req, res) => {
 // ============ CUSTOMER ROUTES ============
 app.get('/api/customers', authenticateToken, async (req, res) => {
   try {
-    const result = await query('SELECT id, customer_id, name, mobile, referral_code, wallet_balance, total_purchases FROM customers ORDER BY id DESC');
+    const result = await query('SELECT id, customer_id, name, mobile, referral_code, referred_by, wallet_balance, total_purchases FROM customers ORDER BY id DESC');
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
