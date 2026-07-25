@@ -811,7 +811,7 @@
                 try { 
                     const products = await apiCall('GET','/products'); 
                     renderProductsByCategory(products, 'landingCategoryTabs', 'landingProductsList', (p) => {
-                        const imgUrl = productImages[p.id] || ''; 
+                        const imgUrl = p.image_url || ''; 
                         const isWeight = p.product_type === 'weight';
                         const priceHtml = isWeight ? `₹${p.rate_per_kg}/${p.unit || 'Kg'}` : `₹${p.selling_price}`;
                         const offerHtml = isWeight ? `${p.cashback_percent||0}% OFF` : `${p.discount_percent||0}% OFF`;
@@ -891,7 +891,7 @@
                         const discountPct = isWeight ? (p.cashback_percent||0) : (p.discount_percent||0);
                         const priceHtml = isWeight ? `₹${p.rate_per_kg}/${p.unit || 'Kg'}` : `₹${p.selling_price}`;
                         const cb = isWeight ? 0 : (p.selling_price * discountPct)/100; 
-                        const imgUrl = productImages[p.id] || ''; 
+                        const imgUrl = p.image_url || ''; 
                         const cashbackNote = isWeight ? '' : ` | +₹${cb.toFixed(2)} cashback`;
                         return `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">${priceHtml}</div><div class="product-discount">${discountPct}% OFF${cashbackNote}</div><div class="discount-circle">${discountPct}%</div></div>`;
                     }, 'customer');
@@ -1323,7 +1323,7 @@
                 const tbody = document.getElementById('adminProductsList'); 
                 tbody.innerHTML = ''; 
                 pageData.forEach(p => { 
-                    const imgUrl = productImages[p.id] || ''; 
+                    const imgUrl = p.image_url || ''; 
                     const isSuper = superDiscountProducts.includes(p.id);
                     let stockDisplay = p.current_stock || 0;
                     let stockUnit = '';
@@ -2012,28 +2012,28 @@
                 const win = window.open('', '_blank'); 
                 win.document.write(`<html><head><title>Bill - SASTA BAZAR</title>
                 <style>
-                    @page { size: 45mm auto; margin: 1.5mm 1mm 1.5mm 1mm; }
-                    body { font-family: 'Courier New', monospace; font-size: 6.5px; width: 45mm; max-width: 45mm; margin: 0 auto; padding: 0; line-height: 1.1; background: white; }
-                    .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 3px; margin-bottom: 3px; }
-                    .header h2 { font-size: 10px; margin: 0; font-weight: bold; letter-spacing: 0.5px; }
-                    .header .sub { font-size: 5.5px; margin: 1px 0; line-height: 1.1; }
-                    .header .bill-info { font-size: 5.5px; margin: 1px 0; line-height: 1.1; }
-                    .header .customer { font-size: 6.5px; font-weight: bold; margin: 1px 0; }
-                    table { width: 100%; border-collapse: collapse; font-size: 5.5px; }
-                    th { text-align: left; border-bottom: 1px dotted #000; padding: 1.5px 1px; font-size: 5px; }
-                    td { padding: 1px 1px; font-size: 5.5px; }
+                    @page { size: 50mm auto; margin: 1.5mm 1mm 1.5mm 1mm; }
+                    body { font-family: 'Courier New', monospace; font-size: 11px; width: 48mm; max-width: 48mm; margin: 0 auto; padding: 0; line-height: 1.25; background: white; }
+                    .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 4px; margin-bottom: 4px; }
+                    .header h2 { font-size: 15px; margin: 0; font-weight: bold; letter-spacing: 0.5px; }
+                    .header .sub { font-size: 9px; margin: 1px 0; line-height: 1.2; }
+                    .header .bill-info { font-size: 9px; margin: 1px 0; line-height: 1.2; }
+                    .header .customer { font-size: 10px; font-weight: bold; margin: 1px 0; }
+                    table { width: 100%; border-collapse: collapse; font-size: 9px; }
+                    th { text-align: left; border-bottom: 1px dotted #000; padding: 2px 1px; font-size: 9px; }
+                    td { padding: 2px 1px; font-size: 9px; }
                     .th-item { text-align: left; width: 28%; }
                     .th-qty { text-align: center; width: 15%; }
                     .th-price { text-align: right; width: 18%; }
                     .th-disc { text-align: center; width: 12%; }
                     .th-total { text-align: right; width: 27%; }
-                    .totals { border-top: 1px dashed #000; padding-top: 2px; margin-top: 2px; text-align: right; }
-                    .totals .total-amount { font-size: 9px; font-weight: bold; }
-                    .totals .cashback-amount { font-size: 7px; color: #1E8A6E; font-weight: bold; }
-                    .footer { text-align: center; border-top: 1px dashed #000; padding-top: 3px; margin-top: 3px; }
-                    .footer .thankyou { font-size: 7px; font-weight: bold; margin: 1px 0; }
-                    .footer .visit { font-size: 5px; margin: 1px 0; }
-                    .footer .gst { font-size: 4.5px; color: #8A776A; margin: 1px 0; }
+                    .totals { border-top: 1px dashed #000; padding-top: 3px; margin-top: 3px; text-align: right; }
+                    .totals .total-amount { font-size: 14px; font-weight: bold; }
+                    .totals .cashback-amount { font-size: 11px; color: #1E8A6E; font-weight: bold; }
+                    .footer { text-align: center; border-top: 1px dashed #000; padding-top: 4px; margin-top: 4px; }
+                    .footer .thankyou { font-size: 11px; font-weight: bold; margin: 1px 0; }
+                    .footer .visit { font-size: 8px; margin: 1px 0; }
+                    .footer .gst { font-size: 7px; color: #8A776A; margin: 1px 0; }
                     .dotted { border-top: 1px dotted #000; margin: 2px 0; }
                 </style>
                 </head>
@@ -2302,9 +2302,10 @@
                             category,
                             purchase_price: price * 0.7, 
                             selling_price: price, 
-                            discount_percent: discount
+                            discount_percent: discount,
+                            current_stock: stock,
+                            image_url: imageUrl
                         }); 
-                        if(imageUrl) productImages[editingId] = imageUrl; 
                         if(isSuper && !superDiscountProducts.includes(editingId)) superDiscountProducts.push(editingId); 
                         else if(!isSuper) superDiscountProducts = superDiscountProducts.filter(pid => pid !== editingId); 
                     } else { 
@@ -2315,10 +2316,10 @@
                             purchase_price: price * 0.7, 
                             selling_price: price, 
                             current_stock: stock, 
-                            discount_percent: discount
+                            discount_percent: discount,
+                            image_url: imageUrl
                         }); 
                         const newId = res.id; 
-                        if(imageUrl) productImages[newId] = imageUrl; 
                         if(isSuper) superDiscountProducts.push(newId); 
                     } 
                     showAlert('Product saved successfully!','success'); 
@@ -2362,10 +2363,10 @@
                 document.getElementById('productPrice').value = product.selling_price; 
                 document.getElementById('productDiscount').value = product.discount_percent || 0; 
                 document.getElementById('productStock').value = product.current_stock || 0; 
-                document.getElementById('productImage').value = productImages[id] || ''; 
+                document.getElementById('productImage').value = product.image_url || ''; 
                 document.getElementById('productSuperDiscount').checked = superDiscountProducts.includes(id); 
-                document.getElementById('previewImg').src = productImages[id] || ''; 
-                document.getElementById('previewImg').style.display = productImages[id] ? 'block' : 'none'; 
+                document.getElementById('previewImg').src = product.image_url || ''; 
+                document.getElementById('previewImg').style.display = product.image_url ? 'block' : 'none'; 
                 showModal('productModal'); 
             }
 
