@@ -711,6 +711,36 @@ async function initTables() {
     await query(`ALTER TABLE bills ADD COLUMN IF NOT EXISTS total_discount DECIMAL DEFAULT 0`);
     await query(`ALTER TABLE bill_items ADD COLUMN IF NOT EXISTS discount_amount DECIMAL(10,2) DEFAULT 0`);
     await query(`ALTER TABLE weight_transactions ADD COLUMN IF NOT EXISTS discount_amount DECIMAL(10,2) DEFAULT 0`);
+
+    // ✅ ONE-TIME MIGRATION: product discount ab % ki jagah seedha ₹ (rupee)
+    // me store hota hai. Pehle se add hue "piece" products me discount_percent
+    // column % value rakhta tha (e.g. 10 = 10%), ab wahi column seedha ₹
+    // amount maana jayega. Isliye ek hi baar, purane % value ko current
+    // selling_price ke hisaab se equivalent ₹ amount me convert kar dete hain.
+    // "discount_migrated" flag isse dobara (server restart par) convert
+    // hone se rokta hai. Weight products ka cashback_percent pehle se hi
+    // seedha ₹/Kg jaise use ho raha tha (backend billing me kabhi /100 nahi
+    // hua), isliye unki value nahi badalte - sirf flag set kar dete hain.
+    await query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_migrated BOOLEAN DEFAULT FALSE`);
+    const toMigrate = await query(
+      `SELECT id, selling_price, discount_percent, product_type FROM products WHERE discount_migrated = FALSE OR discount_migrated IS NULL`
+    );
+    for (const p of toMigrate.rows) {
+      if (p.product_type === 'weight') {
+        await query(`UPDATE products SET discount_migrated = TRUE WHERE id = $1`, [p.id]);
+      } else {
+        const oldPercent = parseFloat(p.discount_percent) || 0;
+        const price = parseFloat(p.selling_price) || 0;
+        const rupeeDiscount = Math.round(((price * oldPercent) / 100) * 100) / 100;
+        await query(
+          `UPDATE products SET discount_percent = $1, discount_migrated = TRUE WHERE id = $2`,
+          [rupeeDiscount, p.id]
+        );
+      }
+    }
+    if (toMigrate.rows.length > 0) {
+      console.log(`✅ Migrated ${toMigrate.rows.length} product(s) discount from % to ₹ (one-time)`);
+    }
     
     await query(`
       CREATE TABLE IF NOT EXISTS wallet_transactions (

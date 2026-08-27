@@ -545,7 +545,7 @@
                         <option value="50">50</option>
                     </select>
                 </div>
-                <div class="table-responsive"><table style="width:100%;"><thead><tr><th>Image</th><th>Code</th><th>Name</th><th>Price</th><th>Discount</th><th>Stock</th><th>Super</th><th>Actions</th></tr></thead><tbody id="adminProductsList"></tbody></table></div>
+                <div class="table-responsive"><table style="width:100%;"><thead><tr><th>Image</th><th>Code</th><th>Name</th><th>Price</th><th>Discount ₹</th><th>Stock</th><th>Super</th><th>Actions</th></tr></thead><tbody id="adminProductsList"></tbody></table></div>
                 <div class="pagination" id="productPagination"></div>
             </div>
 
@@ -591,7 +591,7 @@
                                 <th>Category</th>
                                 <th>Rate/Kg</th>
                                 <th>Stock (Kg)</th>
-                                <th>Discount</th>
+                                <th>Discount ₹/Kg</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -632,7 +632,7 @@
                         <input type="number" id="wpRatePerKg" placeholder="Rate Per Kg *" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpMinWeight" placeholder="Min Weight (Kg)" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpMaxWeight" placeholder="Max Weight (Kg)" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
-                        <input type="number" id="wpCashback" placeholder="Discount %" value="0" step="0.01" min="0" max="100" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
+                        <input type="number" id="wpCashback" placeholder="💰 Discount ₹ per Kg" value="0" step="0.01" min="0" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpGst" placeholder="GST %" value="0" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpStock" placeholder="Stock (Kg)" value="0" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
                         <input type="number" id="wpReorder" placeholder="Reorder Level" value="5" style="padding:12px; border-radius:28px; border:1px solid #E8DCC8;">
@@ -703,7 +703,7 @@
         </div>
 
         <!-- MODALS -->
-        <div id="productModal" class="modal"><div class="modal-content"><h2>Add Product</h2><input type="text" id="productCode" placeholder="Product Code" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productName" placeholder="Product Name" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productCategory" list="productCategoryOptions" placeholder="Category (e.g. Grocery, Cosmetics)" style="width:100%; margin:8px 0; padding:12px;"><datalist id="productCategoryOptions"><option value="Grocery"><option value="Dairy & Bakery"><option value="Cosmetics & Personal Care"><option value="Beverages"><option value="Snacks & Namkeen"><option value="Household & Cleaning"><option value="Stationery"><option value="Baby Care"><option value="Health & Wellness"><option value="Electronics"></datalist><input type="number" id="productPrice" placeholder="Price" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productDiscount" placeholder="Discount %" value="0" step="0.01" min="0" max="100" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productStock" placeholder="Stock" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productImage" placeholder="Image URL" style="width:100%; margin:8px 0; padding:12px;"><img id="previewImg" src="" style="width:60px; display:none;"><label><input type="checkbox" id="productSuperDiscount"> 🔥 Super Discount</label><button onclick="saveProduct()" style="background:#1E8A6E; color:white; border:none; padding:12px; border-radius:40px; margin-top:15px; width:100%;">Save</button><button onclick="closeModal('productModal')" style="margin-top:10px; width:100%; padding:10px; background:#F3EAD9; border:none; border-radius:40px;">Cancel</button></div></div>
+        <div id="productModal" class="modal"><div class="modal-content"><h2>Add Product</h2><input type="text" id="productCode" placeholder="Product Code" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productName" placeholder="Product Name" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productCategory" list="productCategoryOptions" placeholder="Category (e.g. Grocery, Cosmetics)" style="width:100%; margin:8px 0; padding:12px;"><datalist id="productCategoryOptions"><option value="Grocery"><option value="Dairy & Bakery"><option value="Cosmetics & Personal Care"><option value="Beverages"><option value="Snacks & Namkeen"><option value="Household & Cleaning"><option value="Stationery"><option value="Baby Care"><option value="Health & Wellness"><option value="Electronics"></datalist><input type="number" id="productPrice" placeholder="Price" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productDiscount" placeholder="💰 Discount ₹ (flat amount off price)" value="0" step="0.01" min="0" style="width:100%; margin:8px 0; padding:12px;"><input type="number" id="productStock" placeholder="Stock" style="width:100%; margin:8px 0; padding:12px;"><input type="text" id="productImage" placeholder="Image URL" style="width:100%; margin:8px 0; padding:12px;"><img id="previewImg" src="" style="width:60px; display:none;"><label><input type="checkbox" id="productSuperDiscount"> 🔥 Super Discount</label><button onclick="saveProduct()" style="background:#1E8A6E; color:white; border:none; padding:12px; border-radius:40px; margin-top:15px; width:100%;">Save</button><button onclick="closeModal('productModal')" style="margin-top:10px; width:100%; padding:10px; background:#F3EAD9; border:none; border-radius:40px;">Cancel</button></div></div>
         <div id="customerModal" class="modal"><div class="modal-content"><h2>Add Customer</h2><input type="text" id="newCustName" placeholder="Name" style="width:100%;margin:8px 0;padding:12px;"><input type="tel" id="newCustMobile" placeholder="Mobile" style="width:100%;margin:8px 0;padding:12px;"><input type="password" id="newCustPassword" placeholder="Password" style="width:100%;margin:8px 0;padding:12px;"><input type="text" id="newCustRef" placeholder="Referral Code" style="width:100%;margin:8px 0;padding:12px;"><button onclick="saveCustomer()" style="background:#1E8A6E; color:white; border:none; padding:12px; border-radius:40px; width:100%;">Save</button><button onclick="closeModal('customerModal')" style="margin-top:10px; width:100%; padding:10px; background:#F3EAD9; border:none; border-radius:40px;">Cancel</button></div></div>
         <div id="walletControlModal" class="modal"><div class="modal-content"><h2>Wallet Control</h2><select id="walletCustomerSelect"><option>Select Customer</option></select><div id="currentBalance" style="padding:10px; background:#F6EFE1; border-radius:20px; margin:10px 0;">₹0</div><input type="number" id="walletAmount" placeholder="Amount"><input type="text" id="walletReason" placeholder="Reason"><div style="display:flex; gap:10px;"><button onclick="adminAddMoney()" style="background:#1E8A6E; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Add</button><button onclick="adminDeductMoney()" style="background:#C1443C; color:white; border:none; padding:10px; border-radius:40px; flex:1;">Deduct</button></div><button onclick="closeModal('walletControlModal')" style="margin-top:15px; width:100%; padding:10px; background:#F3EAD9; border:none; border-radius:40px;">Close</button></div></div>
 
@@ -884,7 +884,7 @@
                         const imgUrl = p.image_url || ''; 
                         const isWeight = p.product_type === 'weight';
                         const priceHtml = isWeight ? `₹${p.rate_per_kg}/${p.unit || 'Kg'}` : `₹${p.selling_price}`;
-                        const offerHtml = isWeight ? `${p.cashback_percent||0}% OFF` : `${p.discount_percent||0}% OFF`;
+                        const offerHtml = isWeight ? `₹${p.cashback_percent||0} OFF/Kg` : `₹${p.discount_percent||0} OFF`;
                         return `<div class="product-card" onclick="showProductDetail(${p.id})"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">${priceHtml}</div><div class="product-discount">${offerHtml}</div></div>`;
                     }, 'landing');
                 } catch(e) { console.log('Error loading products:', e); } 
@@ -914,9 +914,9 @@
                     const superProds = allProducts.filter(p => superDiscountProducts.includes(p.id)); 
                     container.innerHTML = ''; 
                     superProds.forEach(p => { 
-                        const cb = (p.selling_price * (p.discount_percent||0))/100; 
+                        const cb = p.discount_percent || 0; 
                         const finalPrice = p.selling_price - cb; 
-                        container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: ₹${cb.toFixed(2)}</div></div>`; 
+                        container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ₹${cb} OFF</div><div>Cashback: ₹${cb.toFixed(2)}</div></div>`; 
                     }); 
                 } 
             }
@@ -925,9 +925,9 @@
                 const product = allProducts.find(p => p.id === id); 
                 if(product) { 
                     if(product.product_type === 'weight') {
-                        alert(`🛍️ ${product.name}\n⚖️ Rate: ₹${product.rate_per_kg}/${product.unit || 'Kg'}\n🎁 Discount: ${product.cashback_percent||0}%\n💵 Cashback: as per weight purchased`);
+                        alert(`🛍️ ${product.name}\n⚖️ Rate: ₹${product.rate_per_kg}/${product.unit || 'Kg'}\n🎁 Discount: ₹${product.cashback_percent||0}/Kg\n💵 Cashback: as per weight purchased`);
                     } else {
-                        alert(`🛍️ ${product.name}\n💰 Price: ₹${product.selling_price}\n🎁 Discount: ${product.discount_percent||0}%\n💵 Cashback: ₹${((product.selling_price*(product.discount_percent||0))/100).toFixed(2)}`); 
+                        alert(`🛍️ ${product.name}\n💰 Price: ₹${product.selling_price}\n🎁 Discount: ₹${product.discount_percent||0}\n💵 Cashback: ₹${(product.discount_percent||0).toFixed(2)}`); 
                     }
                 } 
             }
@@ -958,12 +958,13 @@
                     const products = await apiCall('GET','/products'); 
                     renderProductsByCategory(products, 'customerCategoryTabs', 'customerAllProducts', (p) => {
                         const isWeight = p.product_type === 'weight';
-                        const discountPct = isWeight ? (p.cashback_percent||0) : (p.discount_percent||0);
+                        const discountAmt = isWeight ? (p.cashback_percent||0) : (p.discount_percent||0);
                         const priceHtml = isWeight ? `₹${p.rate_per_kg}/${p.unit || 'Kg'}` : `₹${p.selling_price}`;
-                        const cb = isWeight ? 0 : (p.selling_price * discountPct)/100; 
+                        const cb = isWeight ? 0 : discountAmt; 
                         const imgUrl = p.image_url || ''; 
                         const cashbackNote = isWeight ? '' : ` | +₹${cb.toFixed(2)} cashback`;
-                        return `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">${priceHtml}</div><div class="product-discount">${discountPct}% OFF${cashbackNote}</div><div class="discount-circle">${discountPct}%</div></div>`;
+                        const discountLabel = isWeight ? `₹${discountAmt}/Kg OFF` : `₹${discountAmt} OFF`;
+                        return `<div class="product-card"><div class="product-img"><img src="${imgUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-mobile-alt\\'></i>'"></div><h4>${p.name}</h4><div class="product-price">${priceHtml}</div><div class="product-discount">${discountLabel}${cashbackNote}</div><div class="discount-circle">₹${discountAmt}</div></div>`;
                     }, 'customer');
                 } catch(e) { showAlert('Error loading products','error'); } 
             }
@@ -975,9 +976,9 @@
                     container.innerHTML = ''; 
                     const superProds = products.filter(p => superDiscountProducts.includes(p.id)); 
                     superProds.forEach(p => { 
-                        const cb = (p.selling_price * (p.discount_percent||0))/100; 
+                        const cb = p.discount_percent || 0; 
                         const finalPrice = p.selling_price - cb; 
-                        container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ${Math.round(((p.discount_percent||0) + (cb/p.selling_price*100)))}% OFF</div><div>Cashback: +₹${cb.toFixed(2)}</div></div>`; 
+                        container.innerHTML += `<div class="super-card"><i class="fas fa-fire" style="font-size:36px;" class="float"></i><h3 class="bounce">${p.name}</h3><div><span class="old-price">₹${p.selling_price}</span> <span class="price">₹${Math.round(finalPrice)}</span></div><div class="offer-badge">🔥 ₹${cb} OFF</div><div>Cashback: +₹${cb.toFixed(2)}</div></div>`; 
                     }); 
                 } catch(e) { showAlert('Error','error'); } 
             }
@@ -1291,7 +1292,7 @@
                 prodList.innerHTML = '<div class="item" data-value="" onclick="selectProduct(\'\')">Select Product</div>';
                 if(allProducts && allProducts.length > 0) {
                     allProducts.forEach(p => {
-                        const cb = (p.selling_price*(p.discount_percent||0))/100;
+                        const cb = p.discount_percent || 0;
                         prodList.innerHTML += `<div class="item" data-value="${p.id}" data-price="${p.selling_price}" data-discount="${p.discount_percent||0}" data-cashback="${cb}" data-stock="${p.current_stock}" onclick="selectProduct('${p.id}')">${p.name} - ₹${p.selling_price}</div>`;
                     });
                 }
@@ -1406,12 +1407,13 @@
                     // (discount_percent column stays at DB default 0 for them),
                     // so pick the correct field based on product type.
                     const discountShown = p.product_type === 'weight' ? (p.cashback_percent||0) : (p.discount_percent||0);
+                    const discountShownLabel = p.product_type === 'weight' ? `₹${discountShown}/Kg` : `₹${discountShown}`;
                     tbody.innerHTML += `<tr>
                         <td><img src="${imgUrl}" style="width:40px;height:40px; border-radius:8px;" onerror="this.style.display='none'"></td>
                         <td>${p.product_code}</td>
                         <td>${p.name} ${p.product_type === 'weight' ? '⚖️' : ''}</td>
                         <td>₹${p.selling_price}</td>
-                        <td>${discountShown}%</td>
+                        <td>${discountShownLabel}</td>
                         <td>${stockDisplay}${stockUnit}</td>
                         <td>${isSuper ? '🔥' : '-'}</td>
                         <td>
@@ -1587,7 +1589,7 @@
                         showAlert('Out of stock','error'); 
                         return; 
                     } 
-                    const cashback = (p.selling_price * (p.discount_percent||0)) / 100; 
+                    const cashback = p.discount_percent || 0; 
                     const ex = cart.find(i => i.product_id === p.id && i.type !== 'weight'); 
                     if(ex) { 
                         ex.quantity++; 
@@ -1626,7 +1628,7 @@
                 document.getElementById('wcProductCode').textContent = `Barcode: ${product.product_code || 'N/A'}`;
                 document.getElementById('wcRate').textContent = `Rate: ₹${product.rate_per_kg}/Kg`;
                 document.getElementById('wcGst').textContent = `GST: ${product.gst_percent || 0}%`;
-                document.getElementById('wcCashback').textContent = `Discount: ${product.cashback_percent || 0}%`;
+                document.getElementById('wcCashback').textContent = `Discount: ₹${product.cashback_percent || 0}/Kg`;
                 document.getElementById('wcWeightDisplay').textContent = '0.000';
                 document.getElementById('wcWeightDisplay').className = 'weight-display';
                 document.getElementById('wcStatus').textContent = '⏳ Connecting to scale...';
@@ -1933,7 +1935,7 @@
                 // ✅ Direct ₹ discount (not %) entered by the cashier for this line, clamped so it never goes below ₹0
                 const manualDiscount = Math.min(Math.max(parseFloat(discountAmount) || 0, 0), grossAmount);
                 const amount = grossAmount - manualDiscount;
-                const cashback = (grossAmount * (product.cashback_percent || 0)) / 100; // wallet cashback unchanged, still based on gross weight value
+                const cashback = weight * (product.cashback_percent || 0); // ✅ direct ₹ per Kg discount (no percentage math), matches backend calculation
                 const gst = (amount * (product.gst_percent || 0)) / 100;
                 
                 if (product.weight_stock > 0 && weight > product.weight_stock) {
@@ -2382,6 +2384,10 @@
                     showAlert('Please fill Name and Rate Per Kg', 'error');
                     return;
                 }
+                if (data.cashback_percent > data.rate_per_kg) {
+                    showAlert('Discount ₹/Kg, Rate Per Kg se zyada nahi ho sakta', 'error');
+                    return;
+                }
                 
                 try {
                     const editId = this.dataset.editId;
@@ -2441,7 +2447,7 @@
                             <td>${p.category || '-'}</td>
                             <td>₹${p.rate_per_kg}</td>
                             <td>${p.weight_stock || 0} ${p.unit || 'Kg'}</td>
-                            <td>${p.cashback_percent || 0}%</td>
+                            <td>₹${p.cashback_percent || 0}/Kg</td>
                             <td><span style="background:${p.status === 'active' ? '#1E8A6E' : '#C1443C'}; color:white; padding:4px 12px; border-radius:20px; font-size:12px;">${p.status}</span></td>
                             <td>
                                 <button onclick="showWeightProductModal(${p.id})" style="background:#1D6F8C; color:white; border:none; padding:5px 10px; border-radius:20px;">Edit</button>
@@ -2515,6 +2521,7 @@
                 const isSuper = document.getElementById('productSuperDiscount').checked; 
                 
                 if(!code || !name || !price) { showAlert('Fill all required fields','error'); return; } 
+                if(discount > price) { showAlert('Discount ₹ price se zyada nahi ho sakta','error'); return; } 
                 
                 try { 
                     if(editingId) { 
