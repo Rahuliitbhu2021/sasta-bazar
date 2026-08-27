@@ -215,6 +215,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
   try {
     let totalAmount = 0;
     let totalCashback = 0;
+    let totalDiscount = 0; // ₹ manual discount applied by cashier at billing time
     
     for (const item of items) {
       const product = await query('SELECT * FROM products WHERE id = $1', [item.product_id]);
@@ -236,12 +237,18 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
           });
         }
         
+        // ₹ discount entered manually by cashier for this weight line (flat rupee amount)
+        let lineDiscount = parseFloat(item.discount_amount) || 0;
+        const grossAmount = weight * p.rate_per_kg;
+        if (lineDiscount > grossAmount) lineDiscount = grossAmount; // never go below ₹0
+        const amount = grossAmount - lineDiscount;
+        
         const cashbackAmount = weight * (p.cashback_percent || 0);
-        const amount = weight * p.rate_per_kg;
         const gstAmount = (amount * (p.gst_percent || 0)) / 100;
         
         totalAmount += amount + gstAmount;
         totalCashback += cashbackAmount;
+        totalDiscount += lineDiscount;
         
         if (p.weight_stock > 0) {
           const newStock = parseFloat(p.weight_stock) - parseFloat(weight);
@@ -252,9 +259,14 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
           return res.status(400).json({ error: `Insufficient stock for ${p.name}` });
         }
         
+        // ₹ discount entered manually by cashier, per unit
+        let perUnitDiscount = parseFloat(item.discount_amount) || 0;
+        if (perUnitDiscount > p.selling_price) perUnitDiscount = p.selling_price; // never go below ₹0
+        
         const cashbackAmount = p.discount_percent || 0;
-        totalAmount += p.selling_price * item.quantity;
+        totalAmount += (p.selling_price - perUnitDiscount) * item.quantity;
         totalCashback += cashbackAmount * item.quantity;
+        totalDiscount += perUnitDiscount * item.quantity;
         
         await query('UPDATE products SET current_stock = current_stock - $1 WHERE id = $2', [item.quantity, p.id]);
       }
@@ -263,9 +275,9 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
     const billNumber = `INV${Date.now()}`;
     
     const billResult = await query(
-      `INSERT INTO bills (bill_number, customer_id, subtotal, total_amount, cashback, payment_method)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [billNumber, customer_id, totalAmount, totalAmount, totalCashback, payment_method || 'cash']
+      `INSERT INTO bills (bill_number, customer_id, subtotal, total_amount, cashback, total_discount, payment_method)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [billNumber, customer_id, totalAmount, totalAmount, totalCashback, totalDiscount, payment_method || 'cash']
     );
     
     console.log('✅ Bill created:', billResult.rows[0].id);
@@ -275,20 +287,27 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       const p = product.rows[0];
       
       if (p.product_type === 'weight' && item.weight) {
+        let lineDiscount = parseFloat(item.discount_amount) || 0;
+        const grossAmount = item.weight * p.rate_per_kg;
+        if (lineDiscount > grossAmount) lineDiscount = grossAmount;
+        const amount = grossAmount - lineDiscount;
         const cashbackAmount = item.weight * (p.cashback_percent || 0);
-        const amount = item.weight * p.rate_per_kg;
         const gstAmount = (amount * (p.gst_percent || 0)) / 100;
         
         await query(
-          `INSERT INTO weight_transactions (bill_id, product_id, weight, rate_per_kg, amount, gst_amount, cashback_amount)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [billResult.rows[0].id, item.product_id, item.weight, p.rate_per_kg, amount, gstAmount, cashbackAmount]
+          `INSERT INTO weight_transactions (bill_id, product_id, weight, rate_per_kg, amount, gst_amount, cashback_amount, discount_amount)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [billResult.rows[0].id, item.product_id, item.weight, p.rate_per_kg, amount, gstAmount, cashbackAmount, lineDiscount]
         );
       } else {
+        let perUnitDiscount = parseFloat(item.discount_amount) || 0;
+        if (perUnitDiscount > p.selling_price) perUnitDiscount = p.selling_price;
+        const finalUnitPrice = p.selling_price - perUnitDiscount;
+        
         await query(
-          `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, total_price)
-           VALUES ($1, $2, $3, $4, $5)`,
-          [billResult.rows[0].id, item.product_id, item.quantity, p.selling_price, p.selling_price * item.quantity]
+          `INSERT INTO bill_items (bill_id, product_id, quantity, unit_price, total_price, discount_amount)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [billResult.rows[0].id, item.product_id, item.quantity, p.selling_price, finalUnitPrice * item.quantity, perUnitDiscount * item.quantity]
         );
       }
     }
@@ -325,7 +344,8 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       success: true, 
       bill: billResult.rows[0], 
       cashback: totalCashback,
-      total: totalAmount
+      total: totalAmount,
+      discount: totalDiscount
     });
     
   } catch (error) {
@@ -683,6 +703,14 @@ async function initTables() {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
+
+    // ✅ NEW: ₹ (rupee) manual-discount support added at billing time.
+    // Existing columns/behaviour untouched — these are additive, safe
+    // ALTER statements so older rows/deployments keep working exactly
+    // as before, they just default to 0 discount.
+    await query(`ALTER TABLE bills ADD COLUMN IF NOT EXISTS total_discount DECIMAL DEFAULT 0`);
+    await query(`ALTER TABLE bill_items ADD COLUMN IF NOT EXISTS discount_amount DECIMAL(10,2) DEFAULT 0`);
+    await query(`ALTER TABLE weight_transactions ADD COLUMN IF NOT EXISTS discount_amount DECIMAL(10,2) DEFAULT 0`);
     
     await query(`
       CREATE TABLE IF NOT EXISTS wallet_transactions (
