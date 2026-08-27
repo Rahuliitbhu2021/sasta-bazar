@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -238,7 +236,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
           });
         }
         
-        const cashbackAmount = (weight * p.rate_per_kg * (p.cashback_percent || 0)) / 100;
+        const cashbackAmount = weight * (p.cashback_percent || 0);
         const amount = weight * p.rate_per_kg;
         const gstAmount = (amount * (p.gst_percent || 0)) / 100;
         
@@ -254,7 +252,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
           return res.status(400).json({ error: `Insufficient stock for ${p.name}` });
         }
         
-        const cashbackAmount = (p.selling_price * (p.discount_percent || 0)) / 100;
+        const cashbackAmount = p.discount_percent || 0;
         totalAmount += p.selling_price * item.quantity;
         totalCashback += cashbackAmount * item.quantity;
         
@@ -277,7 +275,7 @@ app.post('/api/bills', authenticateToken, async (req, res) => {
       const p = product.rows[0];
       
       if (p.product_type === 'weight' && item.weight) {
-        const cashbackAmount = (item.weight * p.rate_per_kg * (p.cashback_percent || 0)) / 100;
+        const cashbackAmount = item.weight * (p.cashback_percent || 0);
         const amount = item.weight * p.rate_per_kg;
         const gstAmount = (amount * (p.gst_percent || 0)) / 100;
         
@@ -748,11 +746,11 @@ async function initTables() {
     await query(`
       INSERT INTO hardware_settings (setting_key, setting_value) 
       VALUES 
-        ('weighing_machine_type', 'serial'),
-        ('weighing_machine_port', 'COM14'),
+        ('weighing_machine_type', 'manual'),
+        ('weighing_machine_port', 'N/A'),
         ('weighing_machine_baudrate', '9600'),
         ('scale_stable_timeout', '2'),
-        ('manual_weight_fallback', 'false')
+        ('manual_weight_fallback', 'true')
       ON CONFLICT (setting_key) DO NOTHING
     `);
     
@@ -764,65 +762,6 @@ async function initTables() {
   }
 }
 
-// =============================================
-// SCALE BRIDGE API - Receive weight from any laptop
-// =============================================
-
-// Store latest weight from bridge
-let bridgeWeight = 0;
-let bridgeConnected = false;
-let bridgeLastUpdate = null;
-let bridgeStableCount = 0;
-const BRIDGE_STABLE_THRESHOLD = 3;
-
-// Receive weight from bridge service
-app.post('/api/scale/bridge', authenticateToken, async (req, res) => {
-    const { weight, connected } = req.body;
-    
-    bridgeWeight = weight || 0;
-    bridgeConnected = connected || false;
-    bridgeLastUpdate = new Date();
-    
-    if (bridgeConnected && bridgeWeight > 0) {
-        bridgeStableCount++;
-        if (bridgeStableCount > BRIDGE_STABLE_THRESHOLD) {
-            bridgeStableCount = BRIDGE_STABLE_THRESHOLD;
-        }
-    } else {
-        bridgeStableCount = 0;
-    }
-    
-    console.log(`⚖️ Bridge Weight: ${bridgeWeight} Kg | Connected: ${bridgeConnected} | Stable: ${bridgeStableCount >= BRIDGE_STABLE_THRESHOLD}`);
-    res.json({ success: true });
-});
-
-// Get weight from bridge
-app.get('/api/scale/weight', authenticateToken, async (req, res) => {
-    const isRecent = bridgeLastUpdate && (new Date() - bridgeLastUpdate) < 5000;
-    const isConnected = bridgeConnected && isRecent;
-    const isStable = isConnected && bridgeStableCount >= BRIDGE_STABLE_THRESHOLD;
-    
-    res.json({ 
-        weight: isConnected ? bridgeWeight : 0,
-        connected: isConnected,
-        stable: isStable,
-        unit: 'Kg',
-        source: 'bridge'
-    });
-});
-
-// Bridge status
-app.get('/api/scale/bridge-status', authenticateToken, async (req, res) => {
-    const isRecent = bridgeLastUpdate && (new Date() - bridgeLastUpdate) < 5000;
-    res.json({
-        connected: bridgeConnected && isRecent,
-        weight: bridgeWeight,
-        lastUpdate: bridgeLastUpdate,
-        isRecent: isRecent,
-        stable: bridgeStableCount >= BRIDGE_STABLE_THRESHOLD
-    });
-});
-
 // ============ START SERVER ============
 const PORT = process.env.PORT || 5000;
 
@@ -832,6 +771,6 @@ initTables().then(() => {
     console.log(`✅ PostgreSQL Database Connected`);
     console.log(`📋 Admin: admin@shop.com / MyStrongPass@0424`);
     console.log(`📋 Customer: 9876543210 / 9876543210\n`);
-    console.log(`⚖️ Scale Bridge API ready on /api/scale/bridge`);
+    console.log(`⚖️ Manual weight entry mode active (no hardware scale required)`);
   });
 });
